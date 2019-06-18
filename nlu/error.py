@@ -458,6 +458,12 @@ class ParserNERErrors:
 
         if debug: print("overlaps: ", overlaps)
 
+        # re-sort set in overlaps (a list of set) which lost its order during set() based on token_b  # todo: modularize
+        sorted_overlaps = []
+        for overlap in overlaps:
+            sorted_overlaps.append(sorted(overlap, key=lambda t:t[1].token_b))  # set becomes a list
+        overlaps = sorted_overlaps
+
         # split to gold and predict entity mentions and create a list of EntityMentionOverlap
         em_overlaps: List[EntityMentionOverlap] = []
         id_incs = id_incrementer(), id_incrementer()
