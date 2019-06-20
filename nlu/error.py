@@ -293,7 +293,7 @@ class NERAnalyzer:
                     gts = {gem.type for gem in gems}
 
                     if not NERAnalyzer.has_same_type(pems, gems):
-                        type_error = '|'.join(pts) + '->' + '|'.join(gts)
+                        type_error = '|'.join(gts) + '->' + '|'.join(pts)
                     # input('Merge/Split: {}->{}'.format(self.predict_text, self.gold_text))
 
                 else:
