@@ -169,7 +169,6 @@ class NERError(NERComparison):
         self.false_error = self.type['false_error']
         self.span_error = self.type['span_error']
         self.type_error = self.type['type_error']
-        self.type = type
 
     # @property
     # def type(self):
