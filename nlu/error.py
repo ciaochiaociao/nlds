@@ -295,6 +295,9 @@ class NERAnalyzer:
 
     @staticmethod
     def is_mentions_correct(gems: EntityMentions, pems: EntityMentions) -> bool:
+        # Handle different number of gold mentions and predicted mentions
+        if len(pems) != len(gems):
+            return False
         for pem, gem in zip(pems, gems):
             if not NERAnalyzer.is_mention_correct(pem, gem):
                 return False
