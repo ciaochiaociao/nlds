@@ -1,4 +1,6 @@
-from typing import Tuple
+from typing import Tuple, Callable
+
+from ansi.color import fg
 
 from nlu.data import *
 from nlu.parser import ConllParser
@@ -114,6 +116,8 @@ class NERComparison(MD_IDs):
 
     def __init__(self, em_ol: EntityMentionOverlap, ids):
 
+        self.overlap = em_ol
+        self.sentence = self.overlap.sentence
         self.gems = em_ol.gems
         self.pems = em_ol.pems
         self.gems_total = len(self.gems)
@@ -122,8 +126,26 @@ class NERComparison(MD_IDs):
         MD_IDs.__init__(self, ids)
 
     def __str__(self):
-        return '\n[predict] ' + str(self.pems) + '\n[gold] ' + str(self.gems) + '\n[type]' + str(self.type)
+
+        return '\n[predict] {} ({})'.format(str(self.pems), str(self.pems.type)) + \
+               '\n[gold] {} ({})'.format(str(self.gems), str(self.gems.type)) + \
+               '\n[type] {}'.format(str(self.type)) + \
+               '\n[sentence] {}'.format(colorize_tokens(
+                   self.sentence.tokens, self.overlap.token_b, self.overlap.token_e)) + \
+               '\n'
         # self.type - use type of NERError and NERCorrect
+
+
+def bracket(text):
+    return '[' + text + ']'
+
+
+def colorize_tokens(tokens: List[Token], token_b, token_e, color: Callable=fg.blue) -> str:
+    return strlist_to_str(tokens[:token_b]) + ' ' + color(strlist_to_str(tokens[token_b:token_e+1])) \
+           + ' ' + strlist_to_str(tokens[token_e+1:])
+
+def strlist_to_str(strlist, sep=' '):
+    return sep.join([str(s) for s in strlist])
 
 
 class NERCorrect(NERComparison):
@@ -133,6 +155,9 @@ class NERCorrect(NERComparison):
         ids.update({'NERCorrect': correct_id})
         super().__init__(em_ol, ids)
         self.type = type
+
+    def __str__(self):
+        return '---{}---'.format(fg.green('Correct')) + NERComparison.__str__(self)
 
 
 class NERError(NERComparison):
@@ -170,7 +195,10 @@ class NERError(NERComparison):
         self.span_error = self.type['span_error']
         self.type_error = self.type['type_error']
 
-    # @property
+    def __str__(self):
+        return '---{}---'.format(fg.red('Error')) + NERComparison.__str__(self)
+
+    # @property  # todo
     # def type(self):
     #     return self.__type
     #
