@@ -219,7 +219,10 @@ class TextList(ObjectList, MD_Text):
 
     @overrides(MD_Text)
     def __str__(self):
-        return ' '.join([str(member) for member in self.members]) if self.members else ''
+        return self.sep_str()
+
+    def sep_str(self, sep=' '):  # TODO: abstracted to a public utility function
+        return sep.join([str(member) for member in self.members]) if self.members else ''
 
     @overrides(ObjectList)
     def __add__(self, other):

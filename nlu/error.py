@@ -127,8 +127,8 @@ class NERComparison(MD_IDs):
 
     def __str__(self):
 
-        return '\n[predict] {} ({})'.format(str(self.pems), str(self.pems.type)) + \
-               '\n[gold] {} ({})'.format(str(self.gems), str(self.gems.type)) + \
+        return '\n[predict] {} ({})'.format(self.pems.sep_str(sep='|'), str(self.pems.type)) + \
+               '\n[gold] {} ({})'.format(self.gems.sep_str(sep='|'), str(self.gems.type)) + \
                '\n[type] {}'.format(str(self.type)) + \
                '\n[sentence] {}'.format(colorize_tokens(
                    self.sentence.tokens, self.overlap.token_b, self.overlap.token_e)) + \
