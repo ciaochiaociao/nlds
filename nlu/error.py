@@ -503,7 +503,7 @@ class ParserNERErrors:
                 raise ValueError('Not any mentions in the overlap!!!!')
 
             em_overlaps.append(EntityMentionOverlap(i, EntityMentions(ol_g, source_g, type_g, ids_g)
-                                                    , EntityMentions(ol_p, source_g, type_p, ids_p), id_incs))
+                                                    , EntityMentions(ol_p, source_p, type_p, ids_p), id_incs))
 
         if debug: print("---------em_overlaps: ", em_overlaps)
 
