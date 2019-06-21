@@ -3,6 +3,10 @@ from copy import copy
 from functools import reduce
 from typing import List, Dict, Union
 
+from ansi.color import fg
+
+from nlu.utils import list_to_str
+
 
 # from __future__ import annotations
 # only work for python 3.7+ but will be implemented in python 4.0. Use literal like 'Text' instead
