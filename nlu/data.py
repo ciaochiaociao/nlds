@@ -498,8 +498,10 @@ class EntityMentions(TextList):
     OrderedDict([('D', 2)])
     >>> [ str(token) for pem in pems for token in pem.tokens]  # test __iter__()
     ['TSMC', 'Foundation']
-    >>> [ str(pem) for pem in pems.all_tokens ]
-    ['TSMC', 'Foundation']
+    >>> EntityMentions.sep_str(pems, sep='|')
+    'TSMC|Foundation'
+    >>> str(pems)
+    'TSMC Foundation'
     >>> len((pems + pems)[:])  # test __add__ and __getitem__
     4
     >>> EntityMentions([], x.source, x.type, x.parent_ids) \
@@ -513,9 +515,15 @@ class EntityMentions(TextList):
         self.mentions = mentions
         self.all_tokens: List[Token] = [token for mention in mentions for token in mention.tokens]
         try:
+            ids = copy(mentions[0].parent_ids)
             self.source = mentions[0].source
             self.type = mentions[0].type  # todo: sanity check
-            ids = copy(mentions[0].parent_ids)
+            self.token_b = mentions[0].token_b
+            self.token_e = mentions[-1].token_e
+            self.token_bs = [mention.token_b for mention in mentions]
+            self.token_es = [mention.token_e for mention in mentions]
+            self.sentence = mentions[0].sentence
+            self.types: List[str] = [mention.type for mention in mentions]
         except IndexError:
             self.source = source
             self.type = type_
