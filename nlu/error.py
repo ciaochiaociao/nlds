@@ -427,7 +427,7 @@ class NERAnalyzer:
 #         pass
 
 
-class ParserNERErrors:
+class NERErrorAnnotator:
     """
     Parse NER Errors from a parser
     """
@@ -438,19 +438,19 @@ class ParserNERErrors:
         self.parser = parser
 
         if gold_src is None:
-            self.gold_src = ParserNERErrors.GOLD_SOURCE_ALIAS
+            self.gold_src = NERErrorAnnotator.GOLD_SOURCE_ALIAS
 
         if predict_src is None:
-            self.predict_src = ParserNERErrors.PREDICT_SOURCE_ALIAS
+            self.predict_src = NERErrorAnnotator.PREDICT_SOURCE_ALIAS
 
         for doc in parser.docs:
             for sentence in doc.sentences:
-                ParserNERErrors.set_errors_in_sentence(sentence, self.gold_src, self.predict_src)
+                NERErrorAnnotator.set_errors_in_sentence(sentence, self.gold_src, self.predict_src)
 
     @staticmethod
     def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
 
-        sentence.ems_pairs: Union[EntityMentionsPairs, None] = ParserNERErrors.get_pairs(sentence, gold_src, predict_src)
+        sentence.ems_pairs: Union[EntityMentionsPairs, None] = NERErrorAnnotator.get_pairs(sentence, gold_src, predict_src)
         sentence.ner_results: List[Union[NERError, NERCorrect]] = None if sentence.ems_pairs is None else \
             sentence.ems_pairs.results
 
@@ -473,7 +473,7 @@ class ParserNERErrors:
         >>> for token in [taiwan, semi, manu]: \
                 token.set_sentence(sen)
         >>> ConllParser.set_entity_mentions_for_one_sentence(sen, ['gold', 'predict'])
-        >>> pair = ParserNERErrors.get_pairs(sen, 'gold', 'predict')  # FIXME
+        >>> pair = NERErrorAnnotator.get_pairs(sen, 'gold', 'predict')  # FIXME
         >>> pair.results  #doctest: +ELLIPSIS
         [<...NERError object at ...
         >>> pair.results[0].type  # FIXME
@@ -495,7 +495,6 @@ class ParserNERErrors:
                     occupied.append([])
 
             if debug:
-                print('-------- em.token_b: %i, em.token_e: %i' % (em.token_b, em.token_e))
                 print("extended occupied: ", occupied)
 
             # occupying the vacancy with 'p'(predict) or 'g'(gold) and mention id
@@ -510,12 +509,8 @@ class ParserNERErrors:
         for pos in occupied:
             if debug: print('----- pos: ', pos)
             if pos:
-
                 in_pair_ids = []
-
                 for em in pos:
-                    if debug: print("-- em_id: ", em)
-
                     # return which ems_pair (id) the current mention is in (in_pair_ids)
                     # or return None if there is no ems_pair
                     for idx, pair in enumerate(pairs):
@@ -524,15 +519,11 @@ class ParserNERErrors:
                         else:
                             in_pair_ids.append(None)
 
-                if debug: print("in_pair_ids: ", in_pair_ids)
-
                 # return the pair_id if there is at least one not None value, else returns None
                 in_pair_id = None
                 for ioid in in_pair_ids:
                     if ioid is not None:
                         in_pair_id = ioid
-                if debug: print("in_pair_id: ", in_pair_id)
-
                 # if there is an existing ems_pair pairing with the current mention: merge
                 if in_pair_id is not None:
                     if debug: print("Before update - pairs: ", pairs)
@@ -563,19 +554,6 @@ class ParserNERErrors:
                 elif em[0] == 'g':
                     pair_g.append(em[1])
 
-            if debug and (not len(pair_p) or not len(pair_g)):
-                print('---document %s - %s' % ((list(pair)[0][1].sentence.document.fullid,
-                                                list(pair)[0][1].sentence.document)))
-                print('--sentence %s - %s' % (list(pair)[0][1].sentence.fullid, list(pair)[0][1].sentence))
-                print('-entity_mentions: ', [list(pair)[0][1].print() for pair in pairs])
-                print('-pair_p: ', [str(em) for em in pair_p])
-                print('-pair_g: ', pair_g)
-                print('-ems_pair: ', pair)
-                print('-pairs: ', pairs)
-                print('-occupied:', occupied)
-                print('-occupied text:', [(i, occ[0], str(occ[1])) for i, pos in enumerate(occupied) for occ in pos])
-                input()
-
             # Handle False Negative (FN) and False Positive (FP)
             source_p, type_p, ids_p, source_g, type_g, ids_g = (None, None, None, None, None, None)
             if not pair_p and pair_g:  # FN
@@ -587,7 +565,7 @@ class ParserNERErrors:
                 # just pass None's for they will automatically be extracted
                 pass
             else:  # empty
-                raise ValueError('Not any mentions in the pair!!!!')
+                raise ValueError('No any mentions in the pair!!!!')
 
             ems_pairs.append(EntityMentionsPair(i, EntityMentions(pair_g, source_g, type_g, ids_g)
                                                   , EntityMentions(pair_p, source_p, type_p, ids_p), id_incs))
@@ -609,4 +587,4 @@ if __name__ == '__main__':
 
     train_parser.set_entity_mentions()
 
-    ParserNERErrors(train_parser)
+    NERErrorAnnotator(train_parser)
