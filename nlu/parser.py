@@ -269,9 +269,6 @@ class ConllParser:
         return self.get_doc_from_did(did).sentences[sid]
 
 
-
-
-
 if __name__ == '__main__':
 
     import os.path

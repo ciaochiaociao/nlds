@@ -279,9 +279,6 @@ class NERAnalyzer:
     @staticmethod
     def extract(em_pair: EntityMentionsPair, id_incs: Tuple[id_incrementer, id_incrementer]) \
             -> Union[NERError, NERCorrect]:
-        false_error = None
-        type_error = None
-        span_error = None
         pems: EntityMentions = em_pair.pems
         gems: EntityMentions = em_pair.gems
         ems_total = len(gems) + len(pems)
@@ -291,48 +288,75 @@ class NERAnalyzer:
         if NERAnalyzer.is_mentions_correct(pems, gems):
             return NERCorrect(em_pair, em_pair.gems.type, correct_id)
         else:
-            if ems_total == 1:  # False Positive / False Negative
-                false_error = 'False Negative - ' + gems[0].type if len(gems) == 1 else 'False Positive - ' + pems[0].type
-
-            elif ems_total == 2:  # Span Error / Type Errors (type_errors)
-                pb, pe, gb, ge = pems[0].token_b, pems[0].token_e, gems[0].token_b, gems[0].token_e
-                pt, gt = pems[0].type, gems[0].type
-
-                if pb == gb and pe != ge:
-                    span_error = 'R Expansion' if pe > ge else 'R Diminished'
-                elif pb != gb and pe == ge:
-                    span_error = 'L Expansion' if pb < gb else 'L Diminished'
-                elif pb != gb and pe != ge:
-                    if pb < gb:
-                        span_error = 'L Crossed' if pe < ge else 'RL Expansion'
-                    elif pb > gb:
-                        span_error = 'R Crossed' if pe > ge else 'RL Diminished'
-
-                if pt != gt:  # Type Errors (type_errors)
-                    type_error = gems[0].type + ' -> ' + pems[0].type
-
-            elif ems_total >= 3:
-
-                if NERAnalyzer.is_concatenated(pems) and NERAnalyzer.is_concatenated(gems):
-
-                    if NERAnalyzer.has_same_range(pems, gems):
-                        if len(pems) == 1:
-                            span_error = 'Spans Merged - ' + str(len(gems))
-                        elif len(gems) == 1:
-                            span_error = 'Span Split - ' + str(len(pems))
-
-                    if not NERAnalyzer.has_same_type(pems, gems):
-                        type_error = '|'.join(gems.types) + ' -> ' + '|'.join(pems.types)
-                    # input('Merge/Split: {}->{}'.format(self.predict_text, self.gold_text))
-
-                else:
-                    span_error = 'Complicated - {}->{}'.format(len(gems), len(pems))
-                    print('Complicated Case:', [(pem.token_b, pem.token_e, pem.type) for pem in pems],
-                          [(gem.token_b, gem.token_e, gem.type) for gem in gems],
-                          NERAnalyzer.is_mentions_correct(gems, pems))
-
-        return NERError(em_pair, {'false_error': false_error, 'type_error': type_error,
+            false_error, span_error, type_error = NERAnalyzer.get_error(gems, pems)
+            return NERError(em_pair, {'false_error': false_error, 'type_error': type_error,
                                   'span_error': span_error}, error_id)
+
+    @staticmethod
+    def get_error(gems, pems):
+        ems_total = len(gems) + len(pems)
+        false_error, span_error, type_error = None, None, None
+
+        if ems_total == 1:  # False Positive / False Negative
+            false_error = NERAnalyzer.get_false_error_eq_one(gems, pems)
+
+        elif ems_total == 2:  # Span Error w/, w/o Type Errors
+            gt, pt, span_error = NERAnalyzer.get_span_error_from_eq_two(gems, pems)
+
+            if pt != gt:  # Type Errors
+                type_error = gems[0].type + ' -> ' + pems[0].type
+
+        elif ems_total >= 3:
+
+            if NERAnalyzer.is_concatenated(pems) and NERAnalyzer.is_concatenated(gems):
+                # Merge Or Split
+                span_error = NERAnalyzer.get_merge_or_split_from_ge_three(gems, pems)
+
+                if not NERAnalyzer.has_same_type(pems, gems):
+                    type_error = '|'.join(gems.types) + ' -> ' + '|'.join(pems.types)
+
+            else:  # Complicated Case
+                span_error = NERAnalyzer.get_span_error_from_ge_three(gems, pems)
+        return false_error, span_error, type_error
+
+    @staticmethod
+    def get_span_error_from_ge_three(gems, pems):
+        span_error = 'Complicated - {}->{}'.format(len(gems), len(pems))
+        print('Complicated Case:', [(pem.token_b, pem.token_e, pem.type) for pem in pems],
+              [(gem.token_b, gem.token_e, gem.type) for gem in gems],
+              NERAnalyzer.is_mentions_correct(gems, pems))
+        return span_error
+
+    @staticmethod
+    def get_merge_or_split_from_ge_three(gems, pems):
+        if NERAnalyzer.has_same_range(pems, gems):
+            if len(pems) == 1:
+                span_error = 'Spans Merged - ' + str(len(gems))
+            elif len(gems) == 1:
+                span_error = 'Span Split - ' + str(len(pems))
+        return span_error
+
+    @staticmethod
+    def get_span_error_from_eq_two(gems, pems):
+        pb, pe, gb, ge = pems[0].token_b, pems[0].token_e, gems[0].token_b, gems[0].token_e
+        pt, gt = pems[0].type, gems[0].type
+        if pb == gb and pe != ge:
+            span_error = 'R Expansion' if pe > ge else 'R Diminished'
+        elif pb != gb and pe == ge:
+            span_error = 'L Expansion' if pb < gb else 'L Diminished'
+        elif pb != gb and pe != ge:
+            if pb < gb:
+                span_error = 'L Crossed' if pe < ge else 'RL Expansion'
+            else:  #  pb > gb
+                span_error = 'R Crossed' if pe > ge else 'RL Diminished'
+        else:  # pb == gb and pe == ge
+            span_error = None
+        return gt, pt, span_error
+
+    @staticmethod
+    def get_false_error_eq_one(gems, pems):
+        false_error = 'False Negative - ' + gems[0].type if len(gems) == 1 else 'False Positive - ' + pems[0].type
+        return false_error
 
     @staticmethod
     def has_same_type(ems1: List[EntityMention], ems2: List[EntityMention]) -> bool:
