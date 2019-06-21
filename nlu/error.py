@@ -204,7 +204,7 @@ class NERError(NERComparison):
 
     def __init__(self, em_pair: EntityMentionsPair, type: Dict[str, Union[str, int]], error_id):
         ids = copy(em_pair.parent_ids)
-        ids.update({'NERErr': next(error_id)})  # FIXME
+        ids.update({'NERErr': next(error_id)})
         super().__init__(em_pair, ids)
         self.type = type
         self.filtered_type = NERError.filtered_to_array(type)

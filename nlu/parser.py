@@ -157,12 +157,12 @@ class ConllParser:
                                 misc.append(entity_mention)
                     except KeyError:
                         pass
-
-            print('PER: %s' % (len(per)))
-            print('LOC: %s' % (len(loc)))
-            print('ORG: %s' % (len(org)))
-            print('MISC: %s' % (len(misc)))
-            print('TOTAL: %s' % (len(per)+len(loc)+len(org)+len(misc)))
+            ent_tot = len(per)+len(loc)+len(org)+len(misc)
+            print('PER: {} ({:.0%})'.format(len(per), len(per)/ent_tot))
+            print('LOC: {} ({:.0%})'.format(len(loc), len(loc)/ent_tot))
+            print('ORG: {} ({:.0%})'.format(len(org), len(org)/ent_tot))
+            print('MISC: {} ({:.0%})'.format(len(misc), len(misc)/ent_tot))
+            print('TOTAL: {}'.format(ent_tot))
 
         if debug:
             print('Empty document number: ', len([doc for doc in self.docs if not doc]))
@@ -219,6 +219,7 @@ class ConllParser:
         print('---Overall Results---')
         print('correct_total: ', correct_total)
         print('error_total: ', error_total)
+        print('corrects ratio: {:.2%}'.format(correct_total/(correct_total+error_total)))
         print('all corrects and errors', correct_total + error_total)
         print('the number of sentences with/without entities (predict + gold): {} ({:.0%}), {} ({:.0%})'.format(
             ol_total, ol_total/sen_total, sen_total - ol_total, (sen_total - ol_total)/sen_total))
