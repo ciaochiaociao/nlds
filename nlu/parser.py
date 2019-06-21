@@ -183,6 +183,92 @@ class ConllParser:
 #             for sen in doc.sentences
 #             for token in sen.tokens])
 
+    def filter_results(self, type_):
+        arr = []
+        total = 0
+        for doc in self.docs:
+            for sentence in doc:
+                total += 1
+                if sentence.ems_pairs:
+                    for error in sentence.ems_pairs.errors:
+                        if error and error.type['false_error'] == type_:
+                            arr.append(error)
+        return arr
+
+    def add_filtered_to_dict(self, type_: str, stat: Dict) -> None:
+        stat.update({type_: self.filter_results(type_)})
+
+    def error_overall_stats(self) -> None:
+
+        # count all errors
+        correct_total = 0
+        error_total = 0
+        ol_total = 0
+        sen_total = 0
+        for doc in self.docs:
+            for sentence in doc:
+                sen_total += 1
+                if sentence.ems_pairs:
+                    ol_total += 1
+                    for corr in sentence.corrects:
+                        if corr:
+                            correct_total += 1
+                    for error in sentence.errors:
+                        if error:
+                            error_total += 1
+        print('---Overall Results---')
+        print('correct_total: ', correct_total)
+        print('error_total: ', error_total)
+        print('all corrects and errors', correct_total + error_total)
+        print('the number of sentences with/without entities (predict + gold): {} ({:.0%}), {} ({:.0%})'.format(
+            ol_total, ol_total/sen_total, sen_total - ol_total, (sen_total - ol_total)/sen_total))
+
+    def error_type_stats(self):
+
+        # stat = {}
+        # for type_ in NERError.all_span_error_types:
+        #     self.add_filtered_to_dict(type_, stat)
+        #
+        pass
+
+    def print_all_errors(self) -> None:
+        for doc in self.docs:
+            for sentence in doc:
+                if sentence.errors:
+                    for error in sentence.errors:
+                        print(str(error))
+
+    def print_corrects(self, num=10):
+        count = 0
+        for doc in self.docs:
+            for sentence in doc:
+                count += 1
+                if count % num == 0:
+                    sentence.print_corrects()
+
+    def confusion_matrix(self):
+        pass
+
+    def get_from_fullid(self, fullid):  # TODO
+        abbrs = {
+            'doc': 'D',
+            'sen': 'S',
+            'token': 'T',
+            'em': 'EM',
+            'em_ol': 'OL',
+            'ner_error': 'NERErr',
+            'ner_correct': 'NERCorr'
+        }
+
+    def get_doc_from_did(self, did) -> Document:
+        return self.docs[did]
+
+    def get_sen_from_sid(self, did, sid) -> Sentence:
+        return self.get_doc_from_did(did).sentences[sid]
+
+
+
+
 
 if __name__ == '__main__':
 
