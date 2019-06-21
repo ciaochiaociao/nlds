@@ -377,10 +377,12 @@ class Document(TextList):
 
 class EntityMention(TextList):
     """
-    >>> token = ConllToken('TSMC', ners={'predict': ConllNERTag('I-MISC')}, id_=2, sid=6, did=2)
-    >>> sentence = Sentence([token])
-    >>> token.set_sentence(sentence)
-    >>> x = EntityMention([token], id_=33, source='predict')
+    >>> token1 = ConllToken('Welcome', ners={'predict': ConllNERTag('I-MISC')}, id_=0, sid=6, did=2)
+    >>> token2 = ConllToken('TSMC', ners={'predict': ConllNERTag('I-MISC')}, id_=1, sid=6, did=2)
+    >>> token3 = ConllToken('!', ners={'predict': ConllNERTag('I-MISC')}, id_=2, sid=6, did=2)
+    >>> sentence = Sentence([token1, token2, token3])
+    >>> for token in [token1, token2, token3]: token.set_sentence(sentence)
+    >>> x = EntityMention([token2], id_=33, source='predict')
     >>> x.fullid
     'D2-S6-EM33'
     >>> isinstance(x, Hashable)  # hashable test1
@@ -390,6 +392,12 @@ class EntityMention(TextList):
     Traceback (most recent call last):
     ...
     ValueError: Not consecutive ner positions ...
+    >>> print(x.ann_str())  # blue
+    \x1b[34m[\x1b[0mTSMC\x1b[34m]\x1b[0m\x1b[34mMISC\x1b[0m
+    >>> x.source = 'gold'; print(x.ann_str())  # yellow
+    \x1b[33m[\x1b[0mTSMC\x1b[33m]\x1b[0m\x1b[33mMISC\x1b[0m
+    >>> print(x.ann_in_sentence())  # yellow
+    Welcome\x1b[33m[\x1b[0mTSMC\x1b[33m]\x1b[0m\x1b[33mMISC\x1b[0m!
     """
 
     def __init__(self, tokens, id_, source):
@@ -429,12 +437,21 @@ class EntityMention(TextList):
         else:
             print('(%s)%s - %s' % (self.source, self.type, self.text))
 
-    def pretty_print(self):
-        pass  # todo
+    def ann_in_sentence(self) -> str:
+        return list_to_str(self.sentence[:self.token_b]) + self.ann_str() + list_to_str(self.sentence[self.token_e+1:])
 
     @overrides(TextList)
     def __add__(self, other):
         return EntityMention(self.members + other.members, self.id, self.source)
+
+    def ann_str(self) -> str:
+        if self.source == 'predict':
+            color = fg.blue
+        elif self.source == 'gold':
+            color = fg.yellow
+        else:
+            raise ValueError('souce is neither "predict" nor "gold"')
+        return color('[') + str(self) + color(']') + color(self.type)
 
 
 class EntityMentions(TextList):
