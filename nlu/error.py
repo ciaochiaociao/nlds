@@ -28,12 +28,10 @@ class EntityMentionsPair(TextList):
     >>> print(pair)
     Taiwan Taiwan Semiconductor Manufacturer
     >>> print(pair.fullid)
-    D50-S3-OL0
+    D50-S3-PAIR0
     >>> pair.compare()
-    >>> print(pair.result)
-    R Diminished None ORG->LOC
     >>> print(str(pair.result.type))
-    {'false_error': None, 'type_error': 'ORG->LOC', 'span_error': 'R Diminished'}
+    {'false_error': None, 'type_error': 'ORG -> LOC', 'span_error': 'R Diminished'}
     """
     def __init__(self, id_, gems: EntityMentions, pems: EntityMentions, id_incs: Tuple[id_incrementer, id_incrementer]):
         self.gems = gems
@@ -268,12 +266,12 @@ class NERAnalyzer:
     >>> id_incs = id_incrementer(), id_incrementer()
     >>> pair = EntityMentionsPair(0, tsmcs, ts, id_incs)
     >>> NERAnalyzer.extract(pair, id_incs).type
-    {'false_error': None, 'type_error': 'ORG->LOC', 'span_error': 'R Diminished'}
+    {'false_error': None, 'type_error': 'ORG -> LOC', 'span_error': 'R Diminished'}
     >>> co_pem = EntityMention([co], source='predict', id_=3)  # test NERCorrect
     >>> co_gem = EntityMention([co], source='gold', id_=3)
     >>> pair_correct = EntityMentionsPair(1, EntityMentions([co_pem]), EntityMentions([co_gem]), id_incs)
     >>> repr(NERAnalyzer.extract(pair_correct, id_incs))  # doctest: +ELLIPSIS
-    '<error.NERCorrect object at ...
+    '<...NERCorrect object at ...
     >>> NERAnalyzer.extract(pair_correct, id_incs).type
     'ORG'
     """
@@ -450,12 +448,12 @@ class ParserNERErrors:
         >>> sen = Sentence([taiwan, semi, manu])
         >>> for token in [taiwan, semi, manu]: \
                 token.set_sentence(sen)
-        >>> ConllParser.set_entity_mentions_for_one_sentence(sen, ['predict', 'gold'])
+        >>> ConllParser.set_entity_mentions_for_one_sentence(sen, ['gold', 'predict'])
         >>> pair = ParserNERErrors.get_pairs(sen, 'gold', 'predict')  # FIXME
         >>> pair.results  #doctest: +ELLIPSIS
-        [<error.NERError object at ...
+        [<...NERError object at ...
         >>> pair.results[0].type  # FIXME
-        {'false_error': None, 'type_error': 'ORG|MISC|LOC->ORG', 'span_error': 'Span Split - 3'}
+        {'false_error': None, 'type_error': 'ORG -> LOC|MISC|ORG', 'span_error': 'Span Split - 3'}
         """
 
         if not sentence.entity_mentions_dict[gold_src] and not sentence.entity_mentions_dict[predict_src]:
@@ -578,9 +576,10 @@ class ParserNERErrors:
 if __name__ == '__main__':
     import doctest
 
-    doctest.run_docstring_examples(NERError, globs=globals())
+    doctest.testmod()
+    # doctest.run_docstring_examples(NERError, globs=globals())
 
-    train_parser = ConllParser('rcv1.train.compare2')
+    train_parser = ConllParser('../rcv1.train.compare2')
 
     train_parser.obtain_statistics(entity_stat=True, source='predict')
 

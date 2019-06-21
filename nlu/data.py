@@ -38,7 +38,7 @@ class ObjectList:
     >>> [i for i in a]  # test __iter__
     [1, 2, 3]
     >>> repr(a + a)  # doctest: +ELLIPSIS
-    '<data.ObjectList object at ...'
+    '<...ObjectList object at ...'
     >>> isinstance(a, Hashable)  # Hashable test
     True
     """
@@ -197,9 +197,9 @@ class TextList(ObjectList, MD_Text):
     >>> [ str(men) for men in t ]
     ['Semiconductor', 'Cooperation']
     >>> repr(t+t)  # doctest:+ELLIPSIS
-    '<data.TextList object at ...>'
+    '<...TextList object at ...>'
     >>> TextList(OrderedDict({'D': did, 'S': sid, 'EM': 5}), [])  # doctest:+ELLIPSIS
-    <data.TextList object at ...>
+    <...TextList object at ...>
     """
     SEPARATOR = '|'
 
@@ -325,7 +325,7 @@ class Sentence(TextList):
         >>> str(sen)  # test __str__
         'Taiwan Semiconductor Manufacturer Cooperation'
         >>> repr((sen+sen)[0])  # test __add__ and __getitem__  # doctest: +ELLIPSIS
-        '<data.ConllToken object at ...>'
+        '<...ConllToken object at ...>'
         """
         self.tokens: List[Token] = tokens
         self.entity_mentions_dict: Dict[str, List[EntityMention]] = {'predict': [], 'gold': []}  # todo: change to EntityMentions
@@ -388,9 +388,9 @@ class Document(TextList):
     >>> doc.id, doc.fullid, doc.parent_ids
     (6, 'D6', None)
     >>> repr(doc + doc)  # test __add__  # doctest: +ELLIPSIS
-    '<data.Document object at ...>'
+    '<...Document object at ...>'
     >>> (doc + doc)[0]  # test __add__ and __getitem__  # doctest: +ELLIPSIS
-    <data.Sentence object at ...
+    <...Sentence object at ...
     """
     def __init__(self, sentences: List[Sentence]):
 
@@ -506,7 +506,7 @@ class EntityMentions(TextList):
     4
     >>> EntityMentions([], x.source, x.type, x.parent_ids) \
      # None EntityMentions test (For False Negative/Positive) # doctest: +ELLIPSIS
-    <data.EntityMentions object at ...
+    <...EntityMentions object at ...
     """
 
     def __init__(self, mentions: List[EntityMention], source: str = None, type_: str = None

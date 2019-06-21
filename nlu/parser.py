@@ -20,10 +20,11 @@ class ConllParser:
         Document number:  946
         Sentence number:  14041
         Token number:  203621
-        ... PER: 6600
-        ... LOC: 7140
-        ... ORG: 6321
-        ... MISC: 3438
+        PER: 6599 (28%)
+        LOC: 7134 (30%)
+        ORG: 6324 (27%)
+        MISC: 3435 (15%)
+        TOTAL: 23492
         >>> train_parser.set_entity_mentions()
         """
         # attributes
@@ -274,7 +275,9 @@ class ConllParser:
 if __name__ == '__main__':
 
     import os.path
+    import doctest
 
+    doctest.testmod()
     path = os.path.dirname(__file__) + '/../rcv1.train.compare2'
     print(path)
     train_parser = ConllParser(path)
