@@ -131,7 +131,7 @@ class ConllParser:
                 sentence.entity_mentions_dict[source] = entity_mentions
 
     def obtain_statistics(self, entity_stat=False, source=None, debug=False):
-        print(f'---{self.filepath}---')
+        print(f'---{self.filepath} ({source})---')
         print('Document number: ', len([doc for doc in self.docs]))
         print('Sentence number: ', len([sen for doc in self.docs for sen in doc.sentences]))
         print('Token number: ', len([token for doc in self.docs for sen in doc.sentences for token in sen.tokens]))
@@ -158,10 +158,11 @@ class ConllParser:
                     except KeyError:
                         pass
 
-            print('%s - PER: %s' % (self.filepath, len(per)))
-            print('%s - LOC: %s' % (self.filepath, len(loc)))
-            print('%s - ORG: %s' % (self.filepath, len(org)))
-            print('%s - MISC: %s' % (self.filepath, len(misc)))
+            print('PER: %s' % (len(per)))
+            print('LOC: %s' % (len(loc)))
+            print('ORG: %s' % (len(org)))
+            print('MISC: %s' % (len(misc)))
+            print('TOTAL: %s' % (len(per)+len(loc)+len(org)+len(misc)))
 
         if debug:
             print('Empty document number: ', len([doc for doc in self.docs if not doc]))
