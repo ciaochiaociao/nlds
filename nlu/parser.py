@@ -131,6 +131,27 @@ class ConllParser:
             if entity_mentions:
                 sentence.entity_mentions_dict[source] = entity_mentions
 
+    @staticmethod
+    def set_errors(parser, gold_src, predict_src):
+        for doc in parser.docs:
+            ConllParser.set_errors_in_document(doc, gold_src, predict_src)
+
+    @staticmethod
+    def set_errors_in_document(doc, gold_src, predict_src):
+        for sentence in doc.sentences:
+            ConllParser.set_errors_in_sentence(sentence, gold_src, predict_src)
+
+    @staticmethod
+    def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
+
+        sentence.ems_pairs: Union[EntityMentionsPairs, None] = ConllParser.get_pairs(sentence, gold_src, predict_src)
+        sentence.ner_results: List[Union[NERError, NERCorrect]] = None if sentence.ems_pairs is None else \
+            sentence.ems_pairs.results
+
+        sentence.set_corrects_from_pairs(sentence.ems_pairs)
+        sentence.set_errors_from_pairs(sentence.ems_pairs)
+        # TODO: unify the setter or property usage
+
     def obtain_statistics(self, entity_stat=False, source=None, debug=False):
         print(f'---{self.filepath} ({source})---')
         print('Document number: ', len([doc for doc in self.docs]))
@@ -211,10 +232,10 @@ class ConllParser:
                 sen_total += 1
                 if sentence.ems_pairs:
                     ol_total += 1
-                    for corr in sentence.corrects:
+                    for corr in sentence.ner_corrects:
                         if corr:
                             correct_total += 1
-                    for error in sentence.errors:
+                    for error in sentence.ner_errors:
                         if error:
                             error_total += 1
         print('---Overall Results---')
@@ -236,8 +257,8 @@ class ConllParser:
     def print_all_errors(self) -> None:
         for doc in self.docs:
             for sentence in doc:
-                if sentence.errors:
-                    for error in sentence.errors:
+                if sentence.ner_errors:
+                    for error in sentence.ner_errors:
                         print(str(error))
 
     def print_corrects(self, num=10):

@@ -1,7 +1,7 @@
 from collections import OrderedDict, Hashable
 from copy import copy
 from functools import reduce
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from ansi.color import fg
 
@@ -318,35 +318,36 @@ class Sentence(TextList):
         self.id: int = tokens[0].sid
         self.did: int = tokens[0].did
         self.document = None
+        self.ems_pairs: Optional['EntityMentionsPairs'] = None
+        self.ner_results: Optional[List['NERComparison']] = None
+        self.ner_corrects: Optional[List['NERCorrect']] = None
+        self.ner_errors: Optional[List['NERError']] = None
         ids = self.tokens[0].parent_ids
         TextList.__init__(self, ids, tokens)
 
     def set_document(self, document: 'Document') -> None:
         self.document = document
 
-    def set_errors_from_pairs(self, pairs) -> None:
+    def set_errors_from_pairs(self, pairs) -> None:  # change to property
         if pairs is None:
-            self.errors = None
+            self.ner_errors = None
         else:
-            self.errors = pairs.errors
+            self.ner_errors = pairs.errors
 
     def set_corrects_from_pairs(self, pairs) -> None:
         if pairs is None:
-            self.corrects = None
+            self.ner_corrects = None
         else:
-            self.corrects = pairs.corrects
-
-    def set_pairs(self, pairs: List) -> None:
-        self.pairs = pairs
+            self.ner_corrects = pairs.corrects
 
     def print_corrects(self) -> None:
-        if self.corrects:
-            for correct in self.corrects:
+        if self.ner_corrects:
+            for correct in self.ner_corrects:
                 print(str(correct))
 
-    def print_errors(self) -> None:
-        if self.errors:
-            for error in self.errors:
+    def ner_print_errors(self) -> None:
+        if self.ner_errors:
+            for error in self.ner_errors:
                 print(str(error))
 
     @overrides(TextList)

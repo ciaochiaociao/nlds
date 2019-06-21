@@ -29,7 +29,7 @@ class EntityMentionsPair(TextList):
     Taiwan Taiwan Semiconductor Manufacturer
     >>> print(pair.fullid)
     D50-S3-PAIR0
-    >>> pair.compare()
+    >>> pair.set_result()
     >>> print(str(pair.result.type))
     {'false_error': None, 'type_error': 'ORG -> LOC', 'span_error': 'R Diminished'}
     """
@@ -38,6 +38,9 @@ class EntityMentionsPair(TextList):
         self.pems = pems
         self.mentions = self.pems + self.gems
         self.id_incs = id_incs
+        self.result: NERComparison = None
+        self.correct: NERCorrect = None
+        self.error: NERError = None
 
         # ids
         try:
@@ -73,8 +76,6 @@ class EntityMentionsPair(TextList):
         self.sid = self.ids['S']
         self.did = self.ids['D']
 
-        self.compare()
-
     def pretty_print(self) -> None:
         print('--- error id %i ---' % self.fullid)
         print('< gold >')
@@ -96,14 +97,22 @@ class EntityMentionsPair(TextList):
     #
     #     return [pem for pem in self.pems]
 
-    def compare(self):
-        self.result: Union[NERError, NERCorrect] = NERAnalyzer.extract(self, self.id_incs)  # TODO: move to parser class
-        if self.iscorrect():
-            self.correct: Union[None, NERCorrect] = self.result
-            self.error: Union[None, NERError] = None
-        else:
-            self.error: Union[None, NERError] = self.result
-            self.correct: Union[None, NERCorrect] = None
+    def set_result(self, result):
+        self.result: Union[NERError, NERCorrect] = result
+        self.set_error()
+        self.set_correct()
+
+    def set_error(self):
+        try:
+            self.error: Union[None, NERError] = self.result if not self.iscorrect() else None
+        except AttributeError:
+            raise AttributeError('Use {} first to set the result of the EntityMentionsPair'.format(self.set_result.__name__))
+
+    def set_correct(self):
+        try:
+            self.correct: Union[None, NERCorrect] = self.result if self.iscorrect() else None
+        except AttributeError:
+            raise AttributeError('Use {} first to set the result of the EntityMentionsPair'.format(self.set_result.__name__))
 
     def iscorrect(self):
         if isinstance(self.result, NERCorrect):
@@ -118,9 +127,9 @@ class EntityMentionsPairs(TextList):
     """One sentence will have one EntityMentionsPairs"""
     def __init__(self, pairs: List[EntityMentionsPair]):
         self.pairs = pairs
-        self.results = [pair.result for pair in pairs]
-        self.corrects = [pair.correct for pair in pairs if pair.correct is not None]
-        self.errors = [pair.error for pair in pairs if pair.error is not None]
+        self.results: List[NERComparison] = None
+        self.corrects: List[NERCorrect] = None
+        self.errors: List[NERError] = None
 
         try:
             ids = self.pairs[0].ids
@@ -136,12 +145,12 @@ class NERComparison(MD_IDs):
 
     entity_types = ('PER', 'LOC', 'ORG', 'MISC')
 
-    def __init__(self, em_pair: EntityMentionsPair, ids):
+    def __init__(self, ems_pair: EntityMentionsPair, ids):
 
-        self.ems_pair = em_pair
+        self.ems_pair = ems_pair
         self.sentence = self.ems_pair.sentence
-        self.gems = em_pair.gems
-        self.pems = em_pair.pems
+        self.gems = ems_pair.gems
+        self.pems = ems_pair.pems
         self.gems_total = len(self.gems)
         self.pems_total = len(self.pems)
         self.gtypes = [str(gem.type) for gem in self.gems]
@@ -163,10 +172,10 @@ class NERComparison(MD_IDs):
 
 class NERCorrect(NERComparison):
 
-    def __init__(self, em_pair: EntityMentionsPair, type: str, correct_id):
-        ids = copy(em_pair.parent_ids)
+    def __init__(self, ems_pair: EntityMentionsPair, type: str, correct_id):
+        ids = copy(ems_pair.parent_ids)
         ids.update({'NERCorr': next(correct_id)})
-        super().__init__(em_pair, ids)
+        super().__init__(ems_pair, ids)
         self.type = type
         self.filtered_type = type
 
@@ -200,10 +209,10 @@ class NERError(NERComparison):
     # {'type': str, 'pems': EntityMentions, 'gems': EntityMentions, ''}
     # {'false_error': false_error, 'type_error': type_error, 'span_error': span_error}
 
-    def __init__(self, em_pair: EntityMentionsPair, type: Dict[str, Union[str, int]], error_id):
-        ids = copy(em_pair.parent_ids)
+    def __init__(self, ems_pair: EntityMentionsPair, type: Dict[str, Union[str, int]], error_id):
+        ids = copy(ems_pair.parent_ids)
         ids.update({'NERErr': next(error_id)})
-        super().__init__(em_pair, ids)
+        super().__init__(ems_pair, ids)
         self.type = type
         self.filtered_type = NERError.filtered_to_array(type)
         self.false_error = self.type['false_error']
@@ -247,7 +256,7 @@ class NERError(NERComparison):
     #         """.format(type, NERError.all_types))
 
 
-class NERAnalyzer:
+class NERErrorExtractor:
     """
     >>> sid, did = 3, 50
     >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('B-ORG'), 'predict':ConllNERTag('I-LOC')})
@@ -265,31 +274,31 @@ class NERAnalyzer:
     >>> ts = EntityMentions([t])
     >>> id_incs = id_incrementer(), id_incrementer()
     >>> pair = EntityMentionsPair(0, tsmcs, ts, id_incs)
-    >>> NERAnalyzer.extract(pair, id_incs).type
+    >>> NERErrorExtractor.extract(pair, id_incs).type
     {'false_error': None, 'type_error': 'ORG -> LOC', 'span_error': 'R Diminished'}
     >>> co_pem = EntityMention([co], source='predict', id_=3)  # test NERCorrect
     >>> co_gem = EntityMention([co], source='gold', id_=3)
     >>> pair_correct = EntityMentionsPair(1, EntityMentions([co_pem]), EntityMentions([co_gem]), id_incs)
-    >>> repr(NERAnalyzer.extract(pair_correct, id_incs))  # doctest: +ELLIPSIS
+    >>> repr(NERErrorExtractor.extract(pair_correct, id_incs))  # doctest: +ELLIPSIS
     '<...NERCorrect object at ...
-    >>> NERAnalyzer.extract(pair_correct, id_incs).type
+    >>> NERErrorExtractor.extract(pair_correct, id_incs).type
     'ORG'
     """
 
     @staticmethod
-    def extract(em_pair: EntityMentionsPair, id_incs: Tuple[id_incrementer, id_incrementer]) \
+    def extract(ems_pair: EntityMentionsPair, id_incs: Tuple[id_incrementer, id_incrementer]) \
             -> Union[NERError, NERCorrect]:
-        pems: EntityMentions = em_pair.pems
-        gems: EntityMentions = em_pair.gems
+        pems: EntityMentions = ems_pair.pems
+        gems: EntityMentions = ems_pair.gems
         ems_total = len(gems) + len(pems)
 
         error_id, correct_id = id_incs
 
-        if NERAnalyzer.is_mentions_correct(pems, gems):
-            return NERCorrect(em_pair, em_pair.gems.type, correct_id)
+        if NERErrorExtractor.is_mentions_correct(pems, gems):
+            return NERCorrect(ems_pair, ems_pair.gems.type, correct_id)
         else:
-            false_error, span_error, type_error = NERAnalyzer.get_error(gems, pems)
-            return NERError(em_pair, {'false_error': false_error, 'type_error': type_error,
+            false_error, span_error, type_error = NERErrorExtractor.get_error(gems, pems)
+            return NERError(ems_pair, {'false_error': false_error, 'type_error': type_error,
                                   'span_error': span_error}, error_id)
 
     @staticmethod
@@ -298,25 +307,25 @@ class NERAnalyzer:
         false_error, span_error, type_error = None, None, None
 
         if ems_total == 1:  # False Positive / False Negative
-            false_error = NERAnalyzer.get_false_error_eq_one(gems, pems)
+            false_error = NERErrorExtractor.get_false_error_eq_one(gems, pems)
 
         elif ems_total == 2:  # Span Error w/, w/o Type Errors
-            gt, pt, span_error = NERAnalyzer.get_span_error_from_eq_two(gems, pems)
+            gt, pt, span_error = NERErrorExtractor.get_span_error_from_eq_two(gems, pems)
 
             if pt != gt:  # Type Errors
                 type_error = gems[0].type + ' -> ' + pems[0].type
 
         elif ems_total >= 3:
 
-            if NERAnalyzer.is_concatenated(pems) and NERAnalyzer.is_concatenated(gems):
+            if NERErrorExtractor.is_concatenated(pems) and NERErrorExtractor.is_concatenated(gems):
                 # Merge Or Split
-                span_error = NERAnalyzer.get_merge_or_split_from_ge_three(gems, pems)
+                span_error = NERErrorExtractor.get_merge_or_split_from_ge_three(gems, pems)
 
-                if not NERAnalyzer.has_same_type(pems, gems):
+                if not NERErrorExtractor.has_same_type(pems, gems):
                     type_error = '|'.join(gems.types) + ' -> ' + '|'.join(pems.types)
 
             else:  # Complicated Case
-                span_error = NERAnalyzer.get_span_error_from_ge_three(gems, pems)
+                span_error = NERErrorExtractor.get_span_error_from_ge_three(gems, pems)
         return false_error, span_error, type_error
 
     @staticmethod
@@ -324,12 +333,12 @@ class NERAnalyzer:
         span_error = 'Complicated - {}->{}'.format(len(gems), len(pems))
         print('Complicated Case:', [(pem.token_b, pem.token_e, pem.type) for pem in pems],
               [(gem.token_b, gem.token_e, gem.type) for gem in gems],
-              NERAnalyzer.is_mentions_correct(gems, pems))
+              NERErrorExtractor.is_mentions_correct(gems, pems))
         return span_error
 
     @staticmethod
     def get_merge_or_split_from_ge_three(gems, pems):
-        if NERAnalyzer.has_same_range(pems, gems):
+        if NERErrorExtractor.has_same_range(pems, gems):
             if len(pems) == 1:
                 span_error = 'Spans Merged - ' + str(len(gems))
             elif len(gems) == 1:
@@ -379,7 +388,7 @@ class NERAnalyzer:
         if len(pems) != len(gems):
             return False
         for pem, gem in zip(pems, gems):
-            if not NERAnalyzer.is_mention_correct(pem, gem):
+            if not NERErrorExtractor.is_mention_correct(pem, gem):
                 return False
         return True
 
@@ -397,88 +406,30 @@ class NERAnalyzer:
             last_em = em
         return True
 
-#     @property
-#     def type_error(self):
-#         return self.__type_error
 
-#     @type_error.setter
-#     def type_error(self, error):
-#         if error in self.type_errors + [None]:
-#             self.__type_error = error
-#         else:
-#             raise ValueError("Error type assigned '%s' is not one of these: %s" % (error, ', '.join(self.type_errors)))
-
-#     @property
-#     def span_error(self):
-#         return self.__span_error
-
-#     @span_error.setter
-#     def span_error(self, error):
-#         if error in self.all_span_errors + [None]:
-#             self.__span_error = error
-#         else:
-#             raise ValueError("Error type assigned '%s' is not one of these: %s" % (error, ', '.join(self.all_span_errors)))
-
-#     def dual_mention_span_relation(self) -> str:
-#         """
-#         dual_mention_span_relation(predict_mention, gold_mention)
-#         returns string (contain | inside | left_extend | right_extend | left_crossed | right_crossed)
-#         """
-#         pass
-
-
-class NERErrorAnnotator:
+class MentionsPairsExtractor:
+    """Extract EntityMentionsPairs from a Sentence object
+    >>> sid, did = 3, 50
+    >>> taiwan = ConllToken('Taiwan', 0, sid, did \
+    , ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-LOC')})
+    >>> semi = ConllToken('Semiconductor', 1, sid, did,\
+    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-MISC')})
+    >>> manu = ConllToken('Manufacturer', 2, sid, did,\
+    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
+    >>> sen = Sentence([taiwan, semi, manu])
+    >>> for token in [taiwan, semi, manu]: \
+            token.set_sentence(sen)
+    >>> ConllParser.set_entity_mentions_for_one_sentence(sen, ['gold', 'predict'])
+    >>> pairs = MentionsPairsExtractor.get_pairs(sen, 'gold', 'predict')
+    >>> pairs.results  #doctest: +ELLIPSIS
+    [<...NERError object at ...
+    >>> pairs.results[0].type
+    {'false_error': None, 'type_error': 'ORG -> LOC|MISC|ORG', 'span_error': 'Span Split - 3'}
     """
-    Parse NER Errors from a parser
-    """
-    GOLD_SOURCE_ALIAS = 'gold'
-    PREDICT_SOURCE_ALIAS = 'predict'
-
-    def __init__(self, parser: ConllParser, gold_src=None, predict_src=None):
-        self.parser = parser
-
-        if gold_src is None:
-            self.gold_src = NERErrorAnnotator.GOLD_SOURCE_ALIAS
-
-        if predict_src is None:
-            self.predict_src = NERErrorAnnotator.PREDICT_SOURCE_ALIAS
-
-        for doc in parser.docs:
-            for sentence in doc.sentences:
-                NERErrorAnnotator.set_errors_in_sentence(sentence, self.gold_src, self.predict_src)
-
-    @staticmethod
-    def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
-
-        sentence.ems_pairs: Union[EntityMentionsPairs, None] = NERErrorAnnotator.get_pairs(sentence, gold_src, predict_src)
-        sentence.ner_results: List[Union[NERError, NERCorrect]] = None if sentence.ems_pairs is None else \
-            sentence.ems_pairs.results
-
-        sentence.set_corrects_from_pairs(sentence.ems_pairs)
-        sentence.set_errors_from_pairs(sentence.ems_pairs)
-        # TODO: unify the setter or property usage
 
     @staticmethod
     def get_pairs(sentence: Sentence, gold_src: str, predict_src: str, debug=False) \
             -> Union[None, EntityMentionsPairs]:
-        """
-        >>> sid, did = 3, 50
-        >>> taiwan = ConllToken('Taiwan', 0, sid, did \
-        , ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-LOC')})
-        >>> semi = ConllToken('Semiconductor', 1, sid, did,\
-        ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-MISC')})
-        >>> manu = ConllToken('Manufacturer', 2, sid, did,\
-        ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-        >>> sen = Sentence([taiwan, semi, manu])
-        >>> for token in [taiwan, semi, manu]: \
-                token.set_sentence(sen)
-        >>> ConllParser.set_entity_mentions_for_one_sentence(sen, ['gold', 'predict'])
-        >>> pair = NERErrorAnnotator.get_pairs(sen, 'gold', 'predict')  # FIXME
-        >>> pair.results  #doctest: +ELLIPSIS
-        [<...NERError object at ...
-        >>> pair.results[0].type  # FIXME
-        {'false_error': None, 'type_error': 'ORG -> LOC|MISC|ORG', 'span_error': 'Span Split - 3'}
-        """
 
         if not sentence.entity_mentions_dict[gold_src] and not sentence.entity_mentions_dict[predict_src]:
             return None
@@ -486,66 +437,21 @@ class NERErrorAnnotator:
         gems = sentence.entity_mentions_dict[gold_src]
         pems = sentence.entity_mentions_dict[predict_src]
 
-        occupied = []  # a list of vacancy. And each vacancy is stored with a list of occupant mention id if occupied
+        occupied = MentionsPairsExtractor.to_occupied(debug, gems, pems)
 
-        for idx, em in enumerate(gems + pems):
-            # extend the vacancy to be occupied if the vacancy is not enough
-            if len(occupied) <= em.token_e:
-                for i in range(em.token_e - len(occupied) + 1):
-                    occupied.append([])
+        pairs = MentionsPairsExtractor.to_sets_of_ems(debug, occupied)
 
-            if debug:
-                print("extended occupied: ", occupied)
+        pairs = MentionsPairsExtractor.sort_sets_of_ems(pairs)
 
-            # occupying the vacancy with 'p'(predict) or 'g'(gold) and mention id
-            pre = 'g' if idx < len(gems) else 'p'
+        ems_pairs = MentionsPairsExtractor.to_ems_pairs(debug, gold_src, pairs, predict_src, sentence)
 
-            for occ in occupied[em.token_b:em.token_e + 1]:
-                occ.append((pre, em))
+        return EntityMentionsPairs(pairs=ems_pairs)
 
-        if debug: print("after occupied: ", occupied)
-
-        pairs = []  # a list of ems_pair. And every ems_pair is a list of entity mention.
-        for pos in occupied:
-            if debug: print('----- pos: ', pos)
-            if pos:
-                in_pair_ids = []
-                for em in pos:
-                    # return which ems_pair (id) the current mention is in (in_pair_ids)
-                    # or return None if there is no ems_pair
-                    for idx, pair in enumerate(pairs):
-                        if em in pair:
-                            in_pair_ids.append(idx)
-                        else:
-                            in_pair_ids.append(None)
-
-                # return the pair_id if there is at least one not None value, else returns None
-                in_pair_id = None
-                for ioid in in_pair_ids:
-                    if ioid is not None:
-                        in_pair_id = ioid
-                # if there is an existing ems_pair pairing with the current mention: merge
-                if in_pair_id is not None:
-                    if debug: print("Before update - pairs: ", pairs)
-                    pairs[in_pair_id].update(pos)
-                    if debug: print("After update - pairs: ", pairs)
-                else:  # if not, create a new one and append to pairs
-                    if debug: print("Before append - pairs: ", pairs)
-                    pairs.append(set(tuple(pos)))
-                    if debug: print("After append - pairs: ", pairs)
-
-        if debug: print("pairs: ", pairs)
-
-        # re-sort set in pairs (a list of set) which lost its order during set() based on token_b  # todo: modularize
-        sorted_pairs = []
-        for pair in pairs:
-            sorted_pairs.append(sorted(pair, key=lambda t:t[1].token_b))  # set becomes a list
-        pairs = sorted_pairs
-
+    @staticmethod
+    def to_ems_pairs(debug, gold_src, pairs, predict_src, sentence):
         # split to gold and predict entity mentions and create a list of EntityMentionsPair
         ems_pairs: List[EntityMentionsPair] = []
         id_incs = id_incrementer(), id_incrementer()
-
         for i, pair in enumerate(pairs):  # create a EntityMentionsPair
             pair_p, pair_g = [], []
             for em in pair:  # split to gold mentions and predict mentions (ems_pair is a set, the element is a tuple)
@@ -568,11 +474,142 @@ class NERErrorAnnotator:
                 raise ValueError('No any mentions in the pair!!!!')
 
             ems_pairs.append(EntityMentionsPair(i, EntityMentions(pair_g, source_g, type_g, ids_g)
-                                                  , EntityMentions(pair_p, source_p, type_p, ids_p), id_incs))
-
+                                                , EntityMentions(pair_p, source_p, type_p, ids_p), id_incs))
         if debug: print("---------ems_pairs: ", ems_pairs)
+        return ems_pairs
 
-        return EntityMentionsPairs(pairs=ems_pairs)
+    @staticmethod
+    def sort_sets_of_ems(pairs):
+        # re-sort set in pairs (a list of set) which lost its order during set() based on token_b
+        sorted_pairs = []
+        for pair in pairs:
+            sorted_pairs.append(sorted(pair, key=lambda t: t[1].token_b))  # set becomes a list
+        pairs = sorted_pairs
+        return pairs
+
+    @staticmethod
+    def to_sets_of_ems(debug, occupied):
+        pairs = []  # a list of sets, where each set stores an entity mention and its 'p' or 'g' label
+        for ems_in_slot in occupied:
+            if debug:
+                print('----- ems_in_slot: ', ems_in_slot)
+            if ems_in_slot:
+                pair_ids_with_ems = MentionsPairsExtractor.get_pair_ids_with_ems(ems_in_slot, pairs)
+
+                pair_id = MentionsPairsExtractor.filtered_id(pair_ids_with_ems)
+
+                if debug:
+                    print("After update - pairs: ", pairs)
+
+                MentionsPairsExtractor.merge_or_append_ems_to_pairs(ems_in_slot, pair_id, pairs)
+
+                if debug:
+                    print("After append - pairs: ", pairs)
+
+        if debug:
+            print("pairs: ", pairs)
+        return pairs
+
+    @staticmethod
+    def merge_or_append_ems_to_pairs(ems_in_slot, pair_id, pairs):
+        """if there is an existing ems_pair including the current mention: merge"""
+        if pair_id is not None:
+            pairs[pair_id].update(ems_in_slot)
+        else:  # if not, create a new one and append to pairs
+            pairs.append(set(tuple(ems_in_slot)))
+
+    @staticmethod
+    def filtered_id(pair_ids_with_ems):
+        """return the pair_id if there is at least one not None value, else returns None"""
+        pair_id = None
+        for id_ in pair_ids_with_ems:
+            if id_ is not None:
+                pair_id = id_
+        return pair_id
+
+    @staticmethod
+    def get_pair_ids_with_ems(ems_in_slot, pairs):
+        pair_ids_with_ems = []
+        for em in ems_in_slot:
+            # return which ems_pair (id) the current mention is in (pair_ids_with_ems)
+            # or return None if there is no ems_pair
+            for id_, pair in enumerate(pairs):
+                if em in pair:
+                    pair_ids_with_ems.append(id_)
+                else:
+                    pair_ids_with_ems.append(None)
+        return pair_ids_with_ems
+
+    @staticmethod
+    def to_occupied(debug, gems, pems):
+        occupied = []  # a list of vacancy. And each vacancy stores a list of mention occupant
+        for idx, em in enumerate(gems + pems):
+            # extend the vacancy to be occupied if the vacancy is not enough
+            if len(occupied) <= em.token_e:
+                for i in range(em.token_e - len(occupied) + 1):
+                    occupied.append([])
+            if debug:
+                print("extended occupied: ", occupied)
+
+            # occupying the vacancy with 'p'(predict) or 'g'(gold) and mention id
+            pre = 'g' if idx < len(gems) else 'p'
+
+            for occ in occupied[em.token_b:em.token_e + 1]:
+                occ.append((pre, em))
+        if debug:
+            print("after occupied: ", occupied)
+        return occupied
+
+
+class NERErrorAnnotator:
+    """
+    Annotate NER Errors from a parser
+    """
+    GOLD_SOURCE_ALIAS = 'gold'
+    PREDICT_SOURCE_ALIAS = 'predict'
+    id_incs = id_incrementer(), id_incrementer()
+
+    @staticmethod
+    def annotate(parser, gold_src: str = None, predict_src: str = None):
+        gold_src = NERErrorAnnotator.GOLD_SOURCE_ALIAS if gold_src is None else gold_src
+        predict_src = NERErrorAnnotator.PREDICT_SOURCE_ALIAS if predict_src is None else predict_src
+
+        for doc in parser.docs:
+            NERErrorAnnotator.set_results_in_document(doc, gold_src, predict_src)
+
+    @staticmethod
+    def set_results_in_document(doc, gold_src, predict_src):
+        for sentence in doc.sentences:
+            NERErrorAnnotator.set_results_in_sentence(sentence, gold_src, predict_src)
+
+    @staticmethod
+    def set_results_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
+
+        NERErrorAnnotator.set_ems_pairs_in_sentence(sentence, gold_src, predict_src)
+        if sentence.ems_pairs is None:
+            sentence.ner_results: List[Union[NERError, NERCorrect]] = None
+        else:
+            for ems_pair in sentence.ems_pairs:
+                NERErrorAnnotator.set_result_in_ems_pair(ems_pair)
+            NERErrorAnnotator.set_results_in_ems_pairs(sentence.ems_pairs)
+            sentence.ner_results = sentence.ems_pairs.results
+
+        sentence.set_corrects_from_pairs(sentence.ems_pairs)
+        sentence.set_errors_from_pairs(sentence.ems_pairs)
+
+    @staticmethod
+    def set_ems_pairs_in_sentence(sentence: Sentence, gold_src,predict_src):
+        sentence.ems_pairs: Union[EntityMentionsPairs, None] = MentionsPairsExtractor.get_pairs(sentence, gold_src,
+                                                                                                predict_src)
+    @staticmethod
+    def set_result_in_ems_pair(ems_pair: EntityMentionsPair):
+        ems_pair.set_result(NERErrorExtractor.extract(ems_pair, NERErrorAnnotator.id_incs))  #FIXME: ID
+
+    @staticmethod
+    def set_results_in_ems_pairs(ems_pairs: EntityMentionsPairs):
+        ems_pairs.results = [pair.result for pair in ems_pairs]
+        ems_pairs.corrects = [pair.correct for pair in ems_pairs if pair.correct is not None]
+        ems_pairs.errors = [pair.error for pair in ems_pairs if pair.error is not None]
 
 
 if __name__ == '__main__':
