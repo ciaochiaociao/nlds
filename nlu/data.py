@@ -5,7 +5,7 @@ from typing import List, Dict, Union
 
 from ansi.color import fg
 
-from nlu.utils import list_to_str
+from nlu.utils import list_to_str, overrides
 
 
 # from __future__ import annotations
@@ -13,20 +13,6 @@ from nlu.utils import list_to_str
 
 # todo: get_document|sentence|token_from_fullid|id()
 # todo: change all to id_incrementer if possible
-
-def id_incrementer():
-    id_ = 0
-    while True:
-        yield id_
-        id_ += 1
-
-
-def overrides(overridden):
-    def overrider(method):
-        assert (method.__name__ in dir(overridden)), f'method "{method.__name__}" did not override method in class "' \
-            f'{overridden.__name__}"'
-        return method
-    return overrider
 
 
 class ObjectList:

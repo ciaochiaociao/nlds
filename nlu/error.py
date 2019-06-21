@@ -4,7 +4,7 @@ from ansi.color import fg
 
 from nlu.data import *
 from nlu.parser import ConllParser
-from nlu.utils import *
+from nlu.utils import id_incrementer, overrides, colorize_list
 
 
 class EntityMentionsPair(TextList):
