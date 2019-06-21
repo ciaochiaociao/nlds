@@ -6,20 +6,20 @@ from nlu.parser import *
 # basic doctest
 testmod()
 
-train_parser = ConllParser('test.txt')
+cols_format = [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
+                {'type': 'gold', 'col_num': 2, 'tagger': 'ner'}]
 
-train_parser.obtain_statistics(entity_stat=True, source='predict')
+parser = ConllParser('rcv1.testb.compare2', cols_format)
 
-train_parser.obtain_statistics(entity_stat=True, source='gold')
+parser.obtain_statistics(entity_stat=True, source='predict')
 
-ParserNERErrors(train_parser)
+parser.obtain_statistics(entity_stat=True, source='gold')
 
-total = 0
-for doc in train_parser.docs:
-    for sentence in doc:
-        total += 1
-        if sentence.em_overlaps:
-            for res in sentence.em_overlaps.results:
-                print(str(res))
+ParserNERErrors(parser)
 
-print(total)
+parser.error_overall_stats()
+
+# parser.print_all_errors()
+
+parser.print_corrects()
+
