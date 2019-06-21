@@ -335,8 +335,33 @@ class Sentence(TextList):
         ids = self.tokens[0].parent_ids
         TextList.__init__(self, ids, tokens)
 
-    def set_document(self, document: 'Document'):
+    def set_document(self, document: 'Document') -> None:
         self.document = document
+
+    def set_errors_from_overlaps(self, overlaps) -> None:
+        if overlaps is None:
+            self.errors = None
+        else:
+            self.errors = overlaps.errors
+
+    def set_corrects_from_overlaps(self, overlaps) -> None:
+        if overlaps is None:
+            self.corrects = None
+        else:
+            self.corrects = overlaps.corrects
+
+    def set_overlaps(self, overlaps: List) -> None:
+        self.overlaps = overlaps
+
+    def print_corrects(self) -> None:
+        if self.corrects:
+            for correct in self.corrects:
+                print(str(correct))
+
+    def print_errors(self) -> None:
+        if self.errors:
+            for error in self.errors:
+                print(str(error))
 
     @overrides(TextList)
     def __add__(self, other):
