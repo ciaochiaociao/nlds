@@ -140,9 +140,9 @@ class MD_IDs:
         return hash(repr(self))
 
 
-class MD_Text(MD_IDs):
+class TextWithIDs(MD_IDs):
     """abstract class: directly inherited by TextList, Token
-    >>> class SomeText(MD_Text):
+    >>> class SomeText(TextWithIDs):
     ...     def __init__(self, text, ids):
     ...         self.text = text
     ...         super().__init__(ids)
@@ -167,7 +167,7 @@ class MD_Text(MD_IDs):
         raise NotImplementedError
 
 
-class TextList(ObjectList, MD_Text):
+class TextList(ObjectList, TextWithIDs):
     """Directly inherited by Sentence, Document, EntityMention, ...
     >>> sid, did = 3, 6
     >>> taiwan = ConllToken('Taiwan', 0, sid, 111, ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
@@ -214,14 +214,14 @@ class TextList(ObjectList, MD_Text):
                 .format(members[0], members[0].__class__.__name__, mem_p_ids))
 
         ObjectList.__init__(self, members)
-        # a hack: MD_Text requires its __str__ to be overridden, while the __str__ is defined in their another
+        # a hack: TextWithIDs requires its __str__ to be overridden, while the __str__ is defined in their another
         # inherited parent class ObjectList. To have the str
         # The order of the inheritance should be TextList(ObjectList, MD_IDs)
-        # and the call of their __init__ should be ObjectList.__init__() followed by MD_Text.__init__()
+        # and the call of their __init__ should be ObjectList.__init__() followed by TextWithIDs.__init__()
 
-        MD_Text.__init__(self, ids)
+        TextWithIDs.__init__(self, ids)
 
-    @overrides(MD_Text)
+    @overrides(TextWithIDs)
     def __str__(self):
         return self.sep_str()
 
@@ -268,19 +268,19 @@ class ConllPosTag(Tag):  # todo
     pass
 
 
-class Token(MD_Text):
+class Token(TextWithIDs):
     def __init__(self, text, id_, sid, did):
         self.sid = sid
         self.did = did
         self.sentence = None
         ids = OrderedDict({'D': self.did, 'S': self.sid, 'T': id_})
         self.text = text
-        MD_Text.__init__(self, ids)
+        TextWithIDs.__init__(self, ids)
 
     def set_sentence(self, sentence: 'Sentence'):
         self.sentence = sentence
 
-    @overrides(MD_Text)
+    @overrides(TextWithIDs)
     def __str__(self):
         return self.text
 
