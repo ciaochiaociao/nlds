@@ -7,8 +7,8 @@ from nlu.parser import ConllParser
 from nlu.utils import *
 
 
-class EntityMentionOverlap(TextList):
-    """An EntityMentionOverlap has a gold EntityMentions and a predicted EntityMentions
+class EntityMentionsPair(TextList):
+    """An EntityMentionsPair has a gold EntityMentions and a predicted EntityMentions
     >>> sid, did = 3, 50
     >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('B-ORG'), 'predict':ConllNERTag('I-LOC')})
     >>> semi = ConllToken('Semiconductor', 1, sid, did,\
@@ -24,15 +24,15 @@ class EntityMentionOverlap(TextList):
     >>> tsmcs = EntityMentions([tsmc])
     >>> ts = EntityMentions([t])
     >>> error_id_inc = id_incrementer(), id_incrementer()
-    >>> ol = EntityMentionOverlap(0, tsmcs, ts, error_id_inc)
-    >>> print(ol)
+    >>> pair = EntityMentionsPair(0, tsmcs, ts, error_id_inc)
+    >>> print(pair)
     Taiwan Taiwan Semiconductor Manufacturer
-    >>> print(ol.fullid)
+    >>> print(pair.fullid)
     D50-S3-OL0
-    >>> ol.compare()
-    >>> print(ol.result)
+    >>> pair.compare()
+    >>> print(pair.result)
     R Diminished None ORG->LOC
-    >>> print(str(ol.result.type))
+    >>> print(str(pair.result.type))
     {'false_error': None, 'type_error': 'ORG->LOC', 'span_error': 'R Diminished'}
     """
     def __init__(self, id_, gems: EntityMentions, pems: EntityMentions, id_incs: Tuple[id_incrementer, id_incrementer]):
@@ -46,12 +46,12 @@ class EntityMentionOverlap(TextList):
             self.sid, self.did = self.mentions[0].sid, self.mentions[0].did
         except IndexError:
             raise IndexError("Can't access the index of gold mentions and predicted mentions! Probably there is no any "
-                             "mentions in the overlap group")
+                             "mentions in the ems_pair group")
 
         self.source = self.mentions[0].source
 
         ids = copy(self.mentions.ids)
-        ids.update({'OL': id_})
+        ids.update({'PAIR': id_})
 
         # number
         self.pems_total = len(pems)
@@ -88,62 +88,89 @@ class EntityMentionOverlap(TextList):
 
     @overrides(TextList)
     def __add__(self, other):
-        return EntityMentionOverlap(self.id, self.gems + other.gems, self.pems + other.pems, self.id_incs)
+        return EntityMentionsPair(self.id, self.gems + other.gems, self.pems + other.pems, self.id_incs)
+    #
+    # def ann_str(self) -> str:
+    #     result = []
+    #     for i in range(self.token_b, self.token_e+1):
+    #         if i in self.pems.token_bs:
+    #             result.append('[' + self.)
+    #
+    #     return [pem for pem in self.pems]
 
     def compare(self):
-        self.result: Union[NERError, NERCorrect] = NERAnalyzer.extract(self, self.id_incs)
-        # self.correct: NERCorrect = None  # todo
+        self.result: Union[NERError, NERCorrect] = NERAnalyzer.extract(self, self.id_incs)  # TODO: move to parser class
+        if self.iscorrect():
+            self.correct: Union[None, NERCorrect] = self.result
+            self.error: Union[None, NERError] = None
+        else:
+            self.error: Union[None, NERError] = self.result
+            self.correct: Union[None, NERCorrect] = None
+
+    def iscorrect(self):
+        if isinstance(self.result, NERCorrect):
+            return True
+        elif isinstance(self.result, NERError):
+            return False
+        else:
+            raise TypeError('The returned result is neither {} nor {}', NERCorrect.__name__, NERError.__name__)
 
 
-class EntityMentionOverlaps(TextList):
-    """One sentence will have one EntityMentionOverlaps"""
-    def __init__(self, overlaps: List[EntityMentionOverlap]):
-        self.overlaps = overlaps
-        self.results = [overlap.result for overlap in overlaps]
+class EntityMentionsPairs(TextList):
+    """One sentence will have one EntityMentionsPairs"""
+    def __init__(self, pairs: List[EntityMentionsPair]):
+        self.pairs = pairs
+        self.results = [pair.result for pair in pairs]
+        self.corrects = [pair.correct for pair in pairs if pair.correct is not None]
+        self.errors = [pair.error for pair in pairs if pair.error is not None]
 
         try:
-            ids = self.overlaps[0].ids
+            ids = self.pairs[0].ids
         except IndexError:
-            raise IndexError("""Can't access the first element of the overlaps. Overlaps should be empty.
-            repr(overlaps): {}
-            """.format(repr(self.overlaps)))
+            raise IndexError("""Can't access the first element of the pairs. Overlaps should be empty.
+            repr(pairs): {}
+            """.format(repr(self.pairs)))
 
-        TextList.__init__(self, ids, self.overlaps)
+        TextList.__init__(self, ids, self.pairs)
 
 
 class NERComparison(MD_IDs):
 
     entity_types = ('PER', 'LOC', 'ORG', 'MISC')
 
-    def __init__(self, em_ol: EntityMentionOverlap, ids):
+    def __init__(self, em_pair: EntityMentionsPair, ids):
 
-        self.overlap = em_ol
-        self.sentence = self.overlap.sentence
-        self.gems = em_ol.gems
-        self.pems = em_ol.pems
+        self.ems_pair = em_pair
+        self.sentence = self.ems_pair.sentence
+        self.gems = em_pair.gems
+        self.pems = em_pair.pems
         self.gems_total = len(self.gems)
         self.pems_total = len(self.pems)
+        self.gtypes = [str(gem.type) for gem in self.gems]
+        self.ptypes = [str(pem.type) for pem in self.pems]
         self.ems_total = self.gems_total + self.pems_total
         MD_IDs.__init__(self, ids)
 
     def __str__(self):
 
-        return '\n[predict] {} ({})'.format(self.pems.sep_str(sep='|'), str(self.pems.type)) + \
-               '\n[gold] {} ({})'.format(self.gems.sep_str(sep='|'), str(self.gems.type)) + \
-               '\n[type] {}'.format(str(self.type)) + \
-               '\n[sentence] {}'.format(colorize_tokens(
-                   self.sentence.tokens, self.overlap.token_b, self.overlap.token_e)) + \
+        return '\n[predict] {} ({})'.format(self.pems.sep_str(sep='|'), self.ptypes ) + \
+               '\n[gold] {} ({})'.format(self.gems.sep_str(sep='|'), self.gtypes) + \
+               '\n[type] {}'.format(str(self.filtered_type)) + \
+               '\n[sentence] {}'.format(colorize_list(
+                   self.sentence.tokens, self.ems_pair.token_b, self.ems_pair.token_e)) + \
+               '\n[ID] {}'.format(self.fullid) + \
                '\n'
         # self.type - use type of NERError and NERCorrect
 
 
 class NERCorrect(NERComparison):
 
-    def __init__(self, em_ol: EntityMentionOverlap, type: str, correct_id):
-        ids = copy(em_ol.parent_ids)
-        ids.update({'NERCorrect': correct_id})
-        super().__init__(em_ol, ids)
+    def __init__(self, em_pair: EntityMentionsPair, type: str, correct_id):
+        ids = copy(em_pair.parent_ids)
+        ids.update({'NERCorr': next(correct_id)})
+        super().__init__(em_pair, ids)
         self.type = type
+        self.filtered_type = type
 
     def __str__(self):
         return '---{}---'.format(fg.green('Correct')) + NERComparison.__str__(self)
@@ -175,17 +202,35 @@ class NERError(NERComparison):
     # {'type': str, 'pems': EntityMentions, 'gems': EntityMentions, ''}
     # {'false_error': false_error, 'type_error': type_error, 'span_error': span_error}
 
-    def __init__(self, em_ol: EntityMentionOverlap, type: Dict[str, Union[str, int]], error_id):
-        ids = copy(em_ol.parent_ids)
-        ids.update({'NERErr': error_id})
-        super().__init__(em_ol, ids)
+    def __init__(self, em_pair: EntityMentionsPair, type: Dict[str, Union[str, int]], error_id):
+        ids = copy(em_pair.parent_ids)
+        ids.update({'NERErr': next(error_id)})  # FIXME
+        super().__init__(em_pair, ids)
         self.type = type
+        self.filtered_type = NERError.filtered_to_array(type)
         self.false_error = self.type['false_error']
         self.span_error = self.type['span_error']
         self.type_error = self.type['type_error']
 
     def __str__(self):
         return '---{}---'.format(fg.red('Error')) + NERComparison.__str__(self)
+
+    @staticmethod
+    def filtered_to_array(type) -> List:
+        return list(NERError.filtered(type).values())
+
+    @staticmethod
+    def filtered(type: Dict[str, Union[str, int]]) -> Dict:
+        return {error_cat:type_ for error_cat, type_ in type.items() if type_ is not None}
+
+    def ann_str(self) -> str:
+        return
+    # def is_false_positive(self):  # TODO
+    #     return self.false_error in
+    #
+    # def set_different_errors(self):
+    #     if self.false_error in
+    #     self.
 
     # @property  # todo
     # def type(self):
@@ -221,35 +266,35 @@ class NERAnalyzer:
     >>> tsmcs = EntityMentions([tsmc])
     >>> ts = EntityMentions([t])
     >>> id_incs = id_incrementer(), id_incrementer()
-    >>> ol = EntityMentionOverlap(0, tsmcs, ts, id_incs)
-    >>> NERAnalyzer.extract(ol, id_incs).type
+    >>> pair = EntityMentionsPair(0, tsmcs, ts, id_incs)
+    >>> NERAnalyzer.extract(pair, id_incs).type
     {'false_error': None, 'type_error': 'ORG->LOC', 'span_error': 'R Diminished'}
     >>> co_pem = EntityMention([co], source='predict', id_=3)  # test NERCorrect
     >>> co_gem = EntityMention([co], source='gold', id_=3)
-    >>> ol_correct = EntityMentionOverlap(1, EntityMentions([co_pem]), EntityMentions([co_gem]), id_incs)
-    >>> repr(NERAnalyzer.extract(ol_correct, id_incs))  # doctest: +ELLIPSIS
+    >>> pair_correct = EntityMentionsPair(1, EntityMentions([co_pem]), EntityMentions([co_gem]), id_incs)
+    >>> repr(NERAnalyzer.extract(pair_correct, id_incs))  # doctest: +ELLIPSIS
     '<error.NERCorrect object at ...
-    >>> NERAnalyzer.extract(ol_correct, id_incs).type
+    >>> NERAnalyzer.extract(pair_correct, id_incs).type
     'ORG'
     """
 
     @staticmethod
-    def extract(em_ol: EntityMentionOverlap, id_incs: Tuple[id_incrementer, id_incrementer]) \
+    def extract(em_pair: EntityMentionsPair, id_incs: Tuple[id_incrementer, id_incrementer]) \
             -> Union[NERError, NERCorrect]:
         false_error = None
         type_error = None
         span_error = None
-        pems: EntityMentions = em_ol.pems
-        gems: EntityMentions = em_ol.gems
+        pems: EntityMentions = em_pair.pems
+        gems: EntityMentions = em_pair.gems
         ems_total = len(gems) + len(pems)
 
         error_id, correct_id = id_incs
 
         if NERAnalyzer.is_mentions_correct(pems, gems):
-            return NERCorrect(em_ol, em_ol.gems.type, correct_id)
+            return NERCorrect(em_pair, em_pair.gems.type, correct_id)
         else:
             if ems_total == 1:  # False Positive / False Negative
-                false_error = 'False Negative ' + gems[0].type if len(gems) == 1 else 'False Positive ' + pems[0].type
+                false_error = 'False Negative - ' + gems[0].type if len(gems) == 1 else 'False Positive - ' + pems[0].type
 
             elif ems_total == 2:  # Span Error / Type Errors (type_errors)
                 pb, pe, gb, ge = pems[0].token_b, pems[0].token_e, gems[0].token_b, gems[0].token_e
@@ -266,7 +311,7 @@ class NERAnalyzer:
                         span_error = 'R Crossed' if pe > ge else 'RL Diminished'
 
                 if pt != gt:  # Type Errors (type_errors)
-                    type_error = gems[0].type + '->' + pems[0].type
+                    type_error = gems[0].type + ' -> ' + pems[0].type
 
             elif ems_total >= 3:
 
@@ -278,11 +323,8 @@ class NERAnalyzer:
                         elif len(gems) == 1:
                             span_error = 'Span Split - ' + str(len(pems))
 
-                    pts = {pem.type for pem in pems}
-                    gts = {gem.type for gem in gems}
-
                     if not NERAnalyzer.has_same_type(pems, gems):
-                        type_error = '|'.join(gts) + '->' + '|'.join(pts)
+                        type_error = '|'.join(gems.types) + ' -> ' + '|'.join(pems.types)
                     # input('Merge/Split: {}->{}'.format(self.predict_text, self.gold_text))
 
                 else:
@@ -291,7 +333,7 @@ class NERAnalyzer:
                           [(gem.token_b, gem.token_e, gem.type) for gem in gems],
                           NERAnalyzer.is_mentions_correct(gems, pems))
 
-        return NERError(em_ol, {'false_error': false_error, 'type_error': type_error,
+        return NERError(em_pair, {'false_error': false_error, 'type_error': type_error,
                                   'span_error': span_error}, error_id)
 
     @staticmethod
@@ -386,13 +428,17 @@ class ParserNERErrors:
     @staticmethod
     def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
 
-        sentence.em_overlaps: Union[EntityMentionOverlaps, None] = ParserNERErrors.get_overlaps(sentence, gold_src, predict_src)
-        sentence.ner_results: List[Union[NERError, NERCorrect]] = None if sentence.em_overlaps is None else \
-            sentence.em_overlaps.results
+        sentence.ems_pairs: Union[EntityMentionsPairs, None] = ParserNERErrors.get_pairs(sentence, gold_src, predict_src)
+        sentence.ner_results: List[Union[NERError, NERCorrect]] = None if sentence.ems_pairs is None else \
+            sentence.ems_pairs.results
+
+        sentence.set_corrects_from_pairs(sentence.ems_pairs)
+        sentence.set_errors_from_pairs(sentence.ems_pairs)
+        # TODO: unify the setter or property usage
 
     @staticmethod
-    def get_overlaps(sentence: Sentence, gold_src: str, predict_src: str, debug=False) \
-            -> Union[None, EntityMentionOverlaps]:
+    def get_pairs(sentence: Sentence, gold_src: str, predict_src: str, debug=False) \
+            -> Union[None, EntityMentionsPairs]:
         """
         >>> sid, did = 3, 50
         >>> taiwan = ConllToken('Taiwan', 0, sid, did \
@@ -405,18 +451,18 @@ class ParserNERErrors:
         >>> for token in [taiwan, semi, manu]: \
                 token.set_sentence(sen)
         >>> ConllParser.set_entity_mentions_for_one_sentence(sen, ['predict', 'gold'])
-        >>> ol = ParserNERErrors.get_overlaps(sen, 'gold', 'predict')  # FIXME
-        >>> ol.results  #doctest: +ELLIPSIS
+        >>> pair = ParserNERErrors.get_pairs(sen, 'gold', 'predict')  # FIXME
+        >>> pair.results  #doctest: +ELLIPSIS
         [<error.NERError object at ...
-        >>> ol.results[0].type  # FIXME
+        >>> pair.results[0].type  # FIXME
         {'false_error': None, 'type_error': 'ORG|MISC|LOC->ORG', 'span_error': 'Span Split - 3'}
         """
 
         if not sentence.entity_mentions_dict[gold_src] and not sentence.entity_mentions_dict[predict_src]:
             return None
 
-        gems = EntityMentions(sentence.entity_mentions_dict[gold_src])
-        pems = EntityMentions(sentence.entity_mentions_dict[predict_src])
+        gems = sentence.entity_mentions_dict[gold_src]
+        pems = sentence.entity_mentions_dict[predict_src]
 
         occupied = []  # a list of vacancy. And each vacancy is stored with a list of occupant mention id if occupied
 
@@ -438,95 +484,95 @@ class ParserNERErrors:
 
         if debug: print("after occupied: ", occupied)
 
-        overlaps = []  # a list of overlap. And every overlap is a list of entity mention.
+        pairs = []  # a list of ems_pair. And every ems_pair is a list of entity mention.
         for pos in occupied:
             if debug: print('----- pos: ', pos)
             if pos:
 
-                in_overlap_ids = []
+                in_pair_ids = []
 
                 for em in pos:
                     if debug: print("-- em_id: ", em)
 
-                    # return which overlap (id) the current mention is in (in_overlap_ids)
-                    # or return None if there is no overlap
-                    for idx, overlap in enumerate(overlaps):
-                        if em in overlap:
-                            in_overlap_ids.append(idx)
+                    # return which ems_pair (id) the current mention is in (in_pair_ids)
+                    # or return None if there is no ems_pair
+                    for idx, pair in enumerate(pairs):
+                        if em in pair:
+                            in_pair_ids.append(idx)
                         else:
-                            in_overlap_ids.append(None)
+                            in_pair_ids.append(None)
 
-                if debug: print("in_overlap_ids: ", in_overlap_ids)
+                if debug: print("in_pair_ids: ", in_pair_ids)
 
-                # return the overlap_id if there is at least one not None value, else returns None
-                in_overlap_id = None
-                for ioid in in_overlap_ids:
+                # return the pair_id if there is at least one not None value, else returns None
+                in_pair_id = None
+                for ioid in in_pair_ids:
                     if ioid is not None:
-                        in_overlap_id = ioid
-                if debug: print("in_overlap_id: ", in_overlap_id)
+                        in_pair_id = ioid
+                if debug: print("in_pair_id: ", in_pair_id)
 
-                # if there is an existing overlap overlapping with the current mention: merge
-                if in_overlap_id is not None:
-                    if debug: print("Before update - overlaps: ", overlaps)
-                    overlaps[in_overlap_id].update(pos)
-                    if debug: print("After update - overlaps: ", overlaps)
-                else:  # if not, create a new one and append to overlaps
-                    if debug: print("Before append - overlaps: ", overlaps)
-                    overlaps.append(set(tuple(pos)))
-                    if debug: print("After append - overlaps: ", overlaps)
+                # if there is an existing ems_pair pairing with the current mention: merge
+                if in_pair_id is not None:
+                    if debug: print("Before update - pairs: ", pairs)
+                    pairs[in_pair_id].update(pos)
+                    if debug: print("After update - pairs: ", pairs)
+                else:  # if not, create a new one and append to pairs
+                    if debug: print("Before append - pairs: ", pairs)
+                    pairs.append(set(tuple(pos)))
+                    if debug: print("After append - pairs: ", pairs)
 
-        if debug: print("overlaps: ", overlaps)
+        if debug: print("pairs: ", pairs)
 
-        # re-sort set in overlaps (a list of set) which lost its order during set() based on token_b  # todo: modularize
-        sorted_overlaps = []
-        for overlap in overlaps:
-            sorted_overlaps.append(sorted(overlap, key=lambda t:t[1].token_b))  # set becomes a list
-        overlaps = sorted_overlaps
+        # re-sort set in pairs (a list of set) which lost its order during set() based on token_b  # todo: modularize
+        sorted_pairs = []
+        for pair in pairs:
+            sorted_pairs.append(sorted(pair, key=lambda t:t[1].token_b))  # set becomes a list
+        pairs = sorted_pairs
 
-        # split to gold and predict entity mentions and create a list of EntityMentionOverlap
-        em_overlaps: List[EntityMentionOverlap] = []
+        # split to gold and predict entity mentions and create a list of EntityMentionsPair
+        ems_pairs: List[EntityMentionsPair] = []
         id_incs = id_incrementer(), id_incrementer()
 
-        for i, overlap in enumerate(overlaps):  # create a EntityMentionOverlap
-            ol_p, ol_g = [], []
-            for em in overlap:  # split to gold mentions and predict mentions (overlap is a set, the element is a tuple)
+        for i, pair in enumerate(pairs):  # create a EntityMentionsPair
+            pair_p, pair_g = [], []
+            for em in pair:  # split to gold mentions and predict mentions (ems_pair is a set, the element is a tuple)
                 if em[0] == 'p':
-                    ol_p.append(em[1])
+                    pair_p.append(em[1])
                 elif em[0] == 'g':
-                    ol_g.append(em[1])
+                    pair_g.append(em[1])
 
-            if debug and (not len(ol_p) or not len(ol_g)):
-                print('---document %s - %s' % ((list(overlap)[0][1].sentence.document.fullid,
-                                                list(overlap)[0][1].sentence.document)))
-                print('--sentence %s - %s' % (list(overlap)[0][1].sentence.fullid, list(overlap)[0][1].sentence))
-                print('-entity_mentions: ', [list(overlap)[0][1].print() for overlap in overlaps])
-                print('-ol_p: ', [str(em) for em in ol_p])
-                print('-ol_g: ', ol_g)
-                print('-overlap: ', overlap)
-                print('-overlaps: ', overlaps)
+            if debug and (not len(pair_p) or not len(pair_g)):
+                print('---document %s - %s' % ((list(pair)[0][1].sentence.document.fullid,
+                                                list(pair)[0][1].sentence.document)))
+                print('--sentence %s - %s' % (list(pair)[0][1].sentence.fullid, list(pair)[0][1].sentence))
+                print('-entity_mentions: ', [list(pair)[0][1].print() for pair in pairs])
+                print('-pair_p: ', [str(em) for em in pair_p])
+                print('-pair_g: ', pair_g)
+                print('-ems_pair: ', pair)
+                print('-pairs: ', pairs)
                 print('-occupied:', occupied)
                 print('-occupied text:', [(i, occ[0], str(occ[1])) for i, pos in enumerate(occupied) for occ in pos])
                 input()
 
             # Handle False Negative (FN) and False Positive (FP)
             source_p, type_p, ids_p, source_g, type_g, ids_g = (None, None, None, None, None, None)
-            if not ol_p and ol_g:  # FN
+            if not pair_p and pair_g:  # FN
                 # use the parent_ids of "the other source" since they are in the same sentence
                 source_p, type_p, ids_p = predict_src, '', sentence.ids
-            elif ol_p and not ol_g:  # FP
+            elif pair_p and not pair_g:  # FP
                 source_g, type_g, ids_g = gold_src, '', sentence.ids
-            elif ol_p and ol_g:  # both ol_p and ol_g are not empty
+            elif pair_p and pair_g:  # both pair_p and pair_g are not empty
                 # just pass None's for they will automatically be extracted
                 pass
             else:  # empty
-                raise ValueError('Not any mentions in the overlap!!!!')
+                raise ValueError('Not any mentions in the pair!!!!')
 
-            em_overlaps.append(EntityMentionOverlap(i, EntityMentions(ol_g, source_g, type_g, ids_g)
-                                                    , EntityMentions(ol_p, source_p, type_p, ids_p), id_incs))
+            ems_pairs.append(EntityMentionsPair(i, EntityMentions(pair_g, source_g, type_g, ids_g)
+                                                  , EntityMentions(pair_p, source_p, type_p, ids_p), id_incs))
 
-        if debug: print("---------em_overlaps: ", em_overlaps)
+        if debug: print("---------ems_pairs: ", ems_pairs)
 
-        return EntityMentionOverlaps(overlaps=em_overlaps)
+        return EntityMentionsPairs(pairs=ems_pairs)
 
 
 if __name__ == '__main__':
