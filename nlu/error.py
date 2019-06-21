@@ -1,9 +1,10 @@
-from typing import Tuple, Callable
+from typing import Tuple
 
 from ansi.color import fg
 
 from nlu.data import *
 from nlu.parser import ConllParser
+from nlu.utils import *
 
 
 class EntityMentionOverlap(TextList):
@@ -134,18 +135,6 @@ class NERComparison(MD_IDs):
                    self.sentence.tokens, self.overlap.token_b, self.overlap.token_e)) + \
                '\n'
         # self.type - use type of NERError and NERCorrect
-
-
-def bracket(text):
-    return '[' + text + ']'
-
-
-def colorize_tokens(tokens: List[Token], token_b, token_e, color: Callable=fg.blue) -> str:
-    return strlist_to_str(tokens[:token_b]) + ' ' + color(strlist_to_str(tokens[token_b:token_e+1])) \
-           + ' ' + strlist_to_str(tokens[token_e+1:])
-
-def strlist_to_str(strlist, sep=' '):
-    return sep.join([str(s) for s in strlist])
 
 
 class NERCorrect(NERComparison):
