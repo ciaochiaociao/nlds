@@ -338,20 +338,20 @@ class Sentence(TextList):
     def set_document(self, document: 'Document') -> None:
         self.document = document
 
-    def set_errors_from_overlaps(self, overlaps) -> None:
-        if overlaps is None:
+    def set_errors_from_pairs(self, pairs) -> None:
+        if pairs is None:
             self.errors = None
         else:
-            self.errors = overlaps.errors
+            self.errors = pairs.errors
 
-    def set_corrects_from_overlaps(self, overlaps) -> None:
-        if overlaps is None:
+    def set_corrects_from_pairs(self, pairs) -> None:
+        if pairs is None:
             self.corrects = None
         else:
-            self.corrects = overlaps.corrects
+            self.corrects = pairs.corrects
 
-    def set_overlaps(self, overlaps: List) -> None:
-        self.overlaps = overlaps
+    def set_pairs(self, pairs: List) -> None:
+        self.pairs = pairs
 
     def print_corrects(self) -> None:
         if self.corrects:
@@ -452,7 +452,7 @@ class EntityMention(TextList):
         self.sentence = tokens[0].sentence
         self.document = self.sentence.document
 
-        self.mention_overlap = None
+        self.ems_pair = None
 
         ids = copy(self.tokens[0].parent_ids)
         ids.update({'EM': id_})
