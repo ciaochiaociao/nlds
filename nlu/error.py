@@ -310,10 +310,8 @@ class NERErrorExtractor:
             false_error = NERErrorExtractor.get_false_error_eq_one(gems, pems)
 
         elif ems_total == 2:  # Span Error w/, w/o Type Errors
-            gt, pt, span_error = NERErrorExtractor.get_span_error_from_eq_two(gems, pems)
-
-            if pt != gt:  # Type Errors
-                type_error = gems[0].type + ' -> ' + pems[0].type
+            span_error = NERErrorExtractor.get_span_error_from_eq_two(gems, pems)
+            type_error = NERErrorExtractor.get_type_error_from_eq_two(gems, pems)
 
         elif ems_total >= 3:
 
@@ -321,15 +319,29 @@ class NERErrorExtractor:
                 # Merge Or Split
                 span_error = NERErrorExtractor.get_merge_or_split_from_ge_three(gems, pems)
 
-                if not NERErrorExtractor.has_same_type(pems, gems):
-                    type_error = '|'.join(gems.types) + ' -> ' + '|'.join(pems.types)
+                type_error = NERErrorExtractor.get_type_error_from_ge_three(gems, pems)
 
             else:  # Complicated Case
                 span_error = NERErrorExtractor.get_span_error_from_ge_three(gems, pems)
         return false_error, span_error, type_error
 
     @staticmethod
-    def get_span_error_from_ge_three(gems, pems):
+    def get_type_error_from_ge_three(gems, pems):
+        if not NERErrorExtractor.has_same_type(pems, gems):
+            return '|'.join(gems.types) + ' -> ' + '|'.join(pems.types)
+        else:
+            return None
+
+    @staticmethod
+    def get_type_error_from_eq_two(gems, pems):
+        pt, gt = pems[0].type, gems[0].type
+        if pt != gt:  # Type Errors
+            return gems[0].type + ' -> ' + pems[0].type
+        else:
+            return None
+
+    @staticmethod
+    def get_span_error_from_ge_three(gems, pems) -> str:
         span_error = 'Complicated - {}->{}'.format(len(gems), len(pems))
         print('Complicated Case:', [(pem.token_b, pem.token_e, pem.type) for pem in pems],
               [(gem.token_b, gem.token_e, gem.type) for gem in gems],
@@ -337,7 +349,7 @@ class NERErrorExtractor:
         return span_error
 
     @staticmethod
-    def get_merge_or_split_from_ge_three(gems, pems):
+    def get_merge_or_split_from_ge_three(gems, pems) -> str:
         if NERErrorExtractor.has_same_range(pems, gems):
             if len(pems) == 1:
                 span_error = 'Spans Merged - ' + str(len(gems))
@@ -346,9 +358,8 @@ class NERErrorExtractor:
         return span_error
 
     @staticmethod
-    def get_span_error_from_eq_two(gems, pems):
+    def get_span_error_from_eq_two(gems: EntityMentions, pems: EntityMentions) -> str:
         pb, pe, gb, ge = pems[0].token_b, pems[0].token_e, gems[0].token_b, gems[0].token_e
-        pt, gt = pems[0].type, gems[0].type
         if pb == gb and pe != ge:
             span_error = 'R Expansion' if pe > ge else 'R Diminished'
         elif pb != gb and pe == ge:
@@ -360,15 +371,15 @@ class NERErrorExtractor:
                 span_error = 'R Crossed' if pe > ge else 'RL Diminished'
         else:  # pb == gb and pe == ge
             span_error = None
-        return gt, pt, span_error
+        return span_error
 
     @staticmethod
-    def get_false_error_eq_one(gems, pems):
+    def get_false_error_eq_one(gems: EntityMentions, pems: EntityMentions) -> str:
         false_error = 'False Negative - ' + gems[0].type if len(gems) == 1 else 'False Positive - ' + pems[0].type
         return false_error
 
     @staticmethod
-    def has_same_type(ems1: List[EntityMention], ems2: List[EntityMention]) -> bool:
+    def has_same_type(ems1: EntityMentions, ems2: EntityMentions) -> bool:
 
         pts = {em1.type for em1 in ems1}
         gts = {em2.type for em2 in ems2}
@@ -376,7 +387,7 @@ class NERErrorExtractor:
         return pts == gts
 
     @staticmethod
-    def has_same_range(ems1: List[EntityMention], ems2: List[EntityMention]) -> bool:
+    def has_same_range(ems1: EntityMentions, ems2: EntityMentions) -> bool:
         """return if two lists of EntityMentions have the same 'whole range'
         (The whole range here is from the position of the first token to the position of the last token of the list.)
         """
@@ -398,7 +409,7 @@ class NERErrorExtractor:
                (gold_em.token_b, gold_em.token_e, gold_em.type)
 
     @staticmethod
-    def is_concatenated(mentions: List[EntityMention]):
+    def is_concatenated(mentions: EntityMentions):
         last_em = None
         for i, em in enumerate(mentions):
             if last_em is not None and em.token_b - last_em.token_e != 1:  # merge or split errors
