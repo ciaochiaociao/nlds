@@ -145,7 +145,7 @@ class ConllParser:
     def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
 
         sentence.ems_pairs: Union['EntityMentionsPairs', None] = ConllParser.get_pairs(sentence, gold_src, predict_src)
-        sentence.ner_results: List[Union['NERError', 'NERCorrect']] = None if sentence.ems_pairs is None else \
+        sentence.ner_results: List[Union['NERErrorComposite', 'NERCorrect']] = None if sentence.ems_pairs is None else \
             sentence.ems_pairs.results
 
         sentence.set_corrects_from_pairs(sentence.ems_pairs)
@@ -249,7 +249,7 @@ class ConllParser:
     def error_type_stats(self):
 
         # stat = {}
-        # for type_ in NERError.all_span_error_types:
+        # for type_ in NERErrorComposite.all_span_error_types:
         #     self.add_filtered_to_dict(type_, stat)
         #
         pass

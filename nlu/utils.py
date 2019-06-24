@@ -1,6 +1,10 @@
-from typing import Callable
+from typing import Callable, Iterable
 
 from ansi.color import fg
+
+SEPARATOR = ' '
+CLEAR_SEPARATOR = '|'
+TO = '->'
 
 
 def bracket(text):
@@ -33,3 +37,17 @@ def overrides(overridden):
             f'{overridden.__name__}"'
         return method
     return overrider
+
+
+def sep_str(list_: Iterable, sep=None):
+    if sep is None:
+        sep = SEPARATOR
+    return sep.join([str(member) for member in list_]) if list_ else ''
+
+
+def ls_to_ls_str(list1: Iterable, list2: Iterable, sep=None, to=None):
+    if to is None:
+        to = TO
+    if sep is None:
+        sep = CLEAR_SEPARATOR
+    return sep_str(list1, sep) + ' {} '.format(to) + sep_str(list2, sep)

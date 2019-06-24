@@ -5,7 +5,7 @@ from typing import List, Dict, Union, Optional
 
 from ansi.color import fg
 
-from nlu.utils import list_to_str, overrides
+from nlu.utils import list_to_str, overrides, sep_str
 
 
 # from __future__ import annotations
@@ -37,8 +37,8 @@ class ObjectList:
     def __len__(self):
         return len(self.members)
 
-    def separate_str(self):
-        return TextList.SEPARATOR.join([str(member) for member in self.members])
+    def sep_str(self, sep=None):
+        return sep_str(self.members, sep=sep)
 
     def __hash__(self):
         return hash(repr(self))
@@ -211,9 +211,6 @@ class TextList(ObjectList, TextWithIDs):
     def __str__(self):
         return self.sep_str()
 
-    def sep_str(self, sep=' '):  # TODO: abstracted to a public utility function
-        return sep.join([str(member) for member in self.members]) if self.members else ''
-
     @overrides(ObjectList)
     def __add__(self, other):
         return TextList(self.ids, self.members + other.members)
@@ -321,7 +318,7 @@ class Sentence(TextList):
         self.ems_pairs: Optional['EntityMentionsPairs'] = None
         self.ner_results: Optional[List['NERComparison']] = None
         self.ner_corrects: Optional[List['NERCorrect']] = None
-        self.ner_errors: Optional[List['NERError']] = None
+        self.ner_errors: Optional[List['NERErrorComposite']] = None
         ids = self.tokens[0].parent_ids
         TextList.__init__(self, ids, tokens)
 
