@@ -5,6 +5,7 @@ from ansi.color import fg
 SEPARATOR = ' '
 CLEAR_SEPARATOR = '|'
 TO = '->'
+TO_SEP = ' {} '.format(TO)
 
 
 def bracket(text):
@@ -50,4 +51,4 @@ def ls_to_ls_str(list1: Iterable, list2: Iterable, sep=None, to=None):
         to = TO
     if sep is None:
         sep = CLEAR_SEPARATOR
-    return sep_str(list1, sep) + ' {} '.format(to) + sep_str(list2, sep)
+    return sep_str(list1, sep) + TO_SEP + sep_str(list2, sep)

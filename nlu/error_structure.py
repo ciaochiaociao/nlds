@@ -4,7 +4,7 @@ from typing import Tuple, Union, List, Dict, Optional
 from ansi.color import fg
 
 from nlu.data import TextList, EntityMentions, MD_IDs
-from nlu.utils import id_incrementer, overrides, colorize_list, ls_to_ls_str
+from nlu.utils import id_incrementer, overrides, colorize_list, ls_to_ls_str, TO_SEP
 
 NOTE_SEP = '-'
 NOTE = ' {} '.format(NOTE_SEP)
@@ -159,6 +159,7 @@ class NERComparison(MD_IDs):
         self.gtypes = [str(gem.type) for gem in self.gems]
         self.ptypes = [str(pem.type) for pem in self.pems]
         self.ems_total = self.gems_total + self.pems_total
+        self.filtered_type = None
         MD_IDs.__init__(self, ids)
 
     def __str__(self):
@@ -184,72 +185,6 @@ class NERCorrect(NERComparison):
 
     def __str__(self):
         return '---{}---'.format(fg.green('Correct')) + NERComparison.__str__(self)
-
-
-class NERErrorComposite(NERComparison):
-
-
-    type_error_types, false_error_types = [], []
-
-    for t1 in NERComparison.entity_types:
-        for t2 in NERComparison.entity_types:
-            if t1 != t2:
-                type_error_types.append(t1 + '->' + t2)
-        for f in ['False Positive', 'False Negative']:
-            false_error_types.append(f + ' - ' + t1)
-
-    span_errors1 = ['R Expansion', 'L Expansion', 'RL Expansion',
-                    'R Diminished', 'L Diminished', 'RL Diminished',
-                    'R Crossed', 'L Crossed']
-
-    span_errors2 = ['Spans Merged', 'Span Split', 'Complicated']
-
-    all_span_error_types = span_errors1 + span_errors2
-
-    all_types = type_error_types + all_span_error_types
-
-    # {'type': str, 'pems': EntityMentions, 'gems': EntityMentions, ''}
-    # {'false_error': false_error, 'type_error': type_error, 'span_error': span_error}
-
-    def __init__(self, ems_pair: EntityMentionsPair, type: Dict[str, Union[str, int]], error_id):
-        ids = copy(ems_pair.parent_ids)
-        ids.update({'NERErr': next(error_id)})
-        super().__init__(ems_pair, ids)
-        self.type = type
-        self.filtered_type = NERErrorComposite.filtered_to_array(type)
-        self.false_error = self.type['false_error']
-        self.span_error = self.type['span_error']
-        self.type_error = self.type['type_error']
-
-    def __str__(self):
-        return '---{}---'.format(fg.red('Error')) + NERComparison.__str__(self)
-
-    @staticmethod
-    def filtered_to_array(type) -> List:
-        return list(NERErrorComposite.filtered(type).values())
-
-    @staticmethod
-    def filtered(type: Dict[str, Union[str, int]]) -> Dict:
-        return {error_cat:type_ for error_cat, type_ in type.items() if type_ is not None}
-
-    def ann_str(self) -> str:
-        return ''
-
-    # @property  # todo
-    # def type(self):
-    #     return self.__type
-    #
-    # @type.setter
-    # def type(self, type: Dict[str, Union[str, int]]):
-    #
-    #     if type['false_error'] in NERErrorComposite.false_error_types + [None]\
-    #         and type['type_error'] in NERErrorComposite.type_error_types + [None]\
-    #             and type['span_error'] in NERErrorComposite.all_span_error_types + [None]:
-    #         self.__type = type
-    #     else:
-    #         raise ValueError("""The type '{}' is not in one of these:
-    #         '{} or None'
-    #         """.format(type, NERErrorComposite.all_types))
 
 
 class SpanError:
@@ -287,13 +222,14 @@ class SpanError:
 
 class MergeSplitError:
 
-    def __init__(self, ems_pair: EntityMentionsPair):
+    def __init__(self, ems_pair: EntityMentionsPair, type_):
         self.ems_pair = ems_pair
+        self.type = type_
         self.gems = ems_pair.gems
         self.pems = ems_pair.pems
 
     def __str__(self):
-        self.name_str()
+        return self.name_str() + str(self.ems_pair.ems_total)
 
     def name_str(self, sep=None):
         return ls_to_ls_str(self.gems, self.pems, sep=sep)
@@ -329,3 +265,72 @@ class ComplicateError:
         self.ems_pair = ems_pair
         self.predict_types: List[str] = ems_pair.pems.types
         self.gold_types: List[str] = ems_pair.gems.types
+
+    def __str__(self):
+        return 'Complicate - ' + self.ems_pair.gold_text_sep + TO_SEP + self.ems_pair.predict_text_sep
+
+
+class NERErrorComposite(NERComparison):
+
+    type_error_types, false_error_types = [], []
+
+    for t1 in NERComparison.entity_types:
+        for t2 in NERComparison.entity_types:
+            if t1 != t2:
+                type_error_types.append(t1 + '->' + t2)
+        for f in ['False Positive', 'False Negative']:
+            false_error_types.append(f + ' - ' + t1)
+
+    span_errors1 = ['R Expansion', 'L Expansion', 'RL Expansion',
+                    'R Diminished', 'L Diminished', 'RL Diminished',
+                    'R Crossed', 'L Crossed']
+
+    span_errors2 = ['Spans Merged', 'Span Split', 'Complicated']
+
+    all_span_error_types = span_errors1 + span_errors2
+
+    all_types = type_error_types + all_span_error_types
+
+    # {'type': str, 'pems': EntityMentions, 'gems': EntityMentions, ''}
+    # {'false_error': false_error, 'type_error': type_error, 'span_error': span_error}
+
+    def __init__(self, ems_pair: EntityMentionsPair, type: Dict[str, Union[str, SpanError, MentionTypeError
+    , MergeSplitError, ComplicateError]], error_id):
+        ids = copy(ems_pair.parent_ids)
+        ids.update({'NERErr': next(error_id)})
+        super().__init__(ems_pair, ids)
+        self.type = type
+        self.filtered_type = self.filtered_to_array(type)
+        self.false_error = self.type['false_error']
+        self.span_error: SpanError = self.type['span_error']
+        self.type_error = self.type['type_error']
+
+    def __str__(self):
+        return '---{}---'.format(fg.red('Error')) + NERComparison.__str__(self)
+
+    @staticmethod
+    def filtered_to_array(type_) -> List:
+        return list(NERErrorComposite.filtered_err_str_list(type_).values())
+
+    @staticmethod
+    def filtered_err_str_list(type_: Dict[str, Union[str, int]]) -> Dict:
+        return {error_cat:str(t) for error_cat, t in type_.items() if t is not None}
+
+    def ann_str(self) -> str:
+        return ''
+
+    # @property  # todo
+    # def type(self):
+    #     return self.__type
+    #
+    # @type.setter
+    # def type(self, type: Dict[str, Union[str, int]]):
+    #
+    #     if type['false_error'] in NERErrorComposite.false_error_types + [None]\
+    #         and type['type_error'] in NERErrorComposite.type_error_types + [None]\
+    #             and type['span_error'] in NERErrorComposite.all_span_error_types + [None]:
+    #         self.__type = type
+    #     else:
+    #         raise ValueError("""The type '{}' is not in one of these:
+    #         '{} or None'
+    #         """.format(type, NERErrorComposite.all_types))
