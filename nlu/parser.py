@@ -89,10 +89,34 @@ class ConllParser:
                 self.docs.append(Document(sentences))
 
     def set_entity_mentions(self) -> None:
+        
         for doc in self.docs:
             for sentence in doc.sentences:
                 self.set_entity_mentions_for_one_sentence(sentence, [src['type'] for src in self.cols_format])
 
+        # set different types of entity mentions from different sources
+        _types = ['PER', 'LOC', 'ORG', 'MISC']
+        for source in [src['type'] for src in self.cols_format]:
+            preffix = 'pred' if source == 'predict' else 'gold'
+            ems_attr_name = preffix[0] + 'ems'  # 'pems'/'gems'
+            attr_names = [preffix + '_' + _type.lower() + 's' for _type in _types]  # self.pred_pers/self.gold_miscs/...
+            
+            for attr_name in attr_names:
+                self.__setattr__(attr_name, [])
+            for doc in self.docs:
+                for sentence in doc.sentences:
+                    try:
+                        for entity_mention in sentence.entity_mentions_dict[source]:
+                            attr_name = preffix + '_' + entity_mention.type.lower() + 's'
+                            self.__getattribute__(attr_name).append(entity_mention)  # set self.pred_pers/self.gold_miscs/...
+                    except KeyError:
+                        pass
+            
+            self.__setattr__(ems_attr_name, [])
+            for attr_name in attr_names:
+                self.__setattr__(ems_attr_name, self.__getattribute__(ems_attr_name) + self.__getattribute__(attr_name))  # set self.gems/self.pems
+            
+        
     @staticmethod
     def set_entity_mentions_for_one_sentence(sentence: Sentence, sources: List) -> None:
 
@@ -153,6 +177,8 @@ class ConllParser:
         # TODO: unify the setter or property usage
 
     def obtain_statistics(self, entity_stat=False, source=None, debug=False):
+        _types = ['PER', 'LOC', 'ORG', 'MISC']
+        
         print(f'---{self.filepath} ({source})---')
         print('Document number: ', len([doc for doc in self.docs]))
         print('Sentence number: ', len([sen for doc in self.docs for sen in doc.sentences]))
@@ -162,28 +188,11 @@ class ConllParser:
             source = self.TAGGERSOURCE
 
         if entity_stat:
-            per, loc, org, misc = [], [], [], []
             self.set_entity_mentions()
-
-            for doc in self.docs:
-                for sentence in doc.sentences:
-                    try:
-                        for entity_mention in sentence.entity_mentions_dict[source]:
-                            if entity_mention.type == 'PER':
-                                per.append(entity_mention)
-                            elif entity_mention.type == 'LOC':
-                                loc.append(entity_mention)
-                            elif entity_mention.type == 'ORG':
-                                org.append(entity_mention)
-                            elif entity_mention.type == 'MISC':
-                                misc.append(entity_mention)
-                    except KeyError:
-                        pass
-            ent_tot = len(per)+len(loc)+len(org)+len(misc)
-            print('PER: {} ({:.0%})'.format(len(per), len(per)/ent_tot))
-            print('LOC: {} ({:.0%})'.format(len(loc), len(loc)/ent_tot))
-            print('ORG: {} ({:.0%})'.format(len(org), len(org)/ent_tot))
-            print('MISC: {} ({:.0%})'.format(len(misc), len(misc)/ent_tot))
+            ent_tot = len(self.__getattribute__(source[0] + 'ems'))
+            for type_ in _types:
+                ems = self.__getattribute__(source[:4] + '_' + type_.lower() + 's')
+                print(type_ + ': {} ({:.0%})'.format(len(ems), len(ems)/ent_tot))
             print('TOTAL: {}'.format(ent_tot))
 
         if debug:
@@ -239,8 +248,16 @@ class ConllParser:
                         if error:
                             error_total += 1
         print('---Overall Results---')
+        print('found entity mentions:', len(self.pems))
+        print('true entity mentions:', len(self.gems))
         print('correct_total: ', correct_total)
         print('error_total: ', error_total)
+        self.precision = correct_total/len(self.pems)
+        self.recall = correct_total/len(self.gems)
+        self.macrof1 = 2*self.precision*self.recall/(self.recall+self.precision)
+        print('precision: {:.2%}'.format(self.precision))
+        print('recall: {:.2%}'.format(self.recall))
+        print('macro-f1: {:.2%}'.format(self.macrof1))
         print('corrects ratio: {:.2%}'.format(correct_total/(correct_total+error_total)))
         print('all corrects and errors', correct_total + error_total)
         print('the number of sentences with/without entities (predict + gold): {} ({:.0%}), {} ({:.0%})'.format(
