@@ -79,7 +79,13 @@ class EntityMentionsPair(TextList):
         self.did = self.ids['D']
 
     def pretty_print(self) -> None:
-        print('%s[PAIR ID] %s' % (self.result, self.fullid))
+        print('--- error id %s ---' % self.fullid)
+        print('< gold >')
+        for gem in self.gems:
+            print('{} ({}-{}) '.format(gem.text, gem.token_b, gem.token_e))
+        print('< predict >')
+        for pem in self.pems:
+            print('{} ({}-{}) '.format(pem.text, pem.token_b, pem.token_e))
 
     @overrides(TextList)
     def __add__(self, other):
