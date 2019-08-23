@@ -15,6 +15,8 @@ parser.obtain_statistics(entity_stat=True, source='predict')
 
 parser.obtain_statistics(entity_stat=True, source='gold')
 
+parser.set_entity_mentions()
+
 NERErrorAnnotator.annotate(parser)
 
 parser.print_corrects()
