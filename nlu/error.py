@@ -1,8 +1,8 @@
 from typing import Tuple
 
 from nlu.data import *
-from nlu.error_structure import EntityMentionsPair, EntityMentionsPairs, NERCorrect, NERErrorComposite, SpanError\
-    , MergeSplitError, MentionTypeError, ComplicateError, FalseError
+from nlu.error_structure import EntityMentionsPair, EntityMentionsPairs, NERCorrect, NERErrorComposite, SpanError, \
+    MergeSplitError, MentionTypeError, ComplicateError, FalseError
 from nlu.parser import ConllParser
 from nlu.utils import id_incrementer
 
@@ -101,8 +101,8 @@ class NERErrorExtractor:
 
         elif ems_total >= 3:
 
-            if NERErrorExtractor.is_concatenated(pems) and NERErrorExtractor.is_concatenated(gems)
-            and NERErrorExtractor.has_same_range(pems, gems) and (len(pems) == 1 or len(gems) == 1) :
+            if NERErrorExtractor.is_concatenated(pems) and NERErrorExtractor.is_concatenated(gems) and \
+                    NERErrorExtractor.has_same_range(pems, gems) and (len(pems) == 1 or len(gems) == 1):
                 # Merge Or Split
                 span_error = NERErrorExtractor.get_merge_or_split_from_ge_three(ems_pair)
 
@@ -110,7 +110,8 @@ class NERErrorExtractor:
 
             else:  # Complicated Case  
                 """Complicated Case: 
-                    - [O][OO] <-> [OO][O] both pems and gems have the same range but none of them have only one entity mention
+                    - [O][OO] <-> [OO][O] both pems and gems have the same range +
+                    but none of them have only one entity mention
                     - [OO]O[O] <-> [OOOO] not concat
                     - [OO][O] <-> [O][OOO] not same range
                 """
@@ -163,7 +164,7 @@ class NERErrorExtractor:
         elif pb != gb and pe != ge:
             if pb < gb:
                 direction, type_ = ('Left', 'Crossed') if pe < ge else ('Right Left', 'Expansion')
-            else:  #  pb > gb
+            else:  # pb > gb
                 direction, type_ = ('Right', 'Crossed') if pe > ge else ('Right Left', 'Diminished')
         else:  # pb == gb and pe == ge
             direction, type_ = None, None
@@ -415,7 +416,7 @@ class NERErrorAnnotator:
                                                                                                 predict_src)
     @staticmethod
     def set_result_in_ems_pair(ems_pair: EntityMentionsPair):
-        ems_pair.set_result(NERErrorExtractor.extract(ems_pair, NERErrorAnnotator.id_incs))  #FIXME: ID
+        ems_pair.set_result(NERErrorExtractor.extract(ems_pair, NERErrorAnnotator.id_incs))  # FIXME: ID
 
     @staticmethod
     def set_results_in_ems_pairs(ems_pairs: EntityMentionsPairs):
@@ -430,7 +431,7 @@ if __name__ == '__main__':
     doctest.testmod()
     # doctest.run_docstring_examples(NERErrorComposite, globs=globals())
 
-    train_parser = ConllParser('../rcv1.train.compare2')
+    train_parser = ConllParser('../test/train.pred.gold')
 
     train_parser.obtain_statistics(entity_stat=True, source='predict')
 

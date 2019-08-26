@@ -13,8 +13,7 @@ class ConllParser:
                 - col_num: starts from 0
                 - tagger: ner | pos | chunk
         >>> import os.path
-        >>> path = os.path.dirname(__file__) + '/../rcv1.train.compare2'
-        >>> train_parser = ConllParser(path)
+        >>> path = os.path.dirname(__file__) + traintrain.pred.gold>>> train_parser = ConllParser(path)
         >>> train_parser.obtain_statistics(entity_stat=True, source='predict')  # doctest: +ELLIPSIS
         ---...
         Document number:  946
@@ -313,8 +312,7 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-    path = os.path.dirname(__file__) + '/../rcv1.train.compare2'
-    print(path)
+    path = os.path.dirname(__file__) + '/../test/train.pred.gold'
     train_parser = ConllParser(path)
     train_parser.obtain_statistics(entity_stat=True, source='predict')
     train_parser.set_entity_mentions()
