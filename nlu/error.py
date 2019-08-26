@@ -101,13 +101,19 @@ class NERErrorExtractor:
 
         elif ems_total >= 3:
 
-            if NERErrorExtractor.is_concatenated(pems) and NERErrorExtractor.is_concatenated(gems):
+            if NERErrorExtractor.is_concatenated(pems) and NERErrorExtractor.is_concatenated(gems)
+            and NERErrorExtractor.has_same_range(pems, gems) and (len(pems) == 1 or len(gems) == 1) :
                 # Merge Or Split
                 span_error = NERErrorExtractor.get_merge_or_split_from_ge_three(ems_pair)
 
                 type_error = NERErrorExtractor.get_type_error_from_ge_three(ems_pair)
 
-            else:  # Complicated Case
+            else:  # Complicated Case  
+                """Complicated Case: 
+                    - [O][OO] <-> [OO][O] both pems and gems have the same range but none of them have only one entity mention
+                    - [OO]O[O] <-> [OOOO] not concat
+                    - [OO][O] <-> [O][OOO] not same range
+                """
                 span_error = NERErrorExtractor.get_span_error_from_ge_three(ems_pair)
 
                 type_error = NERErrorExtractor.get_type_error_from_ge_three(ems_pair)
@@ -138,11 +144,10 @@ class NERErrorExtractor:
     @staticmethod
     def get_merge_or_split_from_ge_three(ems_pair: EntityMentionsPair) -> MergeSplitError:
         pems, gems = ems_pair.pems, ems_pair.gems
-        if NERErrorExtractor.has_same_range(pems, gems):
-            if len(pems) == 1:
-                span_error = MergeSplitError(ems_pair, 'Spans Merged')
-            elif len(gems) == 1:
-                span_error = MergeSplitError(ems_pair, 'Span Split')
+        if len(pems) == 1:  # ex - P: [OOO] G: [O][OO]
+            span_error = MergeSplitError(ems_pair, 'Spans Merged')
+        elif len(gems) == 1:  # ex - P: [O][OO] G: [OOO]
+            span_error = MergeSplitError(ems_pair, 'Span Split')
         return span_error
 
     @staticmethod
