@@ -88,7 +88,9 @@ class ConllParser:
                 self.docs.append(Document(sentences))
 
     def set_entity_mentions(self) -> None:
-        
+        """chunk entity mentions for all sources (i.e. predict, gold)
+        effect: call self.set_entity_mentions_for_one_sentence function for all sentences in the parser.docs
+        """
         for doc in self.docs:
             for sentence in doc.sentences:
                 self.set_entity_mentions_for_one_sentence(sentence, [src['type'] for src in self.cols_format])
@@ -118,7 +120,9 @@ class ConllParser:
         
     @staticmethod
     def set_entity_mentions_for_one_sentence(sentence: Sentence, sources: List) -> None:
-
+        """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
+        effect: set sentence.entity_mentions_dict ({'predict': `EntityMention`s})
+        """
         for source in sources:
 
             tokens_tray: List[Token] = []
@@ -155,7 +159,7 @@ class ConllParser:
                 sentence.entity_mentions_dict[source] = entity_mentions
 
     @staticmethod
-    def set_errors(parser, gold_src, predict_src):
+    def set_errors(parser, gold_src, predict_src):  # FIXME: set_errors_xx() duplicated method with methods in NERErrorAnnotator
         for doc in parser.docs:
             ConllParser.set_errors_in_document(doc, gold_src, predict_src)
 
@@ -166,8 +170,10 @@ class ConllParser:
 
     @staticmethod
     def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
-
-        sentence.ems_pairs: Union['EntityMentionsPairs', None] = ConllParser.get_pairs(sentence, gold_src, predict_src)
+        """
+        effect: set sentence.ems_pairs, sentence.ner_results, sentence.corrects, sentence.errors
+        """
+        sentence.ems_pairs: Union['EntityMentionsPairs', None] = ConllParser.get_pairs(sentence, gold_src, predict_src)  # FIXME: No get_pairs method any more. 
         sentence.ner_results: List[Union['NERErrorComposite', 'NERCorrect']] = None if sentence.ems_pairs is None else \
             sentence.ems_pairs.results
 

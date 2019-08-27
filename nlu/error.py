@@ -397,7 +397,9 @@ class NERErrorAnnotator:
 
     @staticmethod
     def set_results_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
-
+        """
+        effect: set sentence.ems_pairs, sentence.ner_results, sentence.corrects, sentence.errors
+        """
         NERErrorAnnotator.set_ems_pairs_in_sentence(sentence, gold_src, predict_src)
         if sentence.ems_pairs is None:
             sentence.ner_results: List[Union[NERErrorComposite, NERCorrect]] = None
