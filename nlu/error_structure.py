@@ -77,6 +77,9 @@ class EntityMentionsPair(TextList):
 
         self.sid = self.ids['S']
         self.did = self.ids['D']
+        
+        # set backreference to entity mentions
+        self.set_ems_pair_to_ems()
 
     def pretty_print(self) -> None:
         print('--- error id %s ---' % self.fullid)
@@ -124,6 +127,10 @@ class EntityMentionsPair(TextList):
         else:
             raise TypeError('The returned result is neither {} nor {}, but {} is obtained'
                             .format(NERCorrect.__name__, NERErrorComposite.__name__, type(self.result)))
+            
+    def set_ems_pair_to_ems(self) -> None:
+        for em in self.mentions:
+            em.ems_pair = self
 
 
 class EntityMentionsPairs(TextList):
