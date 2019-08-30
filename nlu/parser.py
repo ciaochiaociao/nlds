@@ -13,7 +13,9 @@ class ConllParser:
                 - col_num: starts from 0
                 - tagger: ner | pos | chunk
         >>> import os.path
-        >>> path = os.path.dirname(__file__) + traintrain.pred.gold>>> train_parser = ConllParser(path)
+        >>> cols_format = [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'}, {'type': 'gold', 'col_num': 2, 'tagger': 'ner'}]
+        >>> path = os.path.dirname(os.path.abspath(__file__)) + '/../test/train.pred.gold'
+        >>> train_parser = ConllParser(path, cols_format)
         >>> train_parser.obtain_statistics(entity_stat=True, source='predict')  # doctest: +ELLIPSIS
         ---...
         Document number:  946
@@ -35,58 +37,131 @@ class ConllParser:
         else:
             self.cols_format = cols_format
 
+        tok_dicts = ConllParser.parse_conll_to_tok_dicts(self.filepath, self.cols_format)
+        self.docs = ConllParser.build_md_docs_from_tok_dicts(tok_dicts)
+        
+        # optional back reference functionality: token1.sentence, sentence5.document
+        ConllParser.add_back_refs_for_md_docs(self.docs)
+
+    @staticmethod
+    def parse_conll_to_tok_dicts(filepath: str, cols_format) -> List[List[List[dict]]]:
+        """read a conll-formatted text file to a hierarchical collection of token dictionaries (tok_dict is like below)
+        input:
+        filepath - the file path of the conll-formatted file
+        cols_format - [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
+                        {'type': 'gold', 'col_num': 2, 'tagger': 'ner'},
+                        {'type': 'predict', 'col_num': 3, 'tagger': 'pos'},
+                        ...]
+        output: 
+        same as the input of function build_md_docs_from_tok_dicts() where
+        tok_dict = {
+            'text': 'Obama',
+            'poss': {'predict': 'NN', 'gold': 'NN'},
+            'chunks': {'predict': 'I-NNP', 'gold': 'I-NNP'},
+            'ners': {'predict': 'I-PER', 'gold': 'I-PER'}
+            }
+        """
+        
         # parse cols_format
-        len_pos = len([col for col in self.cols_format if col['tagger'] == 'pos'])
-        len_chunk = len([col for col in self.cols_format if col['tagger'] == 'chunk'])
-        len_ner = len([col for col in self.cols_format if col['tagger'] == 'ner'])
+        len_pos = len([col for col in cols_format if col['tagger'] == 'pos'])
+        len_chunk = len([col for col in cols_format if col['tagger'] == 'chunk'])
+        len_ner = len([col for col in cols_format if col['tagger'] == 'ner'])
 
         # set doc_separator
-        doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner) + '\n'
-
-        # local variables
-        sentences = []
-        tokens = []
-
-        count = 0
-        did = 0
-        sid = 0
-        tid = 0
-        with open(self.filepath) as f:
+        doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner) + '\n'  # TODO: consider the order given by cols_format
+        
+        
+        docs, sentences, tokens = [], [], []
+        with open(filepath) as f:
 
             # parse conll formatted txt file to ConllParser class
             for line in f:
-                count += 1
                 if line == doc_separator:  # -DOCSTART-|: end of a document
                     if sentences:  # if not empty document
-                        doc = Document(sentences)
-                        self.docs.append(doc)
-                        for sentence in sentences:
-                            sentence.set_document(doc)
+                        docs.append(sentences)
                         sentences = []
-                        did += 1
-                    sid = 0
                 elif not line.strip():  # blank line: the end of a sentence
                     if tokens:  # if not empty sentence (like after -DOCSTART-)
-                        sent = Sentence(tokens)
-                        sentences.append(sent)
-                        for token in tokens:
-                            token.set_sentence(sent)
+                        sentences.append(tokens)
                         tokens = []
-                        sid += 1
-                    tid = 0
                 else:  # inside a sentence: every token
                     a = line.split()
                     poss = {col['type']: ConllPosTag(a[col['col_num']])
-                            for col in self.cols_format if col['tagger'] == 'pos'} if len_pos else None
+                            for col in cols_format if col['tagger'] == 'pos'} if len_pos else None
                     chunks = {col['type']: ConllChunkTag(a[col['col_num']])
-                              for col in self.cols_format if col['tagger'] == 'chunk'} if len_chunk else None
+                              for col in cols_format if col['tagger'] == 'chunk'} if len_chunk else None
                     ners = {col['type']: ConllNERTag(a[col['col_num']])
-                            for col in self.cols_format if col['tagger'] == 'ner'} if len_ner else None
-                    tokens.append(ConllToken(a[0], poss=poss, chunks=chunks, ners=ners, id_=tid, sid=sid, did=did))
-                    tid += 1
+                            for col in cols_format if col['tagger'] == 'ner'} if len_ner else None
+                    tokens.append({'text': a[0], 'poss': poss, 'chunks': chunks, 'ners': ners})
             if sentences:  # for the last document (without -DOCSTART- at the end)
-                self.docs.append(Document(sentences))
+                docs.append(sentences)
+        return docs
+    
+    @staticmethod
+    def add_back_refs_for_md_docs(docs: List[Document]) -> None:  # TODO: Maybe it can be moved to sentence or other places?
+        for doc in docs:
+            for sent in doc:
+                sent.set_document(doc)
+                for tok in sent:
+                    tok.set_sentence(sent)
+        
+    @staticmethod
+    def build_md_docs_from_tok_dicts(docs: List[List[List[dict]]]) -> List[Document]:  
+        # TODO: Maybe it can further be abstracted such that it can be put in other classes than ConllParser?
+        """build the multi-document class from token dictionarys, which are like
+        input:
+        docs -  [
+                    [  # first doc
+                        [ tok_dict1, tok_dict2, ...], # first sent
+                        [...],
+                        ...
+                    ], 
+                    [...],
+                    ...
+                ]
+                where
+                tok_dict = {
+                    'text': 'Obama',
+                    'poss': {'predict': 'NN', 'gold': 'NN'},
+                    'chunks': {'predict': 'I-NNP', 'gold': 'I-NNP'},
+                    'ners': {'predict': 'I-PER', 'gold': 'I-PER'}
+                    }
+        """
+            
+        did, sid, tid = 0, 0, 0
 
+        docs_classes = []
+
+        for doc in docs:
+            did += 1
+            sid = 0
+            sents_classes = []
+            for sent in doc:
+                sid += 1
+                tid = 0
+                toks_classes = []
+                for tok in sent:
+                    tid += 1
+                    toks_classes.append(ConllParser.build_conll_token_from_tok_dicts(tok, tid, sid, did))
+                sents_classes.append(Sentence(toks_classes))
+            docs_classes.append(Document(sents_classes))
+        
+        return docs_classes
+    
+    
+    
+    @staticmethod
+    def build_conll_token_from_tok_dicts(tok, tid, sid, did) -> ConllToken:
+        """build a ConllToken from token dictionarys, which are like
+        tok_dict = {
+        'text': 'Obama',
+        'poss': {'predict': 'NN', 'gold': 'NN'},
+        'chunks': {'predict': 'I-NNP', 'gold': 'I-NNP'},
+        'ners': {'predict': 'I-PER', 'gold': 'I-PER'}
+        }
+        """
+        return ConllToken(tok['text'], poss=tok['poss'], chunks=tok['chunks'], ners=tok['ners'], id_=tid, sid=sid, did=did)
+            
     def set_entity_mentions(self) -> None:
         """chunk entity mentions for all sources (i.e. predict, gold)
         effect: call self.set_entity_mentions_for_one_sentence function for all sentences in the parser.docs
@@ -318,7 +393,9 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-    path = os.path.dirname(__file__) + '/../test/train.pred.gold'
+    print('Test passed!!!!!!')
+    
+    path = os.path.dirname(os.path.abspath(__file__)) + '/../test/train.pred.gold'
     train_parser = ConllParser(path)
     train_parser.obtain_statistics(entity_stat=True, source='predict')
     train_parser.set_entity_mentions()
