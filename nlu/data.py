@@ -105,10 +105,12 @@ class ObjectList(Base):
         return ObjectList(self.members + other.members)
 
 
-class MD_IDs:
+class MD_IDs(Base):
     def __init__(self, ids):
         """
         >>> ids = MD_IDs(ids=OrderedDict({'D':2, 'S': 1, 'T': 7}))
+        >>> ids
+        MD_IDs(ids=OrderedDict([('D', 2), ('S', 1), ('T', 7)]))
         >>> ids.fullid
         'D2-S1-T7'
         >>> ids.parent_fullid
@@ -118,7 +120,7 @@ class MD_IDs:
         >>> MD_IDs(ids=OrderedDict({'D':5, 'S':None, 'T': 2})).fullid # None in ids
         Traceback (most recent call last):
         ...
-        ValueError: There is at least one id not assigned in ids: OrderedDict([('D', 5), ('S', None), ('T', 2)])
+        ValueError: ids is None or there is at least one id not assigned in ids: OrderedDict([('D', 5), ('S', None), ('T', 2)])
         >>> MD_IDs().fullid
         Traceback (most recent call last):
         ...
@@ -130,6 +132,7 @@ class MD_IDs:
         reversed_ids = reversed(ids)
 
         self.id = self.ids[next(reversed_ids)]
+        self.id_ = self.id
         self.fullid: str = MD_IDs.concat_ids(self.ids)
         self.parent_ids = MD_IDs.get_parent_ids(self.ids)
         self.parent_fullid = MD_IDs.concat_ids(self.parent_ids)
@@ -140,8 +143,8 @@ class MD_IDs:
 
     @ids.setter
     def ids(self, ids: OrderedDict):
-        if None in ids.values():
-            raise ValueError(f'There is at least one id not assigned in ids: {ids}')
+        if ids is None or None in ids.values():
+            raise ValueError(f'ids is None or there is at least one id not assigned in ids: {ids}')
         else:
             self.__ids = ids
 
@@ -175,7 +178,39 @@ class MD_IDs:
     def __hash__(self):
         # make children class hashable. This trick is especially needed when __eq__ is overridden
         return hash(repr(self))
+    
+#     def __repr__(self):
+#         """
+#         >>> repr(MD_IDs(ids=OrderedDict({'D':5, 'S':3, 'EM': 2})))
+#         "MD_IDs(OrderedDict([('D', 5), ('S', 3), ('EM', 2)]))"
+#         """
+#         return '{self.__class__.__name__}({self.ids!r})'.format(self=self)
 
+    @staticmethod
+    def parse_fullid_str(str_) -> List:
+        """
+        >>> MD_IDs.parse_fullid_str('D9-S3-E2')
+        [('D', '9'), ('S', '3'), ('E', '2')]
+        """
+        a = [re.split('(\d+)', id_wp, maxsplit=1) for id_wp in str_.split('-')]
+        d = [tuple([i for i in s if i != '']) for s in a]
+        return d
+
+    @classmethod
+    def from_str(cls, str_: str) -> 'MD_IDs':
+        """
+        >>> MD_IDs.from_str('D9-S3-E2')
+        MD_IDs(ids=OrderedDict([('D', '9'), ('S', '3'), ('E', '2')]))
+        """
+        return cls.from_list(MD_IDs.parse_fullid_str(str_))
+    
+    @classmethod
+    def from_list(cls, list_: list) -> 'MD_IDs':
+        """
+        >>> MD_IDs.from_list([('D', '9'), ('S', '3'), ('E', '2')])
+        MD_IDs(ids=OrderedDict([('D', '9'), ('S', '3'), ('E', '2')]))
+        """
+        return cls(OrderedDict(list_))
 
 class TextWithIDs(MD_IDs):
     """abstract class: directly inherited by TextList, Token
