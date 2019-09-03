@@ -722,29 +722,30 @@ class Document(TextList):
         return Document(self.members + other.members)
 
 
-class EntityMention(TextList):
+class EntityMention(TextList, InSentence):
     """
-    >>> token1 = ConllToken('Welcome', ners={'predict': ConllNERTag('I-MISC')}, id_=0, sid=6, did=2)
-    >>> token2 = ConllToken('TSMC', ners={'predict': ConllNERTag('I-MISC')}, id_=1, sid=6, did=2)
-    >>> token3 = ConllToken('!', ners={'predict': ConllNERTag('I-MISC')}, id_=2, sid=6, did=2)
-    >>> sentence = Sentence([token1, token2, token3])
-    >>> for token in [token1, token2, token3]: token.set_sentence(sentence)
-    >>> x = EntityMention([token2], id_=33, source='predict')
-    >>> x.fullid
-    'D2-S6-EM33'
-    >>> isinstance(x, Hashable)  # hashable test1
+    >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+    >>> em1 = EntityMention(sen[0:2], id_=33, source='predict')
+    >>> em2 = EntityMention(sen[4:6], id_=34, source='gold')
+    >>> em1.fullid
+    'D99-S999-EM33'
+    >>> isinstance(em1, Hashable)  # hashable test1
     True
-    >>> s = set([x, x])  #hashable test2 (for checking if two mentions are "the same" using set() trick)
-    >>> (x+x)[:]  # test __add__ and __getitem__  # doctest: +ELLIPSIS
+    >>> s = set([em1, em2])  #hashable test2 (for checking if two mentions are "the same" using set() trick)
+    >>> em1+em1  # test __add__ and __getitem__  # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     ValueError: Not consecutive ner positions ...
-    >>> print(x.ann_str())  # blue
-    \x1b[34m[\x1b[0mTSMC\x1b[34m]\x1b[0m\x1b[34mMISC\x1b[0m
-    >>> x.source = 'gold'; print(x.ann_str())  # yellow
-    \x1b[33m[\x1b[0mTSMC\x1b[33m]\x1b[0m\x1b[33mMISC\x1b[0m
-    >>> print(x.ann_in_sentence())  # yellow
-    Welcome\x1b[33m[\x1b[0mTSMC\x1b[33m]\x1b[0m\x1b[33mMISC\x1b[0m!
+    >>> em1+em2  # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ValueError: Not consistent ner types ...
+    >>> print(em1.ann_str())  # blue
+    \x1b[34m[\x1b[0mNLU Lab\x1b[34m]\x1b[0m\x1b[34mORG\x1b[0m
+    >>> em1.source = 'gold'; print(em1.ann_str())  # yellow
+    \x1b[33m[\x1b[0mNLU Lab\x1b[33m]\x1b[0m\x1b[33mORG\x1b[0m
+    >>> print(em1.ann_in_sentence())  # yellow
+    \x1b[33m[\x1b[0mNLU Lab\x1b[33m]\x1b[0m\x1b[33mORG\x1b[0mis in Taipei Taiwan directed by Keh Yih Su .
     """
 
     def __init__(self, tokens, id_, source):
@@ -767,8 +768,11 @@ class EntityMention(TextList):
         self.token_b = tokens[0].id
         self.token_e = tokens[-1].id
 
-        self.sentence = tokens[0].sentence
-        self.document = self.sentence.document
+        # set refs automatically
+        try:
+            self.sentence = tokens[0].sentence
+        except AttributeError:
+            pass
 
         self.ems_pair = None
 
@@ -800,31 +804,36 @@ class EntityMention(TextList):
             raise ValueError('souce is neither "predict" nor "gold"')
         return color('[') + str(self) + color(']') + color(self.type)
 
+#     @overrides(MD_IDs)  # this will make unhashable
+#     def __eq__(self):  # TODO
+#         MD_IDs.__eq__(self)
+        
 
 class EntityMentions(TextList):
     """A user-defined list of 'EntityMention's.
     - ids: its ids is the same as the ids of the sentence it resides in
-    >>> token = ConllToken('TSMC', ners={'predict': ConllNERTag('I-MISC')}, id_=2, sid=6, did=2)
-    >>> token2 = ConllToken('Foundation', ners={'predict': ConllNERTag('I-MISC')}, id_=3, sid=6, did=2)
-    >>> sentence = Sentence([token])
-    >>> token.set_sentence(sentence)
-    >>> token2.set_sentence(sentence)
-    >>> x = EntityMention([token], id_=2, source='predict')
-    >>> y = EntityMention([token2], id_=3, source='predict')
-    >>> pems = EntityMentions([x, y])
+    >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+    >>> sen.set_entity_mentions()
+    >>> pems = EntityMentions(sen.pems)
+    >>> len(pems), type(pems[0:3]), type(pems[0]), len(pems[0:3]), type(pems[-1])
+    (4, <class '__main__.EntityMentions'>, <class '__main__.EntityMention'>, 3, <class '__main__.EntityMention'>)
     >>> pems.parent_ids
-    OrderedDict([('D', 2)])
-    >>> [ str(token) for pem in pems for token in pem.tokens]  # test __iter__()
-    ['TSMC', 'Foundation']
+    OrderedDict([('D', 99)])
+    >>> {token.fullid:str(token) for pem in pems for token in pem.tokens}  # test __iter__()
+    {'D99-S999-T0': 'NLU', 'D99-S999-T1': 'Lab', 'D99-S999-T4': 'Taipei', 'D99-S999-T5': 'Taiwan', 'D99-S999-T8': 'Keh', 'D99-S999-T9': 'Yih', 'D99-S999-T10': 'Su'}
     >>> EntityMentions.sep_str(pems, sep='|')
-    'TSMC|Foundation'
+    'NLU Lab|Taipei|Taiwan|Keh Yih Su'
     >>> str(pems)
-    'TSMC Foundation'
+    'NLU Lab Taipei Taiwan Keh Yih Su'
     >>> len((pems + pems)[:])  # test __add__ and __getitem__
-    4
-    >>> EntityMentions([], x.source, x.type, x.parent_ids) \
-     # None EntityMentions test (For False Negative/Positive) # doctest: +ELLIPSIS
-    <...EntityMentions object at ...
+    8
+    >>> EntityMentions([], pems.source, pems.type, pems.parent_ids) \
+     # None EntityMentions test (For False Negative/Positive)
+    EntityMentions(mentions=[], source='predict', type_='ORG', ids=OrderedDict([('D', 99)]))
+    >>> print(pems[1:2].get_diff_ann_sent(pems[:1]+pems[2:], colors=[fg.green, fg.red]))
+    \x1b[31m[NLU Lab]ORG\x1b[0m is in \x1b[32m[Taipei]LOC\x1b[0m \x1b[31m[Taiwan]LOC\x1b[0m directed by \x1b[31m[Keh Yih Su]PER\x1b[0m .
+    >>> print(pems[1:2].get_ann_em_in_sent())
+    \x1b[34m[NLU Lab]ORG\x1b[0m is in \x1b[32m[Taipei]LOC\x1b[0m \x1b[34m[Taiwan]LOC\x1b[0m directed by \x1b[34m[Keh Yih Su]PER\x1b[0m .
     """
 
     def __init__(self, mentions: List[EntityMention], source: str = None, type_: str = None
@@ -833,7 +842,9 @@ class EntityMentions(TextList):
         self.mentions = mentions
         self.all_tokens: List[Token] = [token for mention in mentions for token in mention.tokens]
         try:
-            ids = copy(mentions[0].parent_ids)
+            ids = copy(mentions[0].parent_ids)  # FIXME: parent_ids should be D and S instead? 
+            # (this occurs because there is no its id for EntityMentions for now) (Add id 'PEMS0' and 'GEMS0')
+            self.sid, self.did = ids['S'], ids['D']
             self.source = mentions[0].source
             self.type = mentions[0].type  # todo: sanity check
             self.token_b = mentions[0].token_b
@@ -842,18 +853,50 @@ class EntityMentions(TextList):
             self.token_es = [mention.token_e for mention in mentions]
             self.sentence = mentions[0].sentence
             self.types: List[str] = [mention.type for mention in mentions]
-        except IndexError:
+            self.type_ = type_
+        except IndexError:  # no mention
+            dataLogger.error(mentions)
             self.source = source
             self.type = type_
+            self.type_ = type_
             ids = ids
 
         TextList.__init__(self, ids, mentions)
 
     @overrides(TextList)
-    def __add__(self, other):
+    def __add__(self, other) -> 'EntityMentions':
         return EntityMentions(self.members + other.members)
 
+    def get_ann_sent(self, *args, **kwargs):
+        """porting to sentence.get_ann_sent"""
+        return self.sentence.get_ann_sent(self, *args, **kwargs)
+    
+    def get_diff_ann_sent(self, other_ems, *args, **kwargs):
+        """porting to sentence.get_diff_ann_sent"""
+        return self.sentence.get_diff_ann_sent([self, other_ems], *args, **kwargs)
+    
+    def get_ann_em_in_sent(self, colors=[fg.green, fg.blue]):
+        """highlight the entity mentions and the others with two different colors in the setnecne"""
+        other_ems = EntityMentions([em for em in self.sentence.entity_mentions_dict[self.source] if em not in self])
+        return self.get_diff_ann_sent(other_ems, colors)
+    
+    def __getitem__(self, item) -> 'EntityMentions':
+        """
+        extend TextList.__getitem__()
+        return EntityMentions
+        """
+        if isinstance(item, slice):
+            return EntityMentions(TextList.__getitem__(self, item))
+        elif isinstance(item, int):
+            return TextList.__getitem__(self, item)
+        else:
+            raise IndexError("Only integer slice or index are avaiable for EntityMentions")
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+
+    failure_count, test_count = doctest.testmod()
+    
+    if failure_count == 0:
+        
+        print('{} tests passed!!!!!!'.format(test_count))
