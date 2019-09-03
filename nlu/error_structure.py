@@ -3,8 +3,8 @@ from typing import Tuple, Union, List, Dict, Optional
 
 from ansi.color import fg
 
-from nlu.data import TextList, EntityMentions, MD_IDs
-from nlu.utils import id_incrementer, overrides, colorize_list, ls_to_ls_str, TO_SEP
+from nlu.data import TextList, EntityMentions, MD_IDs, Base
+from nlu.utils import id_incrementer, overrides, colorize_list, ls_to_ls_str, TO_SEP, list_to_str
 
 NOTE_SEP = '-'
 NOTE = ' {} '.format(NOTE_SEP)
@@ -12,33 +12,33 @@ NOTE = ' {} '.format(NOTE_SEP)
 
 class EntityMentionsPair(TextList):
     """An EntityMentionsPair has a gold EntityMentions and a predicted EntityMentions
-    >>> from nlu.data import ConllToken, ConllNERTag, Sentence, EntityMention
-    >>> from nlu.error import NERErrorAnnotator, NERErrorExtractor
-    >>> sid, did = 3, 50
-    >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('B-ORG'), 'predict':ConllNERTag('I-LOC')})
-    >>> semi = ConllToken('Semiconductor', 1, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-MISC')})
-    >>> manu = ConllToken('Manufacturer', 2, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-    >>> co = ConllToken('Cooperation', 3, sid, did, ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-    >>> sen = Sentence([taiwan, semi, manu])
-    >>> for token in [taiwan, semi, manu, co]: \
-            token.set_sentence(sen)
-    >>> tsmc = EntityMention([taiwan, semi, manu], source='gold', id_=0)
-    >>> t = EntityMention([taiwan], source='predict', id_=0)
-    >>> tsmcs = EntityMentions([tsmc])
-    >>> ts = EntityMentions([t])
+    >>> from nlu.data import Sentence, EntityMentions
+    >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+    >>> pems = EntityMentions(sen.get_entity_mentions('predict')[1:3])
+    >>> gems = EntityMentions(sen.get_entity_mentions('gold')[1:2])
     >>> error_id_inc = id_incrementer(), id_incrementer()
-    >>> pair = EntityMentionsPair(0, tsmcs, ts, error_id_inc)
+    >>> pair = EntityMentionsPair(0, gems, pems, error_id_inc)
+    >>> pair  # doctest: +ELLIPSIS
+    EntityMentionsPair(...)
+    >>> len(pair.gems), len(pair.pems), len(pair.ems)
+    (1, 2, 3)
     >>> print(pair)
-    Taiwan Taiwan Semiconductor Manufacturer
-    >>> print(pair.fullid)
-    D50-S3-PAIR0
+    D99-S999-PAIR0: (G) NLU Lab is in \x1b[33m[Taipei Taiwan]LOC\x1b[0m directed by Keh Yih Su . (P) NLU Lab is in \x1b[34m[Taipei]LOC\x1b[0m \x1b[34m[Taiwan]LOC\x1b[0m directed by Keh Yih Su .
+    >>> any(em.entity_mentions_pair is not pair for em in pair.gems.mentions)
+    False
+    >>> pair.pprint()
+    --- error id D99-S999-PAIR0 ---
+    (G) NLU Lab is in \x1b[33m[Taipei Taiwan]LOC\x1b[0m directed by Keh Yih Su .
+    (P) NLU Lab is in \x1b[34m[Taipei]LOC\x1b[0m \x1b[34m[Taiwan]LOC\x1b[0m directed by Keh Yih Su .
     """
-    def __init__(self, id_, gems: EntityMentions, pems: EntityMentions, id_incs: Tuple[id_incrementer, id_incrementer]):
+    def __init__(self, id_, gems: EntityMentions, pems: EntityMentions, id_incs: Tuple[id_incrementer, id_incrementer]):  
+        # TODO: idea - Set A Proxy Class for List[EntityMention] like EntityMentions (like `view`)
+        # TODO: fix id_incs generator
+        # TODO: Use List[EntityMention] instead of EntityMentions to be input into TextList constructor
         self.gems = gems
         self.pems = pems
-        self.mentions = self.pems + self.gems
+        self.mentions: EntityMentions = self.pems + self.gems
+        self.ems: EntityMentions = self.mentions
         self.id_incs = id_incs
         self.result: Optional[NERComparison] = None
         self.correct: Optional[NERCorrect] = None
@@ -70,8 +70,8 @@ class EntityMentionsPair(TextList):
         self.predict_text_sep = '|'.join([str(pem) for pem in pems])
         self.gold_text_sep = '|'.join([str(gem) for gem in gems])
 
-        TextList.__init__(self, ids, self.mentions)
-
+        TextList.__init__(self, ids, self.mentions.mentions)
+        
         # navigation
         self.sentence = self.mentions[0].sentence
 
@@ -79,29 +79,25 @@ class EntityMentionsPair(TextList):
         self.did = self.ids['D']
         
         # set backreference to entity mentions
-        self.set_ems_pair_to_ems()
+#         self.set_ems_pair_to_ems()
 
-    def pretty_print(self) -> None:
+    def __str__(self):
+
+        em = self.pems[0]
+        ids = MD_IDs.from_list([('D', em.did), ('S', em.sid), ('PAIR', self.ids['PAIR'])])
+        return ids.fullid + ': (G) ' + self.sentence.get_ann_sent(self.gems, fg.yellow) + ' (P) ' + self.sentence.get_ann_sent(self.pems)
+        
+    def pprint(self) -> None:
+
         print('--- error id %s ---' % self.fullid)
-        print('< gold >')
-        for gem in self.gems:
-            print('{} ({}-{}) '.format(gem.text, gem.token_b, gem.token_e))
-        print('< predict >')
-        for pem in self.pems:
-            print('{} ({}-{}) '.format(pem.text, pem.token_b, pem.token_e))
+        print('(G)', self.sentence.get_ann_sent(self.gems, fg.yellow))
+        print('(P)', self.sentence.get_ann_sent(self.pems))
+
 
     @overrides(TextList)
     def __add__(self, other):
         return EntityMentionsPair(self.id, self.gems + other.gems, self.pems + other.pems, self.id_incs)
-    #
-    # def ann_str(self) -> str:
-    #     result = []
-    #     for i in range(self.token_b, self.token_e+1):
-    #         if i in self.pems.token_bs:
-    #             result.append('[' + self.)
-    #
-    #     return [pem for pem in self.pems]
-
+    
     def set_result(self, result) -> None:
         self.result: Union[NERErrorComposite, NERCorrect] = result
         self.set_error()
@@ -128,9 +124,9 @@ class EntityMentionsPair(TextList):
             raise TypeError('The returned result is neither {} nor {}, but {} is obtained'
                             .format(NERCorrect.__name__, NERErrorComposite.__name__, type(self.result)))
             
-    def set_ems_pair_to_ems(self) -> None:
-        for em in self.mentions:
-            em.ems_pair = self
+#     def set_ems_pair_to_ems(self) -> None:
+#         for em in self.mentions:
+#             em.ems_pair = self
 
 
 class EntityMentionsPairs(TextList):
@@ -189,33 +185,27 @@ class NERCorrect(NERComparison):
         super().__init__(ems_pair, ids)
         self.type = type
         self.filtered_type = type
+        self.correct_id = correct_id
 
     def __str__(self):
         return '---{}---'.format(fg.green('Correct')) + NERComparison.__str__(self)
 
+    
+class NERError(Base):
+    pass
 
-class SpanError:
+class SpanError(NERError):
     """
     >>> from nlu.data import ConllToken, ConllNERTag, Sentence, EntityMention
     >>> from nlu.error import NERErrorAnnotator, NERErrorExtractor
-    >>> sid, did = 3, 50
-    >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('B-ORG'), 'predict':ConllNERTag('I-LOC')})
-    >>> semi = ConllToken('Semiconductor', 1, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-MISC')})
-    >>> manu = ConllToken('Manufacturer', 2, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-    >>> co = ConllToken('Cooperation', 3, sid, did, ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-    >>> sen = Sentence([taiwan, semi, manu])
-    >>> for token in [taiwan, semi, manu, co]: \
-            token.set_sentence(sen)
-    >>> tsmc = EntityMention([taiwan, semi, manu], source='gold', id_=0)
-    >>> t = EntityMention([taiwan], source='predict', id_=0)
-    >>> tsmcs = EntityMentions([tsmc])
-    >>> ts = EntityMentions([t])
-    >>> error_id_inc = id_incrementer(), id_incrementer()
-    >>> pair = EntityMentionsPair(0, tsmcs, ts, error_id_inc)
-    >>> print(str(SpanError(pair, 'R', 'Expansion')))
-    1
+    >>> from nlu.data import Sentence, EntityMentions
+    >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+    >>> sen.set_entity_mentions()
+    >>> len(sen.gems), len(sen.pems)
+    (3, 4)
+    >>> pair = EntityMentionsPair(0, EntityMentions(sen.gems[2:3]), EntityMentions(sen.pems[3:4]), id_incrementer())
+    >>> print(str(SpanError(pair, 'R', 'Diminished')))
+    R Diminished
     """
     def __init__(self, ems_pair: EntityMentionsPair, direction, span_type):
 
@@ -227,22 +217,23 @@ class SpanError:
         return self.direction + ' ' + self.span_type
 
 
-class MergeSplitError:
+class MergeSplitError(NERError):
 
     def __init__(self, ems_pair: EntityMentionsPair, type_):
         self.ems_pair = ems_pair
         self.type = type_
+        self.type_ = type_
         self.gems = ems_pair.gems
         self.pems = ems_pair.pems
 
     def __str__(self):
-        return self.name_str() + str(self.ems_pair.ems_total)
+        return self.name_str()
 
     def name_str(self, sep=None):
         return ls_to_ls_str(self.gems, self.pems, sep=sep)
 
 
-class FalseError:
+class FalseError(NERError):
     def __init__(self, ems_pair: EntityMentionsPair, false_type):
         self.false_type: str = false_type
         self.em_type: str = ems_pair.mentions.type
@@ -252,7 +243,7 @@ class FalseError:
         return self.false_type + NOTE + self.em_type
 
 
-class MentionTypeError:
+class MentionTypeError(NERError):
     def __init__(self, ems_pair: EntityMentionsPair):
         self.ems_pair = ems_pair
         self.gems = ems_pair.gems
@@ -267,7 +258,7 @@ class MentionTypeError:
         return ls_to_ls_str(self.gems.types, self.pems.types, sep=sep)
 
 
-class ComplicateError:
+class ComplicateError(NERError):
     def __init__(self, ems_pair: EntityMentionsPair):
         self.ems_pair = ems_pair
         self.predict_types: List[str] = ems_pair.pems.types
@@ -301,12 +292,14 @@ class NERErrorComposite(NERComparison):
     # {'type': str, 'pems': EntityMentions, 'gems': EntityMentions, ''}
     # {'false_error': false_error, 'type_error': type_error, 'span_error': span_error}
 
-    def __init__(self, ems_pair: EntityMentionsPair, type: Dict[str, Union[str, SpanError, MentionTypeError
-    , MergeSplitError, ComplicateError]], error_id):
+    def __init__(self, ems_pair: EntityMentionsPair, 
+                 type: Dict[str, Union[str, SpanError, MentionTypeError, MergeSplitError, ComplicateError]], 
+                 error_id):
         ids = copy(ems_pair.parent_ids)
         ids.update({'NERErr': next(error_id)})
         super().__init__(ems_pair, ids)
         self.type = type
+        self.error_id = error_id
         self.filtered_type = self.filtered_to_array(type)
         self.false_error = self.type['false_error']
         self.span_error: SpanError = self.type['span_error']
@@ -341,3 +334,13 @@ class NERErrorComposite(NERComparison):
     #         raise ValueError("""The type '{}' is not in one of these:
     #         '{} or None'
     #         """.format(type, NERErrorComposite.all_types))
+
+if __name__ == '__main__':
+    import doctest
+
+    failure_count, test_count = doctest.testmod()
+    
+    if failure_count == 0:
+        
+        print('{} tests passed!!!!!!'.format(test_count))
+    
