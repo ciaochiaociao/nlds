@@ -360,87 +360,157 @@ class ConllPosTag(Tag):  # todo
     pass
 
 
-class Token(TextWithIDs):
+class Token(TextWithIDs, InSentence):
     def __init__(self, text, id_, sid, did):
+        """
+        >>> t = Token('TSMC', 1, 2, 3)
+        >>> repr(t)
+        "Token(text='TSMC', id_=1, sid=2, did=3)"
+        """
         self.sid = sid
         self.did = did
+        
+        # attribute for backref
         self.sentence = None
+        
         ids = OrderedDict({'D': self.did, 'S': self.sid, 'T': id_})
         self.text = text
-        TextWithIDs.__init__(self, ids)
+        TextWithIDs.__init__(self, ids)  # self.id is set here
 
-    def set_sentence(self, sentence: 'Sentence'):
-        self.sentence = sentence
+#     def set_sentence(self, sentence: 'Sentence'):
+#         self.sentence = sentence
 
     @overrides(TextWithIDs)
     def __str__(self):
         return self.text
 
-    # TODO: reference to document
+#     # TODO: reference to document
 
 
 class ConllToken(Token):
+    
+    auto_id = -1
+    
     def __init__(self, text, id_, sid, did, poss=None, chunks=None, ners=None):
         """
-        >>> ConllToken('TSMC', id_=1, sid=2, did=3, ners={'predict': ConllNERTag('I-MISC')}).fullid
+        >>> ct = ConllToken(text='TSMC', id_=1, sid=2, did=3, ners={'predict': ConllNERTag('I-MISC')})
+        >>> repr(ct)
+        "ConllToken(text='TSMC', id_=1, sid=2, did=3, ners={'predict': 'I-MISC'})"
+        >>> ct.fullid
         'D3-S2-T1'
         """
         self.poss: Dict[str, str] = poss
         self.chunks: Dict[str, str] = chunks
         self.ners: Dict[str, ConllNERTag] = ners
         super().__init__(text, id_, sid, did)
+        
+    @classmethod
+    def easy_build(cls, text, ner=None, gner=None, restart=False, id_=None, sid=999, did=99, **kwargs):
+        """
+        >>> ConllToken.easy_build('TSMC', 'I-ORG', restart=True)
+        ConllToken(text='TSMC', id_=0, sid=999, did=99, ners={'predict': 'I-ORG'})
+        >>> ConllToken.easy_build('Morris', 'I-PER')
+        ConllToken(text='Morris', id_=1, sid=999, did=99, ners={'predict': 'I-PER'})
+        >>> ConllToken.easy_build('Taipei', 'I-LOC', id_=12)
+        ConllToken(text='Taipei', id_=12, sid=999, did=99, ners={'predict': 'I-LOC'})
+        """
+        if restart:
+            cls.auto_id = -1
+        
+        if id_ is None:
+            cls.auto_id += 1
+            id_ = cls.auto_id
+        
+        # just text
+        if ner is None and gner is None:
+            return cls(text, id_, sid, did, **kwargs)
 
+        # with predict or gold tag
+        ners_dict = {}
+        if ner is not None:
+            ners_dict.update({'predict': ConllNERTag(ner)})
+        if gner is not None:
+            ners_dict.update({'gold': ConllNERTag(gner)})
+            
+        return cls(text, id_, sid, did, ners=ners_dict, **kwargs)
+        
+    @classmethod
+    def bulk_easy_build(cls, texts: List[str], pners: List[str]=None, gners=None, **kwargs):
+        """
+        >>> tokens = ConllToken.bulk_easy_build(['TSMC', 'is', 'in', 'Hsinchu', 'Taiwan', '.'], ['I-ORG', 'O', 'O', 'I-LOC', 'B-LOC', 'O'])
+        >>> len(tokens)
+        6
+        """
+        cls.auto_id = -1
+        kwargs = {k:v for k, v in kwargs.items() if k != 'id_'}
 
-class Sentence(TextList):
+        assert (gners is None or len(gners) == len(texts)) and \
+            (pners is None or len(pners) == len(texts)), 'The number of tokens and ner tags do not match!'
+            
+        
+        argses = zip(*[arg for arg in [texts, pners, gners] if arg is not None])
+        return [cls.easy_build(*args, **kwargs) for args in argses]
+        
+       
+    @classmethod
+    def bulk_from_str(cls, text_str, pner_str=None, gner_str=None, sep=' ', **kwargs):
+        """
+        >>> tokens = ConllToken.bulk_from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O')
+        >>> len(tokens)
+        12
+        """
+        
+        args = [arg.strip().split(sep) for arg in [text_str, pner_str, gner_str] if arg is not None]
+        return cls.bulk_easy_build(*args, **kwargs)
+
+    
+class Sentence(TextList, InDocument):
     def __init__(self, tokens: List[Token]):
         """
-        >>> sid, did = 3, 6
-        >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-        'predict':ConllNERTag('I-ORG')})
-        >>> semi = ConllToken('Semiconductor', 1, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-        'predict':ConllNERTag('I-ORG')})
-        >>> manu = ConllToken('Manufacturer', 2, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-        'predict':ConllNERTag('B-ORG')})
-        >>> co = ConllToken('Cooperation', 3, sid, did, ners={'gold':ConllNERTag('B-ORG'), \
-        'predict':ConllNERTag('I-ORG')})
-        >>> sen = Sentence([taiwan, semi, manu, co])
+        >>> tokens = ConllToken.bulk_easy_build(['TSMC', 'is', 'in', 'Hsinchu', 'Taiwan', '.'], ['I-ORG', 'O', 'O', 'I-LOC', 'B-LOC', 'O'])
+        >>> sen = Sentence(tokens)
+        >>> sen  # doctest: +ELLIPSIS
+        Sentence(tokens=[ConllToken..., ConllToken(text='.', id_=5, sid=999, did=99...)])
         >>> sen.print(True)
-        Taiwan Semiconductor Manufacturer Cooperation(D6-S3)
-        >>> doc = Document([sen])
-        >>> sen.set_document(doc)
-        >>> print(sen.document)
-        Taiwan Semiconductor Manufacturer Cooperation
+        TSMC is in Hsinchu Taiwan .(D99-S999)
         >>> len(sen)
-        4
+        6
         >>> sen.fullid, sen.ids
-        ('D6-S3', OrderedDict([('D', 6), ('S', 3)]))
+        ('D99-S999', OrderedDict([('D', 99), ('S', 999)]))
         >>> str(sen)  # test __str__
-        'Taiwan Semiconductor Manufacturer Cooperation'
+        'TSMC is in Hsinchu Taiwan .'
         >>> repr((sen+sen)[0])  # test __add__ and __getitem__  # doctest: +ELLIPSIS
-        '<...ConllToken object at ...>'
+        "ConllToken(text='TSMC', id_=0, sid=999, did=99, ners={'predict': 'I-ORG'})"
+        >>> doc = Document([sen])
+        >>> print(sen.document)
+        TSMC is in Hsinchu Taiwan .
         """
         self.tokens: List[Token] = tokens
         self.entity_mentions_dict: Dict[str, List[EntityMention]] = {'predict': [], 'gold': []}  # todo: change to EntityMentions
         self.id: int = tokens[0].sid
         self.did: int = tokens[0].did
+        
+        # attributes for backrefs
         self.document = None
         self.ems_pairs: Optional['EntityMentionsPairs'] = None
+            
+            
         self.ner_results: Optional[List['NERComparison']] = None
         self.ner_corrects: Optional[List['NERCorrect']] = None
         self.ner_errors: Optional[List['NERErrorComposite']] = None
         ids = self.tokens[0].parent_ids
         TextList.__init__(self, ids, tokens)
 
-    def set_document(self, document: 'Document') -> None:
-        self.document = document
+#     def set_document(self, document: 'Document') -> None:
+#         self.document = document
 
-    def set_errors_from_pairs(self, pairs) -> None:  # change to property
+    def set_errors_from_pairs(self, pairs) -> None:  # FIXME: No longer used?
         if pairs is None:
             self.ner_errors = None
         else:
             self.ner_errors = pairs.errors
 
-    def set_corrects_from_pairs(self, pairs) -> None:
+    def set_corrects_from_pairs(self, pairs) -> None:  # FIXME: No longer used?
         if pairs is None:
             self.ner_corrects = None
         else:
@@ -460,36 +530,191 @@ class Sentence(TextList):
     def __add__(self, other):
         return Sentence(self.members + other.members)
 
+#     def __repr__(self):
+#         return '{self.__class__.__name__}({self.tokens!r})'.format(self=self) 
+    
+    @classmethod
+    def easy_build(cls, *args, **kwargs):
+        """
+        >>> sen = Sentence.easy_build(['NLU', 'Lab', 'is', 'in', 'Taipei', 'Taiwan', 'directed', 'by', 'Keh', 'Yih', 'Su', '.'], ['I-ORG', 'I-ORG', 'O', 'O', 'I-LOC', 'B-LOC', 'O', 'O', 'I-PER', 'I-PER', 'I-PER', 'O'])
+        >>> len(sen)
+        12
+        """
+        return cls(ConllToken.bulk_easy_build(*args, **kwargs))
+    
+    @classmethod
+    def from_str(cls, *args, **kwargs):
+        """
+        >>> Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')  # doctest: +ELLIPSIS
+        Sentence(...ners={'predict': 'I-ORG', 'gold': 'I-ORG'}...)
+        """
+        return cls(ConllToken.bulk_from_str(*args, **kwargs))
+    
+    def set_entity_mentions(self, sources: List=['predict', 'gold']) -> None:
+        """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
+        effect: set sentence.entity_mentions_dict ({'predict': `EntityMention`s})
+        >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', pner_str='I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', gner_str='I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+        >>> sen.set_entity_mentions()
+        >>> len(sen.gems), len(sen.pems), len(sen.ems)
+        (3, 4, 7)
+        >>> sen.pems[0]  # doctest: +ELLIPSIS
+        EntityMention(...'NLU'...'predict': 'I-ORG'...'Lab'...predict': 'I-ORG'... source='predict')
+        >>> len(sen.pems[0]), sen.pems[0].type
+        (2, 'ORG')
+        """
+        for source in sources:
 
+            entity_mentions = self.get_entity_mentions(source)
+            
+            if entity_mentions:
+                self.entity_mentions_dict[source] = entity_mentions
+                
+                if source == 'predict':
+                    self.pems = entity_mentions
+                elif source == 'gold':
+                    self.gems = entity_mentions
+                else:
+                    raise ValueError('source should be either "predict" or "gold": {}'.format(source))
+        
+        self.ems = []
+        self.ems += [ em for ems in self.entity_mentions_dict.values() for em in ems]
+    
+    def get_entity_mentions(self, source: str) -> List['EntityMention']:
+        """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
+        >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', pner_str='I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', gner_str='I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+        >>> gems = sen.get_entity_mentions('gold')
+        >>> pems = sen.get_entity_mentions('predict')
+        >>> len(gems)
+        3
+        >>> len(pems)
+        4
+        >>> pems[0]  # doctest: +ELLIPSIS
+        EntityMention(...'NLU'...'predict': 'I-ORG'...'Lab'...predict': 'I-ORG'... source='predict')
+        >>> len(pems[0])
+        2
+        >>> pems[0].type
+        'ORG'
+        """
+
+        tokens_tray: List[Token] = []
+        entity_mentions: List['EntityMention'] = []
+#         last_token = ConllToken(text='', ner='O')
+        last_token = None
+        eid = 0
+
+        for i, token in enumerate(self.tokens):
+            # A. Boundary Detected: create an EntityMention from the tokens_tray and append to entity_mentions and
+            # empty tokens_tray if the tokens_tray is not empty (the last token is of entity tag)
+            # (Boundary: 'O', "B-" prefix, "I-" with different suffix )
+            # B. Entity Tags Detected: add Token to tokens_tray
+            # (not 'O')
+
+            if token.ners[source].type == 'O' or token.ners[source].prefix == 'B' or not last_token \
+                    or token.ners[source].suffix != last_token.ners[source].suffix:  # Boundary detected
+                if tokens_tray:
+                    entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
+                    eid += 1
+                    tokens_tray = []
+
+            if token.ners[source].type != 'O':
+                tokens_tray.append(token)
+
+            last_token = token
+
+        # at the end of a sentence: 
+        #  - add the last entity mention if it exists
+        if tokens_tray:
+            entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
+    
+        return entity_mentions
+    
+    def get_ann_sent(self, ems: 'EntityMentions', color=fg.blue, color_em=True) -> str:
+        """highlight all entity mentions with one color in the sentence"""
+        return self.get_diff_ann_sent([ems], [color], color_em)
+    
+    def get_diff_ann_sent(self, all_ems: List['EntityMentions'], colors=None, color_em=True) -> str:
+        """highlight different entity mentions with different color in the sentence"""
+        def _split(split: list, a: list):
+
+            import copy
+
+            result = copy.copy(list(split))
+
+            if split[0] != 0:
+                result.insert(0, 0)
+            if split[-1] != len(a):
+                result.append(len(a))
+
+            ranges = []
+            for i in range(len(result)-1):
+                ranges.append((result[i], result[i + 1]))
+
+            return ranges
+
+        def _get_oppo_split(splits: list, a: list):
+            fa = sorted({j for i in splits for j in i})
+            return sorted(set(_split(fa, a)) - set(splits))
+
+        def get_str(sentence: 'Sentence', range_: tuple, color=fg.blue, color_em=True):
+            if color_em:
+                return color('[' + list_to_str(sentence[slice(*range_[0])]) + ']' + range_[1].type)
+            else:
+                return color('[') + list_to_str(sentence[slice(*range_[0])]) + color(']' + range_[1].type)
+
+        def _get_ems_dict_with_range(ems: 'EntityMentions', *args, **kwargs) -> list:
+            ems_range = [((em.token_b, em.token_e+1), em) for em in ems]
+            ems_dict = [(range_[0][0], get_str(self, range_, *args, **kwargs)) for range_ in ems_range]
+            return ems_dict, ems_range
+        
+        # sanity check
+        for ems in all_ems:
+            if any(em.sentence is not self for em in ems):
+                raise ValueError('Entity mention in sentence.ems are not in the same sentence: {}'.format(self.ems))
+        
+        if colors is None:
+            colors = [fg.blue] * len(all_ems)
+        
+        all_ems_range = set()
+        all_ems_dict = []
+        for ems, color in zip(all_ems, colors):
+            ems_dict, ems_range = _get_ems_dict_with_range(ems, color)
+            all_ems_range |= set(ems_range)
+            all_ems_dict.extend(ems_dict)
+                        
+        all_ems_range = sorted(all_ems_range)
+        
+        non_ems_range = _get_oppo_split(dict(all_ems_range).keys(), self)
+        non_ems_dict = [(range_[0], list_to_str(self[slice(*range_)])) for range_ in non_ems_range]
+        
+        all_dict = all_ems_dict + non_ems_dict
+        
+        sentence = list_to_str(dict(sorted(all_dict)).values())
+        return sentence
+    
+    
 class Document(TextList):
     """
-    >>> sid, did = 3, 6
-    >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-    'predict':ConllNERTag('I-ORG')})
-    >>> semi = ConllToken('Semiconductor', 1, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-    'predict':ConllNERTag('I-ORG')})
-    >>> manu = ConllToken('Manufacturer', 2, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-    'predict':ConllNERTag('B-ORG')})
-    >>> co = ConllToken('Cooperation', 3, sid, did, ners={'gold':ConllNERTag('B-ORG'), \
-    'predict':ConllNERTag('I-ORG')})
-    >>> sen = Sentence([taiwan, semi, manu, co])
-    >>> sen.print(True)
-    Taiwan Semiconductor Manufacturer Cooperation(D6-S3)
-    >>> doc = Document([sen])
+    >>> sen1 = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+    >>> sen2 = Sentence.from_str('Natural Language Processing is so fun !', 'I-MISC I-MISC I-MISC O O O O', 'O I-MISC I-MISC O O O O')
+    >>> sen1.print(True)
+    NLU Lab is in Taipei Taiwan directed by Keh Yih Su .(D99-S999)
+    >>> doc = Document([sen1, sen2])
+    >>> str(doc)
+    'NLU Lab is in Taipei Taiwan directed by Keh Yih Su . Natural Language Processing is so fun !'
     >>> len(doc)
-    1
+    2
     >>> doc.id, doc.fullid, doc.parent_ids
-    (6, 'D6', None)
-    >>> repr(doc + doc)  # test __add__  # doctest: +ELLIPSIS
-    '<...Document object at ...>'
+    (99, 'D99', None)
+    >>> len(doc + doc)  # test __add__  # doctest: +ELLIPSIS
+    4
     >>> (doc + doc)[0]  # test __add__ and __getitem__  # doctest: +ELLIPSIS
-    <...Sentence object at ...
+    Sentence(...)
     """
     def __init__(self, sentences: List[Sentence]):
 
         self.id = sentences[0].did
-        self.sentences: List[Sentence] = sentences
-        ids = self.sentences[0].parent_ids
+#         self.sentences: List[Sentence] = sentences
+        ids = sentences[0].parent_ids
         TextList.__init__(self, ids, sentences)
 
     @overrides(TextList)
