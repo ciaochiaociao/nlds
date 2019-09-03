@@ -1,7 +1,7 @@
 from nlu.data import *
 
 
-class ConllParser:
+class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     """Column Parser for CoNLL03 formatted text file"""
     TAGGERSOURCE = 'gold'
 
@@ -16,6 +16,8 @@ class ConllParser:
         >>> cols_format = [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'}, {'type': 'gold', 'col_num': 2, 'tagger': 'ner'}]
         >>> path = os.path.dirname(os.path.abspath(__file__)) + '/../test/train.pred.gold'
         >>> train_parser = ConllParser(path, cols_format)
+        >>> train_parser  # doctest: +ELLIPSIS
+        ConllParser(filepath='.../test/train.pred.gold', cols_format=[{'type': 'predict', 'col_num': 1, 'tagger': 'ner'}, {'type': 'gold', 'col_num': 2, 'tagger': 'ner'}])
         >>> train_parser.obtain_statistics(entity_stat=True, source='predict')  # doctest: +ELLIPSIS
         ---...
         Document number:  946
@@ -104,7 +106,13 @@ class ConllParser:
                 sent.set_document(doc)
                 for tok in sent:
                     tok.set_sentence(sent)
-        
+                try:
+                    for em in sent.entity_mentions_dict.values():
+                        em.set_sentence(sent)
+                except AttributeError:
+                    pass  # to remove
+                        
+    
     @staticmethod
     def build_md_docs_from_tok_dicts(docs: List[List[List[dict]]]) -> List[Document]:  
         # TODO: Maybe it can further be abstracted such that it can be put in other classes than ConllParser?
@@ -164,11 +172,11 @@ class ConllParser:
             
     def set_entity_mentions(self) -> None:
         """chunk entity mentions for all sources (i.e. predict, gold)
-        effect: call self.set_entity_mentions_for_one_sentence function for all sentences in the parser.docs
+        effect: call sentence.set_entity_mentions function for all sentences in the parser.docs
         """
         for doc in self.docs:
             for sentence in doc.sentences:
-                self.set_entity_mentions_for_one_sentence(sentence, [src['type'] for src in self.cols_format])
+                sentence.set_entity_mentions([src['type'] for src in self.cols_format])
 
         # set different types of entity mentions from different sources
         _types = ['PER', 'LOC', 'ORG', 'MISC']
@@ -191,48 +199,7 @@ class ConllParser:
             self.__setattr__(ems_attr_name, [])
             for attr_name in attr_names:
                 self.__setattr__(ems_attr_name, self.__getattribute__(ems_attr_name) + self.__getattribute__(attr_name))  # set self.gems/self.pems
-            
         
-    @staticmethod
-    def set_entity_mentions_for_one_sentence(sentence: Sentence, sources: List) -> None:
-        """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
-        effect: set sentence.entity_mentions_dict ({'predict': `EntityMention`s})
-        """
-        for source in sources:
-
-            tokens_tray: List[Token] = []
-            entity_mentions: List[EntityMention] = []
-    #         last_token = ConllToken(text='', ner='O')
-            last_token = None
-            eid = 0
-
-            for i, token in enumerate(sentence.tokens):
-                # A. Boundary Detected: create an EntityMention from the tokens_tray and append to entity_mentions and
-                # empty tokens_tray if the tokens_tray is not empty (the last token is of entity tag)
-                # (Boundary: 'O', "B-" prefix, "I-" with different suffix )
-                # B. Entity Tags Detected: add Token to tokens_tray
-                # (not 'O')
-
-                if token.ners[source].type == 'O' or token.ners[source].prefix == 'B' or not last_token \
-                        or token.ners[source].suffix != last_token.ners[source].suffix:  # Boundary detected
-                    if tokens_tray:
-                        entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
-                        eid += 1
-                        tokens_tray = []
-
-                if token.ners[source].type != 'O':
-                    tokens_tray.append(token)
-
-                last_token = token
-
-            # at the end of a sentence: 
-            #  - add the last entity mention if it exists
-            if tokens_tray:
-                entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
-
-            if entity_mentions:
-                sentence.entity_mentions_dict[source] = entity_mentions
-
     @staticmethod
     def set_errors(parser, gold_src, predict_src):  # FIXME: set_errors_xx() duplicated method with methods in NERErrorAnnotator
         for doc in parser.docs:
@@ -294,7 +261,7 @@ class ConllParser:
 #             for sen in doc.sentences
 #             for token in sen.tokens])
 
-    def filter_results(self, type_):
+    def filter_results(self, type_):  # TODO: move to NERErrorAnalyzer
         arr = []
         total = 0
         for doc in self.docs:
@@ -306,10 +273,10 @@ class ConllParser:
                             arr.append(error)
         return arr
 
-    def add_filtered_to_dict(self, type_: str, stat: Dict) -> None:
+    def add_filtered_to_dict(self, type_: str, stat: Dict) -> None:  # TODO: move to NERErrorAnalyzer
         stat.update({type_: self.filter_results(type_)})
 
-    def error_overall_stats(self) -> None:
+    def error_overall_stats(self) -> None:  # TODO: move to NERErrorAnalyzer
 
         # count all errors
         correct_total = 0
@@ -343,7 +310,7 @@ class ConllParser:
         print('the number of sentences with/without entities (predict + gold): {} ({:.0%}), {} ({:.0%})'.format(
             ol_total, ol_total/sen_total, sen_total - ol_total, (sen_total - ol_total)/sen_total))
 
-    def error_type_stats(self):
+    def error_type_stats(self):  # TODO: move to NERErrorAnalyzer
 
         # stat = {}
         # for type_ in NERErrorComposite.all_span_error_types:
@@ -351,14 +318,14 @@ class ConllParser:
         #
         pass
 
-    def print_all_errors(self) -> None:
+    def print_all_errors(self) -> None:  # TODO: move to NERErrorAnalyzer
         for doc in self.docs:
             for sentence in doc:
                 if sentence.ner_errors:
                     for error in sentence.ner_errors:
                         print(str(error))
 
-    def print_corrects(self, num=10):
+    def print_corrects(self, num=10):  # TODO: move to NERErrorAnalyzer
         count = 0
         for doc in self.docs:
             for sentence in doc:
@@ -366,10 +333,10 @@ class ConllParser:
                 if count % num == 0:
                     sentence.print_corrects()
 
-    def confusion_matrix(self):
+    def confusion_matrix(self):  # TODO: move to NERErrorAnalyzer
         pass
 
-    def get_from_fullid(self, fullid):  # TODO
+    def get_from_fullid(self, fullid):  # TODO: move to ConllDocuments
         abbrs = {
             'doc': 'D',
             'sen': 'S',
@@ -380,22 +347,29 @@ class ConllParser:
             'ner_correct': 'NERCorr'
         }
 
-    def get_doc_from_did(self, did) -> Document:
+    def get_doc_from_did(self, did) -> Document:  # TODO: remove this
         return self.docs[did]
 
-    def get_sen_from_sid(self, did, sid) -> Sentence:
+    def get_sen_from_sid(self, did, sid) -> Sentence:  # TODO: remove this
         return self.get_doc_from_did(did).sentences[sid]
-
+    
+    
+class EntityMentionAnnotator:
+    # put set_entity_mentions() here
+    pass
 
 if __name__ == '__main__':
 
     import os.path
     import doctest
 
-    doctest.testmod()
-    print('Test passed!!!!!!')
+    failure_count, test_count = doctest.testmod()
+#     doctest.run_docstring_examples(ConllParser.get_entity_mentions_from_sent, globals())
+    if failure_count == 0:
+        
+        print('{} tests passed!!!!!!'.format(test_count))
     
-    path = os.path.dirname(os.path.abspath(__file__)) + '/../test/train.pred.gold'
-    train_parser = ConllParser(path)
-    train_parser.obtain_statistics(entity_stat=True, source='predict')
-    train_parser.set_entity_mentions()
+        path = os.path.dirname(os.path.abspath(__file__)) + '/../test/train.pred.gold'
+        train_parser = ConllParser(path)
+        train_parser.obtain_statistics(entity_stat=True, source='predict')
+        train_parser.set_entity_mentions()
