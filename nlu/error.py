@@ -9,69 +9,27 @@ from nlu.utils import id_incrementer
 
 class NERErrorExtractor:
     """
-    >>> sid, did = 3, 50
-    >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('B-ORG'), 'predict':ConllNERTag('I-LOC')})
-    >>> semi = ConllToken('Semiconductor', 1, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-MISC')})
-    >>> manu = ConllToken('Manufacturer', 2, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-    >>> co = ConllToken('Cooperation', 3, sid, did, ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-    >>> sen = Sentence([taiwan, semi, manu])
-    >>> for token in [taiwan, semi, manu, co]: \
-            token.set_sentence(sen)
-    >>> tsmc = EntityMention([taiwan, semi, manu], source='gold', id_=0)
-    >>> t = EntityMention([taiwan], source='predict', id_=0)
-    >>> tsmcs = EntityMentions([tsmc])
-    >>> ts = EntityMentions([t])
+    >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC I-ORG O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+    >>> sen.set_entity_mentions()
     >>> id_incs = id_incrementer(), id_incrementer()
-    >>> pair = EntityMentionsPair(0, tsmcs, ts, id_incs)
-    >>> NERErrorExtractor.extract(pair, id_incs).type
-    {'false_error': None, 'type_error': 'ORG -> LOC', 'span_error': 'R Diminished'}
-    >>> co_pem = EntityMention([co], source='predict', id_=3)  # test NERCorrect
-    >>> co_gem = EntityMention([co], source='gold', id_=3)
-    >>> pair_correct = EntityMentionsPair(1, EntityMentions([co_pem]), EntityMentions([co_gem]), id_incs)
-    >>> repr(NERErrorExtractor.extract(pair_correct, id_incs))  # doctest: +ELLIPSIS
-    '<...NERCorrect object at ...
-    >>> NERErrorExtractor.extract(pair_correct, id_incs).type
-    'ORG'
+    >>> pairs = MentionsPairsExtractor.get_pairs(sen)
+    >>> error_comp = NERErrorExtractor.extract(pairs[1], pairs[1].id_incs)
+    >>> type(error_comp)
+    <class 'nlu.error_structure.NERErrorComposite'>
+    >>> {t: str(o) for t, o in error_comp.type.items()}
+    {'false_error': 'None', 'type_error': 'LOC -> LOC|ORG', 'span_error': 'Taipei Taiwan -> Taipei|Taiwan'}
+    >>> corr = NERErrorExtractor.extract(pairs[0], pairs[0].id_incs)
+    >>> type(corr)
+    <class 'nlu.error_structure.NERCorrect'>
+    >>> pairs[1].set_result(error_comp)
+    >>> {t: str(o) for t, o in pairs[1].result.type.items()}
+    {'false_error': 'None', 'type_error': 'LOC -> LOC|ORG', 'span_error': 'Taipei Taiwan -> Taipei|Taiwan'}
     """
 
     @staticmethod
     def extract(ems_pair: EntityMentionsPair, id_incs: Tuple[id_incrementer, id_incrementer]) \
             -> Union[NERErrorComposite, NERCorrect]:
-        """
-        :param ems_pair:
-        :param id_incs:
-        :return:
-        >>> from nlu.data import ConllToken, ConllNERTag, Sentence, EntityMention
-        >>> from nlu.error import NERErrorAnnotator, NERErrorExtractor
-        >>> import inspect
-        >>> sid, did = 3, 50
-        >>> taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('B-ORG'), 'predict':ConllNERTag('I-LOC')})
-        >>> semi = ConllToken('Semiconductor', 1, sid, did,\
-        ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-MISC')})
-        >>> manu = ConllToken('Manufacturer', 2, sid, did,\
-        ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-        >>> co = ConllToken('Cooperation', 3, sid, did, ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-        >>> sen = Sentence([taiwan, semi, manu])
-        >>> for token in [taiwan, semi, manu, co]: \
-                token.set_sentence(sen)
-        >>> tsmc = EntityMention([taiwan, semi, manu], source='gold', id_=0)
-        >>> t = EntityMention([taiwan], source='predict', id_=0)
-        >>> tsmcs = EntityMentions([tsmc])
-        >>> ts = EntityMentions([t])
-        >>> error_id_inc = id_incrementer(), id_incrementer()
-        >>> pair = EntityMentionsPair(0, tsmcs, ts, error_id_inc)
-        >>> res = NERErrorExtractor.extract(pair, NERErrorAnnotator.id_incs)
-        >>> print(repr(res.__class__), repr(NERErrorComposite))
-        <class 'nlu.error_structure.NERErrorComposite'> <class 'nlu.error_structure.NERErrorComposite'>
-        >>> isinstance(res, NERErrorComposite)
-        True
-        >>> pair.set_result(res)
-        >>> print(str(pair.result.type))
-        {'false_error': None, 'type_error': 'ORG -> LOC', 'span_error': 'R Diminished'}
-        """
-
+        
         pems: EntityMentions = ems_pair.pems
         gems: EntityMentions = ems_pair.gems
         ems_total = len(gems) + len(pems)
@@ -222,26 +180,22 @@ class NERErrorExtractor:
 
 class MentionsPairsExtractor:
     """Extract EntityMentionsPairs from a Sentence object
-    >>> sid, did = 3, 50
-    >>> taiwan = ConllToken('Taiwan', 0, sid, did \
-    , ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-LOC')})
-    >>> semi = ConllToken('Semiconductor', 1, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-MISC')})
-    >>> manu = ConllToken('Manufacturer', 2, sid, did,\
-    ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-    >>> sen = Sentence([taiwan, semi, manu])
-    >>> for token in [taiwan, semi, manu]: \
-            token.set_sentence(sen)
-    >>> ConllParser.set_entity_mentions_for_one_sentence(sen, ['gold', 'predict'])
-    >>> pairs = MentionsPairsExtractor.get_pairs(sen, 'gold', 'predict')
-    >>> pairs.results  #doctest: +ELLIPSIS
-    [<...NERErrorComposite object at ...
-    >>> pairs.results[0].type
-    {'false_error': None, 'type_error': 'ORG -> LOC|MISC|ORG', 'span_error': 'Span Split - 3'}
+    >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
+    >>> sen.set_entity_mentions()
+    >>> pairs = MentionsPairsExtractor.get_pairs(sen)
+    >>> isinstance(pairs[0], EntityMentionsPair)
+    True
+    >>> print(str(pairs[0]))
+    D99-S999-PAIR0: (G) \x1b[33m[NLU Lab]ORG\x1b[0m is in Taipei Taiwan directed by Keh Yih Su . (P) \x1b[34m[NLU Lab]ORG\x1b[0m is in Taipei Taiwan directed by Keh Yih Su .
     """
+    
+#     >>> pairs.results  #doctest: +ELLIPSIS
+#     [<...NERErrorComposite object at ...
+#     >>> pairs.results[0].type
+#     {'false_error': None, 'type_error': 'ORG -> LOC|MISC|ORG', 'span_error': 'Span Split - 3'}
 
     @staticmethod
-    def get_pairs(sentence: Sentence, gold_src: str, predict_src: str, debug=False) \
+    def get_pairs(sentence: Sentence, gold_src: str='gold', predict_src: str='predict', debug=False) \
             -> Union[None, EntityMentionsPairs]:
 
         if not sentence.entity_mentions_dict[gold_src] and not sentence.entity_mentions_dict[predict_src]:
@@ -374,9 +328,9 @@ class MentionsPairsExtractor:
         return occupied
 
 
-class NERErrorAnnotator:
+class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWithErrorAnn
     """
-    Annotate NER Errors from a parser
+    Annotate NER Errors for a parser
     """
     GOLD_SOURCE_ALIAS = 'gold'
     PREDICT_SOURCE_ALIAS = 'predict'
@@ -384,6 +338,23 @@ class NERErrorAnnotator:
 
     @staticmethod
     def annotate(parser, gold_src: str = None, predict_src: str = None):
+        """
+        >>> parser = ConllParser('../test/testa.pred.gold')
+        >>> parser.set_entity_mentions()
+        >>> NERErrorAnnotator.annotate(parser)
+        >>> parser.error_overall_stats()
+        ---Overall Results---
+        found entity mentions: 5942
+        true entity mentions: 5942
+        correct_total:  5941
+        error_total:  1
+        precision: 99.98%
+        recall: 99.98%
+        macro-f1: 99.98%
+        corrects ratio: 99.98%
+        all corrects and errors 5942
+        the number of sentences with/without entities (predict + gold): 2605 (80%), 645 (20%)        
+        """
         gold_src = NERErrorAnnotator.GOLD_SOURCE_ALIAS if gold_src is None else gold_src
         predict_src = NERErrorAnnotator.PREDICT_SOURCE_ALIAS if predict_src is None else predict_src
 
@@ -430,13 +401,18 @@ class NERErrorAnnotator:
 if __name__ == '__main__':
     import doctest
 
-    doctest.testmod()
     # doctest.run_docstring_examples(NERErrorComposite, globs=globals())
+    
+    failure_count, test_count = doctest.testmod()
+    
+    if failure_count == 0:
+        
+        print('{} tests passed!!!!!!'.format(test_count))
+    
+#         parser = ConllParser('../test/testa.pred.gold')
 
-    train_parser = ConllParser('../test/train.pred.gold')
+#         parser.obtain_statistics(entity_stat=True, source='predict')
 
-    train_parser.obtain_statistics(entity_stat=True, source='predict')
+#         parser.set_entity_mentions()
 
-    train_parser.set_entity_mentions()
-
-    NERErrorAnnotator(train_parser)
+#         NERErrorAnnotator(parser)

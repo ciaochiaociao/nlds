@@ -1,4 +1,7 @@
-class ErrorAnalyzer:
+class NERErrorAnalyzer:
+    """
+    input: DocumentsWithErrorAnn
+    """
 
     @staticmethod
     def analyze(self):
