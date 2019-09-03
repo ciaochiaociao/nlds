@@ -101,7 +101,8 @@ class ObjectList(Base):
         return iter(self.members)
 
     # this should be overridden in the child's __add__. The following just shows an example.
-    def __add__(self, other):
+    def __add__(self, other):  
+        """Note on __add__(): the tokens 'added' will reference to the newly created sentence rather than the original through token.sentence"""
         return ObjectList(self.members + other.members)
 
 
@@ -220,12 +221,19 @@ class TextWithIDs(MD_IDs):
     ...         super().__init__(ids)
     ...     def __str__(self):
     ...         return self.text
-    >>> SomeText('A sample text', ids=OrderedDict({'D':2, 'S': 4})).print(True)
+    >>> text_obj = SomeText('A sample text', ids=OrderedDict({'D':2, 'S': 4}))
+    >>> text_obj.print(True)
     A sample text(D2-S4)
+    >>> repr(text_obj)
+    "SomeText(text='A sample text', ids=OrderedDict([('D', 2), ('S', 4)]))"
     """
 
     def __init__(self, ids):
-        self.text: str = str(self)
+        try:
+            self.text: str = str(self)
+        except AttributeError:  # for those who implement their __str__ with the use of other attribute
+            pass
+            
         MD_IDs.__init__(self, ids)
 
     def print(self, detail=False):
@@ -237,7 +245,7 @@ class TextWithIDs(MD_IDs):
     # abstract method
     def __str__(self):
         raise NotImplementedError
-
+    
 
 class TextList(ObjectList, TextWithIDs):
     """Directly inherited by Sentence, Document, EntityMention, ...
@@ -269,9 +277,9 @@ class TextList(ObjectList, TextWithIDs):
     >>> [ str(men) for men in t ]
     ['Semiconductor', 'Cooperation']
     >>> repr(t+t)  # doctest:+ELLIPSIS
-    '<...TextList object at ...>'
+    "TextList(ids=OrderedDict([('D', 6), ('S', 3), ('EM', 4)]), members=[ConllToken(text='Semiconductor', id_=1, sid=3, did=6...), ConllToken(text='Cooperation', id_=3, sid=3, did=6...), ConllToken(text='Semiconductor', id_=1, sid=3, did=6...), ConllToken(text='Cooperation', id_=3, sid=3, did=6...)])"
     >>> TextList(OrderedDict({'D': did, 'S': sid, 'EM': 5}), [])  # doctest:+ELLIPSIS
-    <...TextList object at ...>
+    TextList(ids=OrderedDict([('D', 6), ('S', 3), ('EM', 5)]), members=[])
     """
     SEPARATOR = '|'
 
@@ -301,13 +309,28 @@ class TextList(ObjectList, TextWithIDs):
     def __add__(self, other):
         return TextList(self.ids, self.members + other.members)
 
+#     def __repr__(self):
+#         return '{self.__class__.__name__}({self.ids!r}, {self.members!r})'.format(self=self)
 
-class Tag:
+
+class InSentence:
+
+    def set_sentence(self, sentence: 'Sentence') -> None:
+        self.sentence = sentence
+    
+class InDocument:
+
+    def set_document(self, document: 'Document') -> None:
+        self.document = document
+
+
+class Tag(Base):
     def __init__(self, type_):
         self.type: str = type_
+#         self.type_: str = type_
 
     def __repr__(self):
-        return self.type
+        return repr(self.type)
 
 
 class ConllNERTag(Tag):  # TODO: Create an EntityTag and an ConllEntityTag class
