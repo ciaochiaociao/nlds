@@ -5,33 +5,84 @@ from typing import List, Dict, Union, Optional
 
 from ansi.color import fg
 
-from nlu.utils import list_to_str, overrides, sep_str
+from nlu.utils import list_to_str, overrides, sep_str, camel_to_snake, setup_logger
 
-
+import inspect
+import re
 # from __future__ import annotations
 # only work for python 3.7+ but will be implemented in python 4.0. Use literal like 'Text' instead
 
 # todo: get_document|sentence|token_from_fullid|id()
 # todo: change all to id_incrementer if possible
 
+dataLogger = setup_logger('data_logger', '../data.log')
 
-class ObjectList:
+
+def get_func_keys(func):
+    
+    return inspect.signature(func).parameters.keys()
+
+    
+def prepr(obj):
+    return obj.prepr()
+
+
+def default_repr_format(obj, pretty=False):
+    kwargs = {k: obj.__getattribute__(k) for k in get_func_keys(obj.__init__)}
+    
+    if not pretty:
+        kwargs_str = ', '.join(['%s=%r' % (k, v) for k, v in kwargs.items() if v is not None])
+        return '{self.__class__.__name__}({})'.format(kwargs_str, self=obj)
+    else:  # TODO
+        kwargs_str = ', '.join(['{}={}'.format(k, prepr(v) if prepr in dir(v) else repr(v)) for k, v in kwargs.items() if v is not None])
+        return '{self.__class__.__name__}(\n\t{})'.format(kwargs_str, self=obj)
+
+
+class Base(object):
+
+    def __repr__(self):
+        return default_repr_format(self)
+    
+    def prepr(self):
+        return default_repr_format(self, True)
+
+class ObjectList(Base):
     """
     Inherited by TextList
-    >>> a = ObjectList([1,2,3])
-    >>> a[1:3]  # test slicing __getitem__
-    [2, 3]
-    >>> [i for i in a]  # test __iter__
-    [1, 2, 3]
-    >>> repr(a + a)  # doctest: +ELLIPSIS
-    '<...ObjectList object at ...'
-    >>> isinstance(a, Hashable)  # Hashable test
-    True
     """
+
     SEPARATOR = '|'
 
     def __init__(self, members):
-        self.members: List = members
+        
+        self_name = camel_to_snake(self.__class__.__name__)
+        
+        # santiy check
+        if len(set([type(member) for member in members])) > 1:
+            dataLogger.warning('Not all members in ObjectList are the same: {}'.format(members))
+            dataLogger.warning('This first element is set with self.{}'.format(
+                mems_attr_name))
+        
+        # set refs
+        try:
+            mems_attr_name = camel_to_snake(members[0].__class__.__name__) + 's'  #TODO: better plural 
+            self.__setattr__(mems_attr_name, members)  # container.<member_name>  ex-entity_mention.tokens
+        except IndexError:
+            dataLogger.warning('No members in building a ObjectList')
+        except AttributeError:
+            dataLogger.warning('Not an object in building a ObjectList')
+
+        self.members: List = members  #container.members  ex-entity_mention.members
+        
+        # set backrefs
+        for member in members:
+            if 'parents' not in dir(member):
+                member.containers = {}
+            else:
+                if self not in member.containers.values():
+                    member.containers.update({self_name: self})
+                    # member.containers[<container_name>] ex-token.containers['entity_mention']
+            member.__setattr__(self_name, self)  # member.<container_name>  ex-token.entity_mention
 
     @overrides(list)
     def __len__(self):
