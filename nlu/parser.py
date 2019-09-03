@@ -136,17 +136,17 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                     }
         """
             
-        did, sid, tid = 0, 0, 0
+        did, sid, tid = -1, -1, -1
 
         docs_classes = []
 
         for doc in docs:
             did += 1
-            sid = 0
+            sid = -1
             sents_classes = []
             for sent in doc:
                 sid += 1
-                tid = 0
+                tid = -1
                 toks_classes = []
                 for tok in sent:
                     tid += 1
