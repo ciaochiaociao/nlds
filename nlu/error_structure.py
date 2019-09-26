@@ -83,9 +83,13 @@ class EntityMentionsPair(TextList):
 
     def __str__(self):
 
-        em = self.pems[0]
+        em = self.pems[0] if len(self.pems.members) > 0 else self.gems[0]
         ids = MD_IDs.from_list([('D', em.did), ('S', em.sid), ('PAIR', self.ids['PAIR'])])
-        return ids.fullid + ': (G) ' + self.sentence.get_ann_sent(self.gems, fg.yellow) + ' (P) ' + self.sentence.get_ann_sent(self.pems)
+
+        gem_sent = self.sentence.get_ann_sent(self.gems, fg.yellow) if len(self.gems) > 0 else str(self.sentence)
+        pem_sent = self.sentence.get_ann_sent(self.pems) if len(self.pems) > 0 else str(self.sentence)
+
+        return ids.fullid + ': (G) ' + gem_sent + ' (P) ' + pem_sent
         
     def pprint(self) -> None:
 
