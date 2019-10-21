@@ -334,7 +334,6 @@ class Tag(Base):
 
 
 class ConllNERTag(Tag):  # TODO: Create an EntityTag and an ConllEntityTag class
-    __types = ['I-PER', 'I-ORG', 'I-LOC', 'I-MISC', 'B-PER', 'B-ORG', 'B-LOC', 'B-MISC', 'O']
 
     @property
     def type(self):
@@ -342,16 +341,13 @@ class ConllNERTag(Tag):  # TODO: Create an EntityTag and an ConllEntityTag class
 
     @type.setter
     def type(self, type_):
-        if type_ in self.__types:
-            self.__type = type_
-            if len(type_.split('-')) == 2:
-                self.prefix, self.suffix = type_.split('-')
-            else:
-                self.prefix, self.suffix = None, None
+        self.__type = type_
+        if len(type_.split('-', 1)) == 2:
+            self.prefix, self.suffix = type_.split('-', 1)
         else:
-            raise ValueError("Tag assigned '%s' is not one of these: %s" % (type_, ', '.join(self.__types)))
+            self.prefix, self.suffix = None, None
 
-
+            
 class ConllChunkTag(Tag):  # todo
     pass
 
@@ -391,7 +387,7 @@ class ConllToken(Token):
     
     auto_id = -1
     
-    def __init__(self, text, id_, sid, did, poss=None, chunks=None, ners=None):
+    def __init__(self, text, id_, sid, did, poss=None, chunks=None, ners=None, conf=None):
         """
         >>> ct = ConllToken(text='TSMC', id_=1, sid=2, did=3, ners={'predict': ConllNERTag('I-MISC')})
         >>> repr(ct)
@@ -401,7 +397,8 @@ class ConllToken(Token):
         """
         self.poss: Dict[str, str] = poss
         self.chunks: Dict[str, str] = chunks
-        self.ners: Dict[str, ConllNERTag] = ners
+        self.ners: Dict[str, Tag] = ners
+        self.conf = conf
         super().__init__(text, id_, sid, did)
         
     @classmethod

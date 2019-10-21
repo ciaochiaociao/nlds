@@ -53,6 +53,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         cols_format - [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
                         {'type': 'gold', 'col_num': 2, 'tagger': 'ner'},
                         {'type': 'predict', 'col_num': 3, 'tagger': 'pos'},
+                        ...
+                        {'type': 'predict', col_num': 7, 'tagger': 'ner_conf'}
                         ...]
         output: 
         same as the input of function build_md_docs_from_tok_dicts() where
@@ -60,7 +62,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             'text': 'Obama',
             'poss': {'predict': 'NN', 'gold': 'NN'},
             'chunks': {'predict': 'I-NNP', 'gold': 'I-NNP'},
-            'ners': {'predict': 'I-PER', 'gold': 'I-PER'}
+            'ners': {'predict': 'I-PER', 'gold': 'I-PER'},
+            'ner_conf': {'predict': 0.9993}
             }
         """
         
@@ -68,7 +71,11 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         len_pos = len([col for col in cols_format if col['tagger'] == 'pos'])
         len_chunk = len([col for col in cols_format if col['tagger'] == 'chunk'])
         len_ner = len([col for col in cols_format if col['tagger'] == 'ner'])
-
+        try:
+            col_conf = [col['col_num'] for col in cols_format if col['tagger'] == 'ner_conf'][0]
+        except IndexError:
+            col_conf = None
+        
         # set doc_separator
         doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner) + '\n'  # TODO: consider the order given by cols_format
         
@@ -94,10 +101,17 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                               for col in cols_format if col['tagger'] == 'chunk'} if len_chunk else None
                     ners = {col['type']: ConllNERTag(a[col['col_num']])
                             for col in cols_format if col['tagger'] == 'ner'} if len_ner else None
-                    tokens.append({'text': a[0], 'poss': poss, 'chunks': chunks, 'ners': ners})
+                    ner_conf = a[col_conf] if col_conf is not None else None
+                    tokens.append({'text': a[0], 'poss': poss, 'chunks': chunks, 'ners': ners, 'ner_conf': ner_conf})
             if sentences:  # for the last document (without -DOCSTART- at the end)
                 docs.append(sentences)
-        return docs
+        if len(docs) > 0:
+            return docs
+        elif len(docs) == 0 and len(sentences) > 0:
+            return [sentences]
+        else:
+            return [[tokens]]
+
     
     @staticmethod
     def add_back_refs_for_md_docs(docs: List[Document]) -> None:  # TODO: Maybe it can be moved to sentence or other places?
@@ -132,7 +146,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                     'text': 'Obama',
                     'poss': {'predict': 'NN', 'gold': 'NN'},
                     'chunks': {'predict': 'I-NNP', 'gold': 'I-NNP'},
-                    'ners': {'predict': 'I-PER', 'gold': 'I-PER'}
+                    'ners': {'predict': 'I-PER', 'gold': 'I-PER'},
+                    'ner_conf': 0.99983
                     }
         """
             
@@ -165,12 +180,14 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         'text': 'Obama',
         'poss': {'predict': 'NN', 'gold': 'NN'},
         'chunks': {'predict': 'I-NNP', 'gold': 'I-NNP'},
-        'ners': {'predict': 'I-PER', 'gold': 'I-PER'}
+        'ners': {'predict': 'I-PER', 'gold': 'I-PER'},
+        'ner_conf': 0.99983
         }
         """
-        return ConllToken(tok['text'], poss=tok['poss'], chunks=tok['chunks'], ners=tok['ners'], id_=tid, sid=sid, did=did)
+        return ConllToken(tok['text'], poss=tok['poss'], chunks=tok['chunks'], ners=tok['ners'], conf=tok['ner_conf'],
+                          id_=tid, sid=sid, did=did)
             
-    def set_entity_mentions(self) -> None:
+    def set_entity_mentions(self, tag_policy=None) -> None:
         """chunk entity mentions for all sources (i.e. predict, gold)
         effect: call sentence.set_entity_mentions function for all sentences in the parser.docs
         """
@@ -179,7 +196,13 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                 sentence.set_entity_mentions([src['type'] for src in self.cols_format])
 
         # set different types of entity mentions from different sources
-        _types = ['PER', 'LOC', 'ORG', 'MISC']
+        if tag_policy in [None, 'conll']:
+            _types = ['PER', 'LOC', 'ORG', 'MISC']
+        elif tag_policy == 'wnut':
+            _types = ['person', 'location', 'corporation', 'creative-work', 'group', 'product']
+        else:
+            raise ValueError('illegal tag_policy {} (should be conll, wnut or ...)'.format(tag_policy))
+            
         for source in [src['type'] for src in self.cols_format]:
             preffix = 'pred' if source == 'predict' else 'gold'
             ems_attr_name = preffix[0] + 'ems'  # 'pems'/'gems'
@@ -223,9 +246,14 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         sentence.set_errors_from_pairs(sentence.ems_pairs)
         # TODO: unify the setter or property usage
 
-    def obtain_statistics(self, entity_stat=False, source=None, debug=False):
-        _types = ['PER', 'LOC', 'ORG', 'MISC']
-        
+    def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy=None):
+        if tag_policy in [None, 'conll']:
+            _types = ['PER', 'LOC', 'ORG', 'MISC']
+        elif tag_policy == 'wnut':
+            _types = ['person', 'location', 'corporation', 'creative-work', 'group', 'product']
+        else:
+            raise ValueError('illegal tag_policy {} (should be conll, wnut or ...)'.format(tag_policy))
+
         print(f'---{self.filepath} ({source})---')
         print('Document number: ', len([doc for doc in self.docs]))
         print('Sentence number: ', len([sen for doc in self.docs for sen in doc.sentences]))
@@ -235,7 +263,6 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             source = self.TAGGERSOURCE
 
         if entity_stat:
-            self.set_entity_mentions()
             ent_tot = len(self.__getattribute__(source[0] + 'ems'))
             for type_ in _types:
                 ems = self.__getattribute__(source[:4] + '_' + type_.lower() + 's')

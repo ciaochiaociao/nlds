@@ -6,12 +6,17 @@ from nlu.parser import *
 # basic doctest
 testmod()
 
-cols_format = [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
-                {'type': 'gold', 'col_num': 2, 'tagger': 'ner'}]
+cols_format = [{'type': 'gold', 'col_num': 1, 'tagger': 'ner'},
+                {'type': 'predict', 'col_num': 2, 'tagger': 'ner'},
+                {'type': 'predict', 'col_num': 3, 'tagger': 'ner_conf'}]
 
-parser = ConllParser('test/testb.pred.gold', cols_format)
+parser = ConllParser('test/wnut.test.gold.pred.iob1', cols_format)
+print(parser.docs[0][0][0].conf)
+
+parser.set_entity_mentions(tag_policy='wnut')
 
 parser.obtain_statistics(entity_stat=True, source='predict')
+
 
 parser.obtain_statistics(entity_stat=True, source='gold')
 
