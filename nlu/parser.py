@@ -1,4 +1,7 @@
 from nlu.data import *
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
@@ -246,8 +249,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         sentence.set_errors_from_pairs(sentence.ems_pairs)
         # TODO: unify the setter or property usage
 
-    def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy=None):
-        if tag_policy in [None, 'conll']:
+    def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy='conll'):
+        if tag_policy == 'conll':
             _types = ['PER', 'LOC', 'ORG', 'MISC']
         elif tag_policy == 'wnut':
             _types = ['person', 'location', 'corporation', 'creative-work', 'group', 'product']
@@ -345,14 +348,30 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         #
         pass
 
-    def print_all_errors(self) -> None:  # TODO: move to NERErrorAnalyzer
+    def print_all_errors(self) -> None:
         for doc in self.docs:
             for sentence in doc:
                 if sentence.ner_errors:
                     for error in sentence.ner_errors:
                         print(str(error))
 
-    def print_corrects(self, num=10):  # TODO: move to NERErrorAnalyzer
+    def print_n_errors(self, n=50) -> None:
+        import random
+
+        errors = []
+
+        for doc in self.docs:
+            for sentence in doc:
+                if sentence.ner_errors:
+                    for error in sentence.ner_errors:
+                        errors.append(str(error))
+
+        randomized = random.sample(errors, n)
+
+        for error in randomized:
+            print(error)
+
+    def print_corrects(self, num=10):
         count = 0
         for doc in self.docs:
             for sentence in doc:
@@ -360,8 +379,77 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                 if count % num == 0:
                     sentence.print_corrects()
 
-    def confusion_matrix(self):  # TODO: move to NERErrorAnalyzer
-        pass
+    def print_n_corrects(self, n=50):
+
+        import random
+        correct_sents = []
+
+        for doc in self.docs:
+            for sentence in doc:
+                correct_sents.append(sentence)
+
+        randomized = random.sample(correct_sents, n)
+
+        for correct_sent in randomized:
+            correct_sent.print_corrects()
+
+    def confusion_matrix(self, tag_policy='conll'):  # TODO: move to NERErrorAnalyzer
+
+        y_true = []
+        y_pred = []
+
+        for doc in self.docs:
+            for sentence in doc:
+                if sentence.ems_pairs:
+                    for ems_pair in sentence.ems_pairs.pairs:
+                        if len(ems_pair.result.gtypes) == 1 and len(ems_pair.result.ptypes) == 1:
+                            y_true.append(ems_pair.result.gtypes[0])
+                            y_pred.append(ems_pair.result.ptypes[0])
+
+        wnut_types = ["person", "location", "corporation", "group", "creative-work", "product"]
+        conll_types = ["PER", "LOC", "ORG", "MISC"]
+        labels = wnut_types if tag_policy == 'wnut' else conll_types
+
+        return confusion_matrix(y_true, y_pred, labels=labels)
+
+    def print_confusion_matrix(self, cm, tag_policy='conll'):  # TODO: move to NERErrorAnalyzer
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        cax = ax.matshow(cm)
+
+        wnut_types = ["person", "location", "corporation", "group", "creative-work", "product"]
+        conll_types = ["PER", "LOC", "ORG", "MISC"]
+        labels = wnut_types if tag_policy == 'wnut' else conll_types
+
+        plt.title('Confusion matrix of the classifier')
+        fig.colorbar(cax)
+
+        ax.set_xticklabels([''] + labels)
+        ax.set_yticklabels([''] + labels)
+        ax.xaxis.tick_bottom()
+        plt.xticks(rotation=45, ha='right', rotation_mode='anchor')
+
+        plt.xlabel('Predicted')
+        plt.ylabel('True')
+
+        # Loop over data dimensions and create text annotations.
+        for i in range(len(labels)):
+            for j in range(len(labels)):
+                ax.text(j, i, cm[i, j], ha="center", va="center", color="w")
+
+        plt.show()
+
+    def pprint_confusion_matrix(self, cm, tag_policy='conll'):  # TODO: move to NERErrorAnalyzer
+        from nlu.ext_utils.confusion_matrix_pretty_print import pretty_plot_confusion_matrix
+
+        wnut_types = ["person", "location", "corporation", "group", "creative-work", "product"]
+        conll_types = ["PER", "LOC", "ORG", "MISC"]
+        labels = wnut_types if tag_policy == 'wnut' else conll_types
+
+        df_cm = pd.DataFrame(cm, index=labels, columns=labels)
+        pretty_plot_confusion_matrix(df_cm, pred_val_axis='x', show_null_values=0)
+
 
     def get_from_fullid(self, fullid):  # TODO: move to ConllDocuments
         abbrs = {
