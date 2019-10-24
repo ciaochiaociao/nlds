@@ -1,7 +1,4 @@
 from nlu.data import *
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
-import pandas as pd
 
 
 class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
@@ -225,7 +222,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             self.__setattr__(ems_attr_name, [])
             for attr_name in attr_names:
                 self.__setattr__(ems_attr_name, self.__getattribute__(ems_attr_name) + self.__getattribute__(attr_name))  # set self.gems/self.pems
-        
+
     @staticmethod
     def set_errors(parser, gold_src, predict_src):  # FIXME: set_errors_xx() duplicated method with methods in NERErrorAnnotator
         for doc in parser.docs:
@@ -291,21 +288,6 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 #             for sen in doc.sentences
 #             for token in sen.tokens])
 
-    def filter_results(self, type_):  # TODO: move to NERErrorAnalyzer
-        arr = []
-        total = 0
-        for doc in self.docs:
-            for sentence in doc:
-                total += 1
-                if sentence.ems_pairs:
-                    for error in sentence.ems_pairs.errors:
-                        if error and error.type['false_error'] == type_:
-                            arr.append(error)
-        return arr
-
-    def add_filtered_to_dict(self, type_: str, stat: Dict) -> None:  # TODO: move to NERErrorAnalyzer
-        stat.update({type_: self.filter_results(type_)})
-
     def error_overall_stats(self) -> None:  # TODO: move to NERErrorAnalyzer
 
         # count all errors
@@ -331,22 +313,14 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         print('error_total: ', error_total)
         self.precision = correct_total/len(self.pems)
         self.recall = correct_total/len(self.gems)
-        self.macrof1 = 2*self.precision*self.recall/(self.recall+self.precision)
+        self.microf1 = 2 * self.precision * self.recall / (self.recall + self.precision)
         print('precision: {:.2%}'.format(self.precision))
         print('recall: {:.2%}'.format(self.recall))
-        print('macro-f1: {:.2%}'.format(self.macrof1))
+        print('micro-f1: {:.2%}'.format(self.microf1))
         print('corrects ratio: {:.2%}'.format(correct_total/(correct_total+error_total)))
         print('all corrects and errors', correct_total + error_total)
         print('the number of sentences with/without entities (predict + gold): {} ({:.0%}), {} ({:.0%})'.format(
             ol_total, ol_total/sen_total, sen_total - ol_total, (sen_total - ol_total)/sen_total))
-
-    def error_type_stats(self):  # TODO: move to NERErrorAnalyzer
-
-        # stat = {}
-        # for type_ in NERErrorComposite.all_span_error_types:
-        #     self.add_filtered_to_dict(type_, stat)
-        #
-        pass
 
     def print_all_errors(self) -> None:
         for doc in self.docs:
@@ -393,81 +367,52 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         for correct_sent in randomized:
             correct_sent.print_corrects()
 
-    def confusion_matrix(self, tag_policy='conll'):  # TODO: move to NERErrorAnalyzer
-
-        y_true = []
-        y_pred = []
-
-        for doc in self.docs:
-            for sentence in doc:
-                if sentence.ems_pairs:
-                    for ems_pair in sentence.ems_pairs.pairs:
-                        if len(ems_pair.result.gtypes) == 1 and len(ems_pair.result.ptypes) == 1:
-                            y_true.append(ems_pair.result.gtypes[0])
-                            y_pred.append(ems_pair.result.ptypes[0])
-
-        wnut_types = ["person", "location", "corporation", "group", "creative-work", "product"]
-        conll_types = ["PER", "LOC", "ORG", "MISC"]
-        labels = wnut_types if tag_policy == 'wnut' else conll_types
-
-        return confusion_matrix(y_true, y_pred, labels=labels)
-
-    def print_confusion_matrix(self, cm, tag_policy='conll'):  # TODO: move to NERErrorAnalyzer
-
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        cax = ax.matshow(cm)
-
-        wnut_types = ["person", "location", "corporation", "group", "creative-work", "product"]
-        conll_types = ["PER", "LOC", "ORG", "MISC"]
-        labels = wnut_types if tag_policy == 'wnut' else conll_types
-
-        plt.title('Confusion matrix of the classifier')
-        fig.colorbar(cax)
-
-        ax.set_xticklabels([''] + labels)
-        ax.set_yticklabels([''] + labels)
-        ax.xaxis.tick_bottom()
-        plt.xticks(rotation=45, ha='right', rotation_mode='anchor')
-
-        plt.xlabel('Predicted')
-        plt.ylabel('True')
-
-        # Loop over data dimensions and create text annotations.
-        for i in range(len(labels)):
-            for j in range(len(labels)):
-                ax.text(j, i, cm[i, j], ha="center", va="center", color="w")
-
-        plt.show()
-
-    def pprint_confusion_matrix(self, cm, tag_policy='conll'):  # TODO: move to NERErrorAnalyzer
-        from nlu.ext_utils.confusion_matrix_pretty_print import pretty_plot_confusion_matrix
-
-        wnut_types = ["person", "location", "corporation", "group", "creative-work", "product"]
-        conll_types = ["PER", "LOC", "ORG", "MISC"]
-        labels = wnut_types if tag_policy == 'wnut' else conll_types
-
-        df_cm = pd.DataFrame(cm, index=labels, columns=labels)
-        pretty_plot_confusion_matrix(df_cm, pred_val_axis='x', show_null_values=0)
-
-
-    def get_from_fullid(self, fullid):  # TODO: move to ConllDocuments
-        abbrs = {
-            'doc': 'D',
-            'sen': 'S',
-            'token': 'T',
-            'em': 'EM',
-            'em_ol': 'OL',
-            'ner_error': 'NERErr',
-            'ner_correct': 'NERCorr'
+    def get_from_fullid(self, fullid):
+        """
+        :param fullid: ex - 'D0-S3-T2'
+        :return: object, ex - Token
+        >>> parser.get_from_fullid('D0-S3-T2').fullid
+        'D0-S3-T2'
+        """
+        attr_name_table = {
+            'D': 'docs',
+            'S': None,
+            'T': None,
+            'GEM': 'gems',
+            'PEM': 'pems',
+            'PAIR': 'ems_pairs'
         }
 
-    def get_doc_from_did(self, did) -> Document:  # TODO: remove this
-        return self.docs[did]
+        abs_id_table = {
+            'NERErr': 'ner_errors',
+            'NERCorr': 'ner_corrects'
+        }
 
-    def get_sen_from_sid(self, did, sid) -> Sentence:  # TODO: remove this
-        return self.get_doc_from_did(did).sentences[sid]
-    
+        import re
+
+        ids = fullid.split('-')
+
+        obj = self
+        for id in ids:
+            prefix, idx = list(filter(None, re.split('(\D+)', id)))
+            idx = int(idx)
+            if prefix in attr_name_table:
+                table = attr_name_table
+            elif prefix in abs_id_table:  # found absolute id => set obj back to the ancestor `parser`
+                table = abs_id_table
+                obj = self
+            else:
+                raise KeyError('prefix {} is not valid'.format(prefix))
+
+            attr_name = table[prefix]
+
+            if attr_name is not None:
+                obj = obj.__getattribute__(attr_name)[idx]
+            else:
+                obj = obj[idx]
+
+        return obj
+
     
 class EntityMentionAnnotator:
     # put set_entity_mentions() here

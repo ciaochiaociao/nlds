@@ -361,10 +361,20 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         for doc in parser.docs:
             NERErrorAnnotator.set_results_in_document(doc, gold_src, predict_src)
 
+        # set back references for parser
+        parser.ner_errors = [error for doc in parser.docs for error in doc.ner_errors]
+        parser.ner_corrects = [correct for doc in parser.docs for correct in doc.ner_corrects]
+        parser.ner_results = [result for doc in parser.docs for result in doc.ner_results]
+
     @staticmethod
     def set_results_in_document(doc, gold_src, predict_src):
         for sentence in doc.sentences:
             NERErrorAnnotator.set_results_in_sentence(sentence, gold_src, predict_src)
+
+        # set back ref for doc
+        doc.ner_errors = [error for sent in doc for error in sent.ner_errors]
+        doc.ner_corrects = [correct for sent in doc for correct in sent.ner_corrects]
+        doc.ner_results = [result for sent in doc for result in sent.ner_results]
 
     @staticmethod
     def set_results_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
@@ -373,7 +383,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         """
         NERErrorAnnotator.set_ems_pairs_in_sentence(sentence, gold_src, predict_src)
         if sentence.ems_pairs is None:
-            sentence.ner_results: List[Union[NERErrorComposite, NERCorrect]] = None
+            sentence.ner_results: List[Union[NERErrorComposite, NERCorrect]] = []
         else:
             for ems_pair in sentence.ems_pairs:
                 NERErrorAnnotator.set_result_in_ems_pair(ems_pair)

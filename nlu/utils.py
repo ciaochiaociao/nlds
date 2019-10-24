@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Callable, Iterable
 
 from ansi.color import fg
@@ -6,6 +7,7 @@ import logging
 import time
 import re
 
+from pandas import DataFrame
 
 SEPARATOR = ' '
 CLEAR_SEPARATOR = '|'
@@ -99,3 +101,90 @@ def lprint(*args, **kwargs):
     myInfo = inspect.getframeinfo(callerFrame[0])
     myFilename = os.path.basename(myInfo.filename)
     print('{}({}):'.format(myFilename, myInfo.lineno), *args, flush=True, file=sys.stderr, **kwargs)
+
+
+def groupby(list_, key):
+    groups = defaultdict(list)
+    for i in list_:
+        groups[key(i)].append(i)
+
+    return groups
+
+
+def sort_two_level_group(df: DataFrame, indexorder, columnorder):
+    return df.reindex(indexorder, columns=columnorder)
+
+
+def two_level_groupby(list_, key1, key2, count=False, apply_func=False):
+    g1 = groupby(list_, key1)
+    g2 = {type_: groupby(err, key2) for type_, err in g1.items()}
+
+    if count:
+        apply_func = len
+
+    if apply_func:
+        g2 = {_: {_: apply_func(v2) for _, v2 in v.items()} for _, v in g2.items()}
+
+    return g2
+
+
+def add_total_column_row(df: DataFrame):
+
+    df.loc['Total'] = df.sum()
+    df['Total'] = df.T.sum()
+
+
+def frame_text(text, markers=None, style='=', spaces=[0, 1, 0, 1]):
+    markers_dict = {
+        '=': ['╔', '═', '╗', '║', '║', '╚', '═', '╝'],
+        '+-': ['+', '-', '+', '|', '|', '+', '-', '+'],
+        '+': ['+'] * 8,
+        'x': ['x'] * 8,
+        'o': ['o'] * 8
+    }
+    if not markers or len(markers) != 8 or any([not isinstance(marker, str) for marker in markers]):
+        markers = markers_dict[style]
+
+    tl, tm, tr, ml, mr, bl, bm, br = markers
+    lines = text.split('\r\n')
+    width = max([len(line) for line in lines])
+    height = len(lines)
+    boxw = width + spaces[1] + spaces[3] + len(tl) + len(tr)
+    print(tl + tm * (boxw - len(tl) - len(tr)) + tr)
+
+    for i in range(spaces[0]):
+        print(ml + ' ' * (boxw - len(ml) - len(mr)) + mr)
+    for y in range(height):
+        trailing = boxw - len(lines[y]) - spaces[3] - len(ml) - len(mr)
+        print(ml + ' ' * spaces[3] + lines[y] + ' ' * trailing + mr)
+    for i in range(spaces[2]):
+        print(ml + ' ' * (boxw - len(ml) - len(mr)) + mr)
+    print(bl + tm * (boxw - len(tl) - len(tr)) + br)
+
+
+def fprint(text, *args, **kwargs):
+    """
+    print framed text
+    :param text:
+    :param args:
+    :param kwargs:
+    :return: None
+    """
+    print(frame_text(text, *args, **kwargs))
+
+
+def make_autopct(values):
+    def my_autopct(pct):
+        total = sum(values)
+        val = int(round(pct*total/100.0))
+        return '{p:.2f}%  ({v:d})'.format(p=pct,v=val)
+    return my_autopct
+
+
+def calc_f1(corrects, pred_total, true_total):
+
+    precision = corrects / pred_total
+    recall = corrects / true_total
+    f1 = 2 * precision * recall / (recall + precision)
+
+    return precision, recall, f1

@@ -503,13 +503,13 @@ class Sentence(TextList, InDocument):
 
     def set_errors_from_pairs(self, pairs) -> None:  # FIXME: No longer used?
         if pairs is None:
-            self.ner_errors = None
+            self.ner_errors = []
         else:
             self.ner_errors = pairs.errors
 
     def set_corrects_from_pairs(self, pairs) -> None:  # FIXME: No longer used?
         if pairs is None:
-            self.ner_corrects = None
+            self.ner_corrects = []
         else:
             self.ner_corrects = pairs.corrects
 
@@ -774,7 +774,13 @@ class EntityMention(TextList, InSentence):
         self.ems_pair = None
 
         ids = copy(self.tokens[0].parent_ids)
-        ids.update({'EM': id_})
+        if source == 'predict':
+            prefix = 'PEM'
+        elif source == 'gold':
+            prefix = 'GEM'
+        else:
+            raise ValueError('source nees to be either "predict" or "gold"')
+        ids.update({prefix: id_})
 
         TextList.__init__(self, ids, tokens)
 

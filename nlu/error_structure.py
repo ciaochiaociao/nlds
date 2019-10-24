@@ -216,12 +216,13 @@ class SpanError(NERError):
         self.direction: str = direction
         self.span_type: str = span_type
         self.ems_pair = ems_pair
+        self.type = direction + ' ' + span_type
 
     def __str__(self):
         return self.direction + ' ' + self.span_type
 
 
-class MergeSplitError(NERError):
+class MergeSplitError(SpanError):
 
     def __init__(self, ems_pair: EntityMentionsPair, type_):
         self.ems_pair = ems_pair
@@ -262,11 +263,18 @@ class MentionTypeError(NERError):
         return ls_to_ls_str(self.gems.types, self.pems.types, sep=sep)
 
 
-class ComplicateError(NERError):
+class ComplicateError(SpanError):
+    """Complicated Case:
+        - [O][OO] <-> [OO][O] both pems and gems have the same range +
+        but none of them have only one entity mention
+        - [OO]O[O] <-> [OOOO] not concat
+        - [OO][O] <-> [O][OOO] not same range
+    """
     def __init__(self, ems_pair: EntityMentionsPair):
         self.ems_pair = ems_pair
         self.predict_types: List[str] = ems_pair.pems.types
         self.gold_types: List[str] = ems_pair.gems.types
+        self.type = 'Complicate'
 
     def __str__(self):
         return 'Complicate - ' + self.ems_pair.gold_text_sep + TO_SEP + self.ems_pair.predict_text_sep
