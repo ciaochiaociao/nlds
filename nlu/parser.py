@@ -1,11 +1,11 @@
 from nlu.data import *
-
+from nlu.parser_utils import *
 
 class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     """Column Parser for CoNLL03 formatted text file"""
     TAGGERSOURCE = 'gold'
 
-    def __init__(self, filepath: str, cols_format: List[Dict[str, Union[str, int]]] = None) -> None:
+    def __init__(self, filepath: str, cols_format: List[Dict[str, Union[str, int]]] = None, tag_scheme='iob1') -> None:
         """
             :param filepath: The filename. Note that the file loaded should end with two blank lines!!!
             :param cols_format:
@@ -30,6 +30,19 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         TOTAL: 23492
         >>> train_parser.set_entity_mentions()
         """
+        newfilepath = filepath + '.iob1'
+        
+        if tag_scheme in ['iob1', 'bio1']:
+            pass  #TODO
+        elif tag_scheme in ['iob2', 'bio2']:
+            bioes2iob1_file(filepath, newfilepath, bieos_cols=[1, 2])  #TODO
+        elif tag_scheme in ['ioblu', 'iobes']:
+            bioes2iob1_file(filepath, newfilepath, bieos_cols=[1, 2])  #TODO
+        else:
+            raise ValueError('Invalid tagging scheme')
+        
+        filepath = newfilepath
+        
         # attributes
         self.docs = []
         self.filepath = filepath
