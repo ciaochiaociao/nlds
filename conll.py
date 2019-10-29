@@ -5,13 +5,12 @@ from nlu.parser import *
 from nlu.error_analysis import *
 
 # basic doctest
-testmod()
+# testmod()
 
 # conll
 cols_format = [{'type': 'gold', 'col_num': 1, 'tagger': 'ner'},
-                {'type': 'predict', 'col_num': 2, 'tagger': 'ner'},
-                {'type': 'predict', 'col_num': 3, 'tagger': 'ner_conf'}]
-parser = ConllParser('test/wnut.test.gold.pred.iob1', cols_format)
+                {'type': 'predict', 'col_num': 2, 'tagger': 'ner'}]
+parser = ConllParser('test/testb.pred.gold', cols_format)
 print(parser.docs[0][0][0].conf)
 parser.set_entity_mentions()
 parser.obtain_statistics(entity_stat=True, source='predict')
@@ -23,4 +22,4 @@ parser.error_overall_stats()
 cm = NERErrorAnalyzer.get_confusion_matrix(parser)
 # NERErrorAnalyzer.print_confusion_matrix(cm)
 NERErrorAnalyzer.pprint_confusion_matrix(cm, save_file='confusion_matrix_conll.png')
-NERErrorAnalyzer.print_report(parser, tag_policy='wnut')
+NERErrorAnalyzer.save_report(parser)

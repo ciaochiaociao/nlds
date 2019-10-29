@@ -311,11 +311,22 @@ class NERErrorComposite(NERComparison):
         ids.update({'NERErr': next(error_id)})
         super().__init__(ems_pair, ids)
         self.type = type
+        #TODO: type of error directly saved
+        # if is_complicate_error(self.span_error):
+        #     self.type2 = 'Span Error'
+        # elif is_fp(self.false_error):
+        #     self.type2 = 'False Positive'
+        # elif is_fn(self.false_error):
+        #     self.type2 = 'False Negative'
+        # elif is_span_error(self.span_error) and
+        #
         self.error_id = error_id
         self.filtered_type = self.filtered_to_array(type)
         self.false_error = self.type['false_error']
         self.span_error: SpanError = self.type['span_error']
         self.type_error = self.type['type_error']
+        self.ptext = self.pems.text
+        self.gtext = self.gems.text
 
     def __str__(self):
         return '---{}---'.format(fg.red('Error')) + NERComparison.__str__(self)
@@ -346,6 +357,79 @@ class NERErrorComposite(NERComparison):
     #         raise ValueError("""The type '{}' is not in one of these:
     #         '{} or None'
     #         """.format(type, NERErrorComposite.all_types))
+
+def is_error(ems_pair):
+    return isinstance(ems_pair.result, NERErrorComposite)
+
+def is_correct(ems_pair):
+    return isinstance(ems_pair.result, NERCorrect)
+
+def is_span_error(ems_pair):
+    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, SpanError)
+
+def is_only_span_error(ems_pair):
+    return is_span_error(ems_pair) and not is_type_error(ems_pair) and not is_complicate_error(ems_pair)
+
+def is_false_error(ems_pair):
+    return is_error(ems_pair) and isinstance(ems_pair.result.false_error, FalseError)
+
+def is_only_type_error(ems_pair):
+    return is_type_error(ems_pair) and not is_span_error(ems_pair) and not is_complicate_error(ems_pair)
+
+def is_fn(ems_pair):
+    return is_false_error(ems_pair) and ems_pair.result.false_error.false_type == 'False Negative'
+
+def is_fp(ems_pair):
+    return is_false_error(ems_pair) and ems_pair.result.false_error.false_type == 'False Positive'
+
+def is_ex(ems_pair):
+    return is_span_error(ems_pair) and ems_pair.result.span_error.span_type == 'Expansion'
+
+def is_re(ems_pair):
+    return is_ex(ems_pair) and ems_pair.result.span_error.direction == 'Right'
+
+def is_le(ems_pair):
+    return is_ex(ems_pair) and ems_pair.result.span_error.direction == 'Left'
+
+def is_rle(ems_pair):
+    return is_ex(ems_pair) and ems_pair.result.span_error.direction == 'Right Left'
+
+def is_dim(ems_pair):
+    return is_span_error(ems_pair) and ems_pair.result.span_error.span_type == 'Diminished'
+
+def is_rd(ems_pair):
+    return is_dim(ems_pair) and ems_pair.result.span_error.direction == 'Right'
+
+def is_ld(ems_pair):
+    return is_dim(ems_pair) and ems_pair.result.span_error.direction == 'Left'
+
+def is_rld(ems_pair):
+    return is_dim(ems_pair) and ems_pair.result.span_error.direction == 'Right Left'
+
+def is_cross(ems_pair):
+    return is_span_error(ems_pair) and 'Crossed' in ems_pair.result.span_error.type
+
+def is_rc(ems_pair):
+    return is_cross(ems_pair) and ems_pair.result.span_error.direction == 'Right'
+
+def is_lc(ems_pair):
+    return is_cross(ems_pair) and ems_pair.result.span_error.direction == 'Left'
+
+def is_merge_split(ems_pair):
+    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, MergeSplitError)
+
+def is_merge(ems_pair):
+    return is_merge_split(ems_pair) and ems_pair.result.span_error.type == 'Spans Merged'
+
+def is_split(ems_pair):
+    return is_merge_split(ems_pair) and ems_pair.result.span_error.type == 'Span Split'
+
+def is_type_error(ems_pair):
+    return is_error(ems_pair) and isinstance(ems_pair.result.type_error, MentionTypeError)
+
+def is_complicate_error(ems_pair):
+    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, ComplicateError)
+
 
 if __name__ == '__main__':
     import doctest

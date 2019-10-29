@@ -192,9 +192,9 @@ class NERErrorAnalyzer:
         # print
         fnames = ['error_pie.png', 'false_error_heatmap.png', 'span_error_heatmap.png', 'confusion_matrix.png']
         cls.print_error_pie(parser, fnames[0])
-        cls.print_false_error_heatmap(parser, tag_policy='wnut', save_file=fnames[1])
-        cls.print_span_error_heatmap(parser, tag_policy='wnut', save_file=fnames[2])
-        cls.pprint_ner_confusion_matrix(parser, tag_policy='wnut', save_file=fnames[3])
+        cls.print_false_error_heatmap(parser, tag_policy=tag_policy, save_file=fnames[1])
+        cls.print_span_error_heatmap(parser, tag_policy=tag_policy, save_file=fnames[2])
+        cls.pprint_ner_confusion_matrix(parser, tag_policy=tag_policy, save_file=fnames[3])
 
     @staticmethod
     def get_span_error_category_df(parser, transpose=True, tag_policy='conll'):
