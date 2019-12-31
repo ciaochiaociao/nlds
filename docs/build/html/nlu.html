@@ -1,0 +1,1877 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>nlu package &mdash; ner_error_analysis 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ner_error_analysis
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">nlu package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-nlu.data">nlu.data module</a></li>
+<li><a class="reference internal" href="#module-nlu.error">nlu.error module</a></li>
+<li><a class="reference internal" href="#module-nlu.error_analysis">nlu.error_analysis module</a></li>
+<li><a class="reference internal" href="#module-nlu.error_structure">nlu.error_structure module</a></li>
+<li><a class="reference internal" href="#module-nlu.parser">nlu.parser module</a></li>
+<li><a class="reference internal" href="#module-nlu.parser_utils">nlu.parser_utils module</a></li>
+<li><a class="reference internal" href="#nlu-setup-module">nlu.setup module</a></li>
+<li><a class="reference internal" href="#module-nlu.utils">nlu.utils module</a></li>
+<li><a class="reference internal" href="#module-nlu">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ner_error_analysis</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>nlu package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/nlu.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="nlu-package">
+<h1>nlu package<a class="headerlink" href="#nlu-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nlu.ext_utils.html">nlu.ext_utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nlu.ext_utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nlu.ext_utils.html#module-nlu.ext_utils.confusion_matrix_pretty_print">nlu.ext_utils.confusion_matrix_pretty_print module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nlu.ext_utils.html#module-nlu.ext_utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nlu.data">
+<span id="nlu-data-module"></span><h2>nlu.data module<a class="headerlink" href="#module-nlu.data" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nlu.data.Base">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">Base</code><a class="headerlink" href="#nlu.data.Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="nlu.data.Base.prepr">
+<code class="sig-name descname">prepr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.Base.prepr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.ConllChunkTag">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">ConllChunkTag</code><span class="sig-paren">(</span><em class="sig-param">type_</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ConllChunkTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Tag" title="nlu.data.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Tag</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.ConllNERTag">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">ConllNERTag</code><span class="sig-paren">(</span><em class="sig-param">type_</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ConllNERTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Tag" title="nlu.data.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Tag</span></code></a></p>
+<dl class="method">
+<dt id="nlu.data.ConllNERTag.type">
+<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#nlu.data.ConllNERTag.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.ConllPosTag">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">ConllPosTag</code><span class="sig-paren">(</span><em class="sig-param">type_</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ConllPosTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Tag" title="nlu.data.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Tag</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.ConllToken">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">ConllToken</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">id_</em>, <em class="sig-param">sid</em>, <em class="sig-param">did</em>, <em class="sig-param">poss=None</em>, <em class="sig-param">chunks=None</em>, <em class="sig-param">ners=None</em>, <em class="sig-param">conf=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ConllToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Token" title="nlu.data.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Token</span></code></a></p>
+<dl class="attribute">
+<dt id="nlu.data.ConllToken.auto_id">
+<code class="sig-name descname">auto_id</code><em class="property"> = -1</em><a class="headerlink" href="#nlu.data.ConllToken.auto_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.ConllToken.bulk_easy_build">
+<em class="property">classmethod </em><code class="sig-name descname">bulk_easy_build</code><span class="sig-paren">(</span><em class="sig-param">texts: List[str], pners: List[str] = None, gners=None, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ConllToken.bulk_easy_build" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tokens</span> <span class="o">=</span> <span class="n">ConllToken</span><span class="o">.</span><span class="n">bulk_easy_build</span><span class="p">([</span><span class="s1">&#39;TSMC&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="s1">&#39;Hsinchu&#39;</span><span class="p">,</span> <span class="s1">&#39;Taiwan&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-LOC&#39;</span><span class="p">,</span> <span class="s1">&#39;B-LOC&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.ConllToken.bulk_from_str">
+<em class="property">classmethod </em><code class="sig-name descname">bulk_from_str</code><span class="sig-paren">(</span><em class="sig-param">text_str</em>, <em class="sig-param">pner_str=None</em>, <em class="sig-param">gner_str=None</em>, <em class="sig-param">sep=' '</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ConllToken.bulk_from_str" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tokens</span> <span class="o">=</span> <span class="n">ConllToken</span><span class="o">.</span><span class="n">bulk_from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+<span class="go">12</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.ConllToken.easy_build">
+<em class="property">classmethod </em><code class="sig-name descname">easy_build</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">ner=None</em>, <em class="sig-param">gner=None</em>, <em class="sig-param">restart=False</em>, <em class="sig-param">id_=None</em>, <em class="sig-param">sid=999</em>, <em class="sig-param">did=99</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ConllToken.easy_build" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ConllToken</span><span class="o">.</span><span class="n">easy_build</span><span class="p">(</span><span class="s1">&#39;TSMC&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG&#39;</span><span class="p">,</span> <span class="n">restart</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">ConllToken(text=&#39;TSMC&#39;, id_=0, sid=999, did=99, ners={&#39;predict&#39;: &#39;I-ORG&#39;})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ConllToken</span><span class="o">.</span><span class="n">easy_build</span><span class="p">(</span><span class="s1">&#39;Morris&#39;</span><span class="p">,</span> <span class="s1">&#39;I-PER&#39;</span><span class="p">)</span>
+<span class="go">ConllToken(text=&#39;Morris&#39;, id_=1, sid=999, did=99, ners={&#39;predict&#39;: &#39;I-PER&#39;})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ConllToken</span><span class="o">.</span><span class="n">easy_build</span><span class="p">(</span><span class="s1">&#39;Taipei&#39;</span><span class="p">,</span> <span class="s1">&#39;I-LOC&#39;</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="go">ConllToken(text=&#39;Taipei&#39;, id_=12, sid=999, did=99, ners={&#39;predict&#39;: &#39;I-LOC&#39;})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.Document">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">Document</code><span class="sig-paren">(</span><em class="sig-param">sentences: List[nlu.data.Sentence]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.Document" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.TextList" title="nlu.data.TextList"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextList</span></code></a></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen1</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen2</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;Natural Language Processing is so fun !&#39;</span><span class="p">,</span> <span class="s1">&#39;I-MISC I-MISC I-MISC O O O O&#39;</span><span class="p">,</span> <span class="s1">&#39;O I-MISC I-MISC O O O O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen1</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">NLU Lab is in Taipei Taiwan directed by Keh Yih Su .(D99-S999)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span> <span class="o">=</span> <span class="n">Document</span><span class="p">([</span><span class="n">sen1</span><span class="p">,</span> <span class="n">sen2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+<span class="go">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su . Natural Language Processing is so fun !&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">fullid</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">parent_ids</span>
+<span class="go">(99, &#39;D99&#39;, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span> <span class="o">+</span> <span class="n">doc</span><span class="p">)</span>  <span class="c1"># test __add__  </span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">doc</span> <span class="o">+</span> <span class="n">doc</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># test __add__ and __getitem__  </span>
+<span class="go">Sentence(...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.EntityMention">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">EntityMention</code><span class="sig-paren">(</span><em class="sig-param">tokens</em>, <em class="sig-param">id_</em>, <em class="sig-param">source</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.EntityMention" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.TextList" title="nlu.data.TextList"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextList</span></code></a>, <a class="reference internal" href="#nlu.data.InSentence" title="nlu.data.InSentence"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.InSentence</span></code></a></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">em1</span> <span class="o">=</span> <span class="n">EntityMention</span><span class="p">(</span><span class="n">sen</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">id_</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">&#39;predict&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">em2</span> <span class="o">=</span> <span class="n">EntityMention</span><span class="p">(</span><span class="n">sen</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">id_</span><span class="o">=</span><span class="mi">34</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">&#39;gold&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">em1</span><span class="o">.</span><span class="n">fullid</span>
+<span class="go">&#39;D99-S999-EM33&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">em1</span><span class="p">,</span> <span class="n">Hashable</span><span class="p">)</span>  <span class="c1"># hashable test1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">em1</span><span class="p">,</span> <span class="n">em2</span><span class="p">])</span>  <span class="c1">#hashable test2 (for checking if two mentions are &quot;the same&quot; using set() trick)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">em1</span><span class="o">+</span><span class="n">em1</span>  <span class="c1"># test __add__ and __getitem__  </span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Not consecutive ner positions ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">em1</span><span class="o">+</span><span class="n">em2</span>  
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Not consistent ner types ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">em1</span><span class="o">.</span><span class="n">ann_str</span><span class="p">())</span>  <span class="c1"># blue</span>
+<span class="go">[34m[[0mNLU Lab[34m][0m[34mORG[0m</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">em1</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;gold&#39;</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">em1</span><span class="o">.</span><span class="n">ann_str</span><span class="p">())</span>  <span class="c1"># yellow</span>
+<span class="go">[33m[[0mNLU Lab[33m][0m[33mORG[0m</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">em1</span><span class="o">.</span><span class="n">ann_in_sentence</span><span class="p">())</span>  <span class="c1"># yellow</span>
+<span class="go">[33m[[0mNLU Lab[33m][0m[33mORG[0mis in Taipei Taiwan directed by Keh Yih Su .</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="nlu.data.EntityMention.ann_in_sentence">
+<code class="sig-name descname">ann_in_sentence</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.data.EntityMention.ann_in_sentence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.EntityMention.ann_str">
+<code class="sig-name descname">ann_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.data.EntityMention.ann_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.EntityMention.print">
+<code class="sig-name descname">print</code><span class="sig-paren">(</span><em class="sig-param">detail=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.EntityMention.print" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.EntityMentions">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">EntityMentions</code><span class="sig-paren">(</span><em class="sig-param">mentions: List[nlu.data.EntityMention], source: str = None, type_: str = None, ids: collections.OrderedDict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.EntityMentions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.TextList" title="nlu.data.TextList"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextList</span></code></a></p>
+<p>A user-defined list of ‘EntityMention’s.</p>
+<p>its ids is the same as the ids of the sentence it resides in</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span><span class="o">.</span><span class="n">set_entity_mentions</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pems</span> <span class="o">=</span> <span class="n">EntityMentions</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">pems</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">pems</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">type</span><span class="p">(</span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">type</span><span class="p">(</span><span class="n">pems</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">(4, &lt;class &#39;__main__.EntityMentions&#39;&gt;, &lt;class &#39;__main__.EntityMention&#39;&gt;, 3, &lt;class &#39;__main__.EntityMention&#39;&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pems</span><span class="o">.</span><span class="n">parent_ids</span>
+<span class="go">OrderedDict([(&#39;D&#39;, 99)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="n">token</span><span class="o">.</span><span class="n">fullid</span><span class="p">:</span><span class="nb">str</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">pem</span> <span class="ow">in</span> <span class="n">pems</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">pem</span><span class="o">.</span><span class="n">tokens</span><span class="p">}</span>  <span class="c1"># test __iter__()</span>
+<span class="go">{&#39;D99-S999-T0&#39;: &#39;NLU&#39;, &#39;D99-S999-T1&#39;: &#39;Lab&#39;, &#39;D99-S999-T4&#39;: &#39;Taipei&#39;, &#39;D99-S999-T5&#39;: &#39;Taiwan&#39;, &#39;D99-S999-T8&#39;: &#39;Keh&#39;, &#39;D99-S999-T9&#39;: &#39;Yih&#39;, &#39;D99-S999-T10&#39;: &#39;Su&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">EntityMentions</span><span class="o">.</span><span class="n">sep_str</span><span class="p">(</span><span class="n">pems</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+<span class="go">&#39;NLU Lab|Taipei|Taiwan|Keh Yih Su&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">pems</span><span class="p">)</span>
+<span class="go">&#39;NLU Lab Taipei Taiwan Keh Yih Su&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">((</span><span class="n">pems</span> <span class="o">+</span> <span class="n">pems</span><span class="p">)[:])</span>  <span class="c1"># test __add__ and __getitem__</span>
+<span class="go">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">EntityMentions</span><span class="p">([],</span> <span class="n">pems</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">pems</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">pems</span><span class="o">.</span><span class="n">parent_ids</span><span class="p">)</span>      <span class="c1"># None EntityMentions test (For False Negative/Positive)</span>
+<span class="go">EntityMentions(mentions=[], source=&#39;predict&#39;, type_=&#39;ORG&#39;, ids=OrderedDict([(&#39;D&#39;, 99)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pems</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_diff_ann_sent</span><span class="p">(</span><span class="n">pems</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">pems</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="n">fg</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="n">fg</span><span class="o">.</span><span class="n">red</span><span class="p">]))</span>
+<span class="go">[31m[NLU Lab]ORG[0m is in [32m[Taipei]LOC[0m [31m[Taiwan]LOC[0m directed by [31m[Keh Yih Su]PER[0m .</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pems</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_ann_em_in_sent</span><span class="p">())</span>
+<span class="go">[34m[NLU Lab]ORG[0m is in [32m[Taipei]LOC[0m [34m[Taiwan]LOC[0m directed by [34m[Keh Yih Su]PER[0m .</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="nlu.data.EntityMentions.get_ann_em_in_sent">
+<code class="sig-name descname">get_ann_em_in_sent</code><span class="sig-paren">(</span><em class="sig-param">colors=[&lt;ansi.colour.base.Graphic object&gt;, &lt;ansi.colour.base.Graphic object&gt;]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.EntityMentions.get_ann_em_in_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>highlight the entity mentions and the others with two different colors in the setnecne</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.EntityMentions.get_ann_sent">
+<code class="sig-name descname">get_ann_sent</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.EntityMentions.get_ann_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>porting to sentence.get_ann_sent</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.EntityMentions.get_diff_ann_sent">
+<code class="sig-name descname">get_diff_ann_sent</code><span class="sig-paren">(</span><em class="sig-param">other_ems</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.EntityMentions.get_diff_ann_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>porting to sentence.get_diff_ann_sent</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.InDocument">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">InDocument</code><a class="headerlink" href="#nlu.data.InDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="nlu.data.InDocument.set_document">
+<code class="sig-name descname">set_document</code><span class="sig-paren">(</span><em class="sig-param">document: nlu.data.Document</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.data.InDocument.set_document" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.InSentence">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">InSentence</code><a class="headerlink" href="#nlu.data.InSentence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="nlu.data.InSentence.set_sentence">
+<code class="sig-name descname">set_sentence</code><span class="sig-paren">(</span><em class="sig-param">sentence: nlu.data.Sentence</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.data.InSentence.set_sentence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.MD_IDs">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">MD_IDs</code><span class="sig-paren">(</span><em class="sig-param">ids</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.MD_IDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Base" title="nlu.data.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Base</span></code></a></p>
+<dl class="method">
+<dt id="nlu.data.MD_IDs.concat_ids">
+<em class="property">static </em><code class="sig-name descname">concat_ids</code><span class="sig-paren">(</span><em class="sig-param">ids: Union[None, OrderedDict[str, int]]</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.data.MD_IDs.concat_ids" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">concat_ids</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}))</span>
+<span class="go">&#39;D1-S2&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">concat_ids</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;CC&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;DE&#39;</span><span class="p">:</span><span class="mi">6</span><span class="p">}))</span>
+<span class="go">&#39;A3-B4-CC5-DE6&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">none1</span><span class="p">,</span> <span class="n">none2</span><span class="p">,</span> <span class="n">none3</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">(),</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;CC&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;DE&#39;</span><span class="p">:</span><span class="mi">6</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">concat_ids</span><span class="p">(</span><span class="n">none1</span><span class="p">),</span> <span class="n">MD_IDs</span><span class="o">.</span><span class="n">concat_ids</span><span class="p">(</span><span class="n">none2</span><span class="p">),</span> <span class="n">MD_IDs</span><span class="o">.</span><span class="n">concat_ids</span><span class="p">(</span><span class="n">none3</span><span class="p">)</span>
+<span class="go">(&#39;&#39;, &#39;&#39;, &#39;&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.MD_IDs.from_list">
+<em class="property">classmethod </em><code class="sig-name descname">from_list</code><span class="sig-paren">(</span><em class="sig-param">list_: list</em><span class="sig-paren">)</span> &#x2192; nlu.data.MD_IDs<a class="headerlink" href="#nlu.data.MD_IDs.from_list" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">from_list</span><span class="p">([(</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;9&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">)])</span>
+<span class="go">MD_IDs(ids=OrderedDict([(&#39;D&#39;, &#39;9&#39;), (&#39;S&#39;, &#39;3&#39;), (&#39;E&#39;, &#39;2&#39;)]))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.MD_IDs.from_str">
+<em class="property">classmethod </em><code class="sig-name descname">from_str</code><span class="sig-paren">(</span><em class="sig-param">str_: str</em><span class="sig-paren">)</span> &#x2192; nlu.data.MD_IDs<a class="headerlink" href="#nlu.data.MD_IDs.from_str" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;D9-S3-E2&#39;</span><span class="p">)</span>
+<span class="go">MD_IDs(ids=OrderedDict([(&#39;D&#39;, &#39;9&#39;), (&#39;S&#39;, &#39;3&#39;), (&#39;E&#39;, &#39;2&#39;)]))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.MD_IDs.get_parent_ids">
+<em class="property">static </em><code class="sig-name descname">get_parent_ids</code><span class="sig-paren">(</span><em class="sig-param">ids: collections.OrderedDict</em><span class="sig-paren">)</span> &#x2192; Optional[collections.OrderedDict]<a class="headerlink" href="#nlu.data.MD_IDs.get_parent_ids" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">get_parent_ids</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">}))</span>
+<span class="go">OrderedDict([(&#39;D&#39;, 2), (&#39;S&#39;, 1)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">get_parent_ids</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.MD_IDs.ids">
+<em class="property">property </em><code class="sig-name descname">ids</code><a class="headerlink" href="#nlu.data.MD_IDs.ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.MD_IDs.parse_fullid_str">
+<em class="property">static </em><code class="sig-name descname">parse_fullid_str</code><span class="sig-paren">(</span><em class="sig-param">str_</em><span class="sig-paren">)</span> &#x2192; List<a class="headerlink" href="#nlu.data.MD_IDs.parse_fullid_str" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">MD_IDs</span><span class="o">.</span><span class="n">parse_fullid_str</span><span class="p">(</span><span class="s1">&#39;D9-S3-E2&#39;</span><span class="p">)</span>
+<span class="go">[(&#39;D&#39;, &#39;9&#39;), (&#39;S&#39;, &#39;3&#39;), (&#39;E&#39;, &#39;2&#39;)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.ObjectList">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">ObjectList</code><span class="sig-paren">(</span><em class="sig-param">members</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ObjectList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Base" title="nlu.data.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Base</span></code></a></p>
+<p>Inherited by TextList</p>
+<dl class="attribute">
+<dt id="nlu.data.ObjectList.SEPARATOR">
+<code class="sig-name descname">SEPARATOR</code><em class="property"> = '|'</em><a class="headerlink" href="#nlu.data.ObjectList.SEPARATOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.ObjectList.sep_str">
+<code class="sig-name descname">sep_str</code><span class="sig-paren">(</span><em class="sig-param">sep=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.ObjectList.sep_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.Sentence">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">Sentence</code><span class="sig-paren">(</span><em class="sig-param">tokens: List[nlu.data.Token]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.Sentence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.TextList" title="nlu.data.TextList"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextList</span></code></a>, <a class="reference internal" href="#nlu.data.InDocument" title="nlu.data.InDocument"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.InDocument</span></code></a></p>
+<dl class="method">
+<dt id="nlu.data.Sentence.easy_build">
+<em class="property">classmethod </em><code class="sig-name descname">easy_build</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.Sentence.easy_build" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">easy_build</span><span class="p">([</span><span class="s1">&#39;NLU&#39;</span><span class="p">,</span> <span class="s1">&#39;Lab&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="s1">&#39;Taipei&#39;</span><span class="p">,</span> <span class="s1">&#39;Taiwan&#39;</span><span class="p">,</span> <span class="s1">&#39;directed&#39;</span><span class="p">,</span> <span class="s1">&#39;by&#39;</span><span class="p">,</span> <span class="s1">&#39;Keh&#39;</span><span class="p">,</span> <span class="s1">&#39;Yih&#39;</span><span class="p">,</span> <span class="s1">&#39;Su&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-LOC&#39;</span><span class="p">,</span> <span class="s1">&#39;B-LOC&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-PER&#39;</span><span class="p">,</span> <span class="s1">&#39;I-PER&#39;</span><span class="p">,</span> <span class="s1">&#39;I-PER&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sen</span><span class="p">)</span>
+<span class="go">12</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.from_str">
+<em class="property">classmethod </em><code class="sig-name descname">from_str</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.Sentence.from_str" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>  
+<span class="go">Sentence(...ners={&#39;predict&#39;: &#39;I-ORG&#39;, &#39;gold&#39;: &#39;I-ORG&#39;}...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.get_ann_sent">
+<code class="sig-name descname">get_ann_sent</code><span class="sig-paren">(</span><em class="sig-param">ems: nlu.data.EntityMentions</em>, <em class="sig-param">color=&lt;ansi.colour.base.Graphic object&gt;</em>, <em class="sig-param">color_em=True</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.data.Sentence.get_ann_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>highlight all entity mentions with one color in the sentence</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.get_diff_ann_sent">
+<code class="sig-name descname">get_diff_ann_sent</code><span class="sig-paren">(</span><em class="sig-param">all_ems: List[EntityMentions], colors=None, color_em=True</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.data.Sentence.get_diff_ann_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>highlight different entity mentions with different color in the sentence</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.get_entity_mentions">
+<code class="sig-name descname">get_entity_mentions</code><span class="sig-paren">(</span><em class="sig-param">source: str</em><span class="sig-paren">)</span> &#x2192; List[nlu.data.EntityMention]<a class="headerlink" href="#nlu.data.Sentence.get_entity_mentions" title="Permalink to this definition">¶</a></dt>
+<dd><p>chunk entity mentions for all sources (i.e. predict, gold) from <a href="#id1"><span class="problematic" id="id2">`</span></a>ConllToken`s in a sentence</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="n">pner_str</span><span class="o">=</span><span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="n">gner_str</span><span class="o">=</span><span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gems</span> <span class="o">=</span> <span class="n">sen</span><span class="o">.</span><span class="n">get_entity_mentions</span><span class="p">(</span><span class="s1">&#39;gold&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pems</span> <span class="o">=</span> <span class="n">sen</span><span class="o">.</span><span class="n">get_entity_mentions</span><span class="p">(</span><span class="s1">&#39;predict&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">gems</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">pems</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  
+<span class="go">EntityMention(...&#39;NLU&#39;...&#39;predict&#39;: &#39;I-ORG&#39;...&#39;Lab&#39;...predict&#39;: &#39;I-ORG&#39;... source=&#39;predict&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;ORG&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.ner_print_errors">
+<code class="sig-name descname">ner_print_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.data.Sentence.ner_print_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.print_corrects">
+<code class="sig-name descname">print_corrects</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.data.Sentence.print_corrects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.set_corrects_from_pairs">
+<code class="sig-name descname">set_corrects_from_pairs</code><span class="sig-paren">(</span><em class="sig-param">pairs</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.data.Sentence.set_corrects_from_pairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.set_entity_mentions">
+<code class="sig-name descname">set_entity_mentions</code><span class="sig-paren">(</span><em class="sig-param">sources: List = ['predict', 'gold']</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.data.Sentence.set_entity_mentions" title="Permalink to this definition">¶</a></dt>
+<dd><p>chunk entity mentions for all sources (i.e. predict, gold) from <a href="#id3"><span class="problematic" id="id4">`</span></a>ConllToken`s in a sentence</p>
+<p>effect: set sentence.entity_mentions_dict ({‘predict’: <a href="#id5"><span class="problematic" id="id6">`</span></a>EntityMention`s})</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="n">pner_str</span><span class="o">=</span><span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="n">gner_str</span><span class="o">=</span><span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span><span class="o">.</span><span class="n">set_entity_mentions</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">gems</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">pems</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">ems</span><span class="p">)</span>
+<span class="go">(3, 4, 7)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span><span class="o">.</span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  
+<span class="go">EntityMention(...&#39;NLU&#39;...&#39;predict&#39;: &#39;I-ORG&#39;...&#39;Lab&#39;...predict&#39;: &#39;I-ORG&#39;... source=&#39;predict&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">sen</span><span class="o">.</span><span class="n">pems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+<span class="go">(2, &#39;ORG&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.data.Sentence.set_errors_from_pairs">
+<code class="sig-name descname">set_errors_from_pairs</code><span class="sig-paren">(</span><em class="sig-param">pairs</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.data.Sentence.set_errors_from_pairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.Tag">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">Tag</code><span class="sig-paren">(</span><em class="sig-param">type_</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.Tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Base" title="nlu.data.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Base</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.TextList">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">TextList</code><span class="sig-paren">(</span><em class="sig-param">ids</em>, <em class="sig-param">members</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.TextList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.ObjectList" title="nlu.data.ObjectList"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.ObjectList</span></code></a>, <a class="reference internal" href="#nlu.data.TextWithIDs" title="nlu.data.TextWithIDs"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextWithIDs</span></code></a></p>
+<p>Directly inherited by Sentence, Document, EntityMention, …</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sid</span><span class="p">,</span> <span class="n">did</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">taiwan</span> <span class="o">=</span> <span class="n">ConllToken</span><span class="p">(</span><span class="s1">&#39;Taiwan&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="mi">111</span><span class="p">,</span> <span class="n">ners</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gold&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">),</span> <span class="s1">&#39;predict&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">semi</span> <span class="o">=</span> <span class="n">ConllToken</span><span class="p">(</span><span class="s1">&#39;Semiconductor&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">did</span><span class="p">,</span> <span class="n">ners</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gold&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">),</span>     <span class="s1">&#39;predict&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manu</span> <span class="o">=</span> <span class="n">ConllToken</span><span class="p">(</span><span class="s1">&#39;Manufacturer&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">999</span><span class="p">,</span> <span class="n">did</span><span class="p">,</span> <span class="n">ners</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gold&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">),</span>     <span class="s1">&#39;predict&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;B-ORG&#39;</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">co</span> <span class="o">=</span> <span class="n">ConllToken</span><span class="p">(</span><span class="s1">&#39;Cooperation&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">did</span><span class="p">,</span> <span class="n">ners</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gold&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;B-ORG&#39;</span><span class="p">),</span> <span class="s1">&#39;predict&#39;</span><span class="p">:</span><span class="n">ConllNERTag</span><span class="p">(</span><span class="s1">&#39;I-ORG&#39;</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">TextList</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">did</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;EM&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}),</span> <span class="p">[</span><span class="n">semi</span><span class="p">,</span> <span class="n">co</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fullid</span>  <span class="c1"># test MD_IDs</span>
+<span class="go">&#39;D6-S3-EM4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TextList</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">did</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;EM&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}),</span> <span class="p">[</span><span class="n">manu</span><span class="p">,</span> <span class="n">co</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">The members &quot;Manufacturer&quot; of class &quot;ConllToken&quot; in &quot;LIST[ConllToken]&quot; should have same parent ids</span>
+<span class="go">                full ids of the members: [OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 999)]), OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 3)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TextList</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;EM&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}),</span> <span class="p">[</span><span class="n">manu</span><span class="p">,</span> <span class="n">co</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">The members &quot;Manufacturer&quot; of class &quot;ConllToken&quot; in &quot;LIST[ConllToken]&quot; should have same parent ids</span>
+<span class="go">                full ids of the members: [OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 999)]), OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 3)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TextList</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">did</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;EM&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}),</span> <span class="p">[</span><span class="n">manu</span><span class="p">,</span> <span class="n">co</span><span class="p">])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">The members &quot;Manufacturer&quot; of class &quot;ConllToken&quot; in &quot;LIST[ConllToken]&quot; should have same parent ids</span>
+<span class="go">                full ids of the members: [OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 999)]), OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 3)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span> <span class="nb">str</span><span class="p">(</span><span class="n">men</span><span class="p">)</span> <span class="k">for</span> <span class="n">men</span> <span class="ow">in</span> <span class="n">t</span> <span class="p">]</span>
+<span class="go">[&#39;Semiconductor&#39;, &#39;Cooperation&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="n">t</span><span class="o">+</span><span class="n">t</span><span class="p">)</span>  
+<span class="go">&quot;TextList(ids=OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 3), (&#39;EM&#39;, 4)]), members=[ConllToken(text=&#39;Semiconductor&#39;, id_=1, sid=3, did=6...), ConllToken(text=&#39;Cooperation&#39;, id_=3, sid=3, did=6...), ConllToken(text=&#39;Semiconductor&#39;, id_=1, sid=3, did=6...), ConllToken(text=&#39;Cooperation&#39;, id_=3, sid=3, did=6...)])&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TextList</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">did</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;EM&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}),</span> <span class="p">[])</span>  
+<span class="go">TextList(ids=OrderedDict([(&#39;D&#39;, 6), (&#39;S&#39;, 3), (&#39;EM&#39;, 5)]), members=[])</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="nlu.data.TextList.SEPARATOR">
+<code class="sig-name descname">SEPARATOR</code><em class="property"> = '|'</em><a class="headerlink" href="#nlu.data.TextList.SEPARATOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.TextWithIDs">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">TextWithIDs</code><span class="sig-paren">(</span><em class="sig-param">ids</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.TextWithIDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.MD_IDs" title="nlu.data.MD_IDs"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.MD_IDs</span></code></a></p>
+<p>abstract class: directly inherited by TextList, Token</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SomeText</span><span class="p">(</span><span class="n">TextWithIDs</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
+<span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">text_obj</span> <span class="o">=</span> <span class="n">SomeText</span><span class="p">(</span><span class="s1">&#39;A sample text&#39;</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">({</span><span class="s1">&#39;D&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">text_obj</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">A sample text(D2-S4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="n">text_obj</span><span class="p">)</span>
+<span class="go">&quot;SomeText(text=&#39;A sample text&#39;, ids=OrderedDict([(&#39;D&#39;, 2), (&#39;S&#39;, 4)]))&quot;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="nlu.data.TextWithIDs.print">
+<code class="sig-name descname">print</code><span class="sig-paren">(</span><em class="sig-param">detail=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.TextWithIDs.print" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.data.Token">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">Token</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">id_</em>, <em class="sig-param">sid</em>, <em class="sig-param">did</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.Token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.TextWithIDs" title="nlu.data.TextWithIDs"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextWithIDs</span></code></a>, <a class="reference internal" href="#nlu.data.InSentence" title="nlu.data.InSentence"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.InSentence</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.data.default_repr_format">
+<code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">default_repr_format</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">pretty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.default_repr_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.data.get_func_keys">
+<code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">get_func_keys</code><span class="sig-paren">(</span><em class="sig-param">func</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.get_func_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.data.prepr">
+<code class="sig-prename descclassname">nlu.data.</code><code class="sig-name descname">prepr</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.data.prepr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-nlu.error">
+<span id="nlu-error-module"></span><h2>nlu.error module<a class="headerlink" href="#module-nlu.error" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nlu.error.MentionsPairsExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error.</code><code class="sig-name descname">MentionsPairsExtractor</code><a class="headerlink" href="#nlu.error.MentionsPairsExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Extract EntityMentionsPairs from a Sentence object</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span><span class="o">.</span><span class="n">set_entity_mentions</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pairs</span> <span class="o">=</span> <span class="n">MentionsPairsExtractor</span><span class="o">.</span><span class="n">get_pairs</span><span class="p">(</span><span class="n">sen</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">EntityMentionsPair</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="go">D99-S999-PAIR0: (G) [33m[NLU Lab]ORG[0m is in Taipei Taiwan directed by Keh Yih Su . (P) [34m[NLU Lab]ORG[0m is in Taipei Taiwan directed by Keh Yih Su .</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.filtered_id">
+<em class="property">static </em><code class="sig-name descname">filtered_id</code><span class="sig-paren">(</span><em class="sig-param">pair_ids_with_ems</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.MentionsPairsExtractor.filtered_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the pair_id if there is at least one not None value, else returns None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.get_pair_ids_with_ems">
+<em class="property">static </em><code class="sig-name descname">get_pair_ids_with_ems</code><span class="sig-paren">(</span><em class="sig-param">ems_in_slot</em>, <em class="sig-param">pairs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.MentionsPairsExtractor.get_pair_ids_with_ems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.get_pairs">
+<em class="property">static </em><code class="sig-name descname">get_pairs</code><span class="sig-paren">(</span><em class="sig-param">sentence: nlu.data.Sentence</em>, <em class="sig-param">gold_src: str = 'gold'</em>, <em class="sig-param">predict_src: str = 'predict'</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span> &#x2192; Union[None, nlu.error_structure.EntityMentionsPairs]<a class="headerlink" href="#nlu.error.MentionsPairsExtractor.get_pairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.merge_or_append_ems_to_pairs">
+<em class="property">static </em><code class="sig-name descname">merge_or_append_ems_to_pairs</code><span class="sig-paren">(</span><em class="sig-param">ems_in_slot</em>, <em class="sig-param">pair_id</em>, <em class="sig-param">pairs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.MentionsPairsExtractor.merge_or_append_ems_to_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>if there is an existing ems_pair including the current mention: merge</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.sort_sets_of_ems">
+<em class="property">static </em><code class="sig-name descname">sort_sets_of_ems</code><span class="sig-paren">(</span><em class="sig-param">pairs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.MentionsPairsExtractor.sort_sets_of_ems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.to_ems_pairs">
+<em class="property">static </em><code class="sig-name descname">to_ems_pairs</code><span class="sig-paren">(</span><em class="sig-param">debug</em>, <em class="sig-param">gold_src</em>, <em class="sig-param">pairs</em>, <em class="sig-param">predict_src</em>, <em class="sig-param">sentence</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.MentionsPairsExtractor.to_ems_pairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.to_occupied">
+<em class="property">static </em><code class="sig-name descname">to_occupied</code><span class="sig-paren">(</span><em class="sig-param">debug</em>, <em class="sig-param">gems</em>, <em class="sig-param">pems</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.MentionsPairsExtractor.to_occupied" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.MentionsPairsExtractor.to_sets_of_ems">
+<em class="property">static </em><code class="sig-name descname">to_sets_of_ems</code><span class="sig-paren">(</span><em class="sig-param">debug</em>, <em class="sig-param">occupied</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.MentionsPairsExtractor.to_sets_of_ems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error.NERErrorAnnotator">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error.</code><code class="sig-name descname">NERErrorAnnotator</code><a class="headerlink" href="#nlu.error.NERErrorAnnotator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Annotate NER Errors for a parser</p>
+<dl class="attribute">
+<dt id="nlu.error.NERErrorAnnotator.GOLD_SOURCE_ALIAS">
+<code class="sig-name descname">GOLD_SOURCE_ALIAS</code><em class="property"> = 'gold'</em><a class="headerlink" href="#nlu.error.NERErrorAnnotator.GOLD_SOURCE_ALIAS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error.NERErrorAnnotator.PREDICT_SOURCE_ALIAS">
+<code class="sig-name descname">PREDICT_SOURCE_ALIAS</code><em class="property"> = 'predict'</em><a class="headerlink" href="#nlu.error.NERErrorAnnotator.PREDICT_SOURCE_ALIAS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorAnnotator.annotate">
+<em class="property">static </em><code class="sig-name descname">annotate</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">gold_src: str = None</em>, <em class="sig-param">predict_src: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.NERErrorAnnotator.annotate" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">ConllParser</span><span class="p">(</span><span class="s1">&#39;../test/testa.pred.gold&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">set_entity_mentions</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NERErrorAnnotator</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">error_overall_stats</span><span class="p">()</span>
+<span class="go">---Overall Results---</span>
+<span class="go">found entity mentions: 5942</span>
+<span class="go">true entity mentions: 5942</span>
+<span class="go">correct_total:  5941</span>
+<span class="go">error_total:  1</span>
+<span class="go">precision: 99.98%</span>
+<span class="go">recall: 99.98%</span>
+<span class="go">macro-f1: 99.98%</span>
+<span class="go">corrects ratio: 99.98%</span>
+<span class="go">all corrects and errors 5942</span>
+<span class="go">the number of sentences with/without entities (predict + gold): 2605 (80%), 645 (20%)        </span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error.NERErrorAnnotator.id_incs">
+<code class="sig-name descname">id_incs</code><em class="property"> = (&lt;generator object id_incrementer&gt;, &lt;generator object id_incrementer&gt;)</em><a class="headerlink" href="#nlu.error.NERErrorAnnotator.id_incs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorAnnotator.set_ems_pairs_in_sentence">
+<em class="property">static </em><code class="sig-name descname">set_ems_pairs_in_sentence</code><span class="sig-paren">(</span><em class="sig-param">sentence: nlu.data.Sentence</em>, <em class="sig-param">gold_src</em>, <em class="sig-param">predict_src</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.NERErrorAnnotator.set_ems_pairs_in_sentence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorAnnotator.set_result_in_ems_pair">
+<em class="property">static </em><code class="sig-name descname">set_result_in_ems_pair</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.NERErrorAnnotator.set_result_in_ems_pair" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorAnnotator.set_results_in_document">
+<em class="property">static </em><code class="sig-name descname">set_results_in_document</code><span class="sig-paren">(</span><em class="sig-param">doc</em>, <em class="sig-param">gold_src</em>, <em class="sig-param">predict_src</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.NERErrorAnnotator.set_results_in_document" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorAnnotator.set_results_in_ems_pairs">
+<em class="property">static </em><code class="sig-name descname">set_results_in_ems_pairs</code><span class="sig-paren">(</span><em class="sig-param">ems_pairs: nlu.error_structure.EntityMentionsPairs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.NERErrorAnnotator.set_results_in_ems_pairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorAnnotator.set_results_in_sentence">
+<em class="property">static </em><code class="sig-name descname">set_results_in_sentence</code><span class="sig-paren">(</span><em class="sig-param">sentence: nlu.data.Sentence</em>, <em class="sig-param">gold_src</em>, <em class="sig-param">predict_src</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.error.NERErrorAnnotator.set_results_in_sentence" title="Permalink to this definition">¶</a></dt>
+<dd><p>effect: set sentence.ems_pairs, sentence.ner_results, sentence.corrects, sentence.errors</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error.NERErrorExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error.</code><code class="sig-name descname">NERErrorExtractor</code><a class="headerlink" href="#nlu.error.NERErrorExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-ORG O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span><span class="o">.</span><span class="n">set_entity_mentions</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">id_incs</span> <span class="o">=</span> <span class="n">id_incrementer</span><span class="p">(),</span> <span class="n">id_incrementer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pairs</span> <span class="o">=</span> <span class="n">MentionsPairsExtractor</span><span class="o">.</span><span class="n">get_pairs</span><span class="p">(</span><span class="n">sen</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error_comp</span> <span class="o">=</span> <span class="n">NERErrorExtractor</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id_incs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">error_comp</span><span class="p">)</span>
+<span class="go">&lt;class &#39;nlu.error_structure.NERErrorComposite&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="n">t</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">error_comp</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="go">{&#39;false_error&#39;: &#39;None&#39;, &#39;type_error&#39;: &#39;LOC -&gt; LOC|ORG&#39;, &#39;span_error&#39;: &#39;Taipei Taiwan -&gt; Taipei|Taiwan&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corr</span> <span class="o">=</span> <span class="n">NERErrorExtractor</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id_incs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">corr</span><span class="p">)</span>
+<span class="go">&lt;class &#39;nlu.error_structure.NERCorrect&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">error_comp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="n">t</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="go">{&#39;false_error&#39;: &#39;None&#39;, &#39;type_error&#39;: &#39;LOC -&gt; LOC|ORG&#39;, &#39;span_error&#39;: &#39;Taipei Taiwan -&gt; Taipei|Taiwan&#39;}</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.extract">
+<em class="property">static </em><code class="sig-name descname">extract</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair, id_incs: Tuple[nlu.utils.id_incrementer, nlu.utils.id_incrementer]</em><span class="sig-paren">)</span> &#x2192; Union[nlu.error_structure.NERErrorComposite, nlu.error_structure.NERCorrect]<a class="headerlink" href="#nlu.error.NERErrorExtractor.extract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.get_error">
+<em class="property">static </em><code class="sig-name descname">get_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.NERErrorExtractor.get_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.get_false_error_eq_one">
+<em class="property">static </em><code class="sig-name descname">get_false_error_eq_one</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span> &#x2192; nlu.error_structure.FalseError<a class="headerlink" href="#nlu.error.NERErrorExtractor.get_false_error_eq_one" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.get_merge_or_split_from_ge_three">
+<em class="property">static </em><code class="sig-name descname">get_merge_or_split_from_ge_three</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span> &#x2192; nlu.error_structure.MergeSplitError<a class="headerlink" href="#nlu.error.NERErrorExtractor.get_merge_or_split_from_ge_three" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.get_span_error_from_eq_two">
+<em class="property">static </em><code class="sig-name descname">get_span_error_from_eq_two</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span> &#x2192; Optional[nlu.error_structure.SimpleSpanError]<a class="headerlink" href="#nlu.error.NERErrorExtractor.get_span_error_from_eq_two" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.get_span_error_from_ge_three">
+<em class="property">static </em><code class="sig-name descname">get_span_error_from_ge_three</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.error.NERErrorExtractor.get_span_error_from_ge_three" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.get_type_error_from_eq_two">
+<em class="property">static </em><code class="sig-name descname">get_type_error_from_eq_two</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span> &#x2192; Optional[nlu.error_structure.MentionTypeError]<a class="headerlink" href="#nlu.error.NERErrorExtractor.get_type_error_from_eq_two" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.get_type_error_from_ge_three">
+<em class="property">static </em><code class="sig-name descname">get_type_error_from_ge_three</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span> &#x2192; Optional[nlu.error_structure.MentionTypeError]<a class="headerlink" href="#nlu.error.NERErrorExtractor.get_type_error_from_ge_three" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.has_same_range">
+<em class="property">static </em><code class="sig-name descname">has_same_range</code><span class="sig-paren">(</span><em class="sig-param">ems1: nlu.data.EntityMentions</em>, <em class="sig-param">ems2: nlu.data.EntityMentions</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#nlu.error.NERErrorExtractor.has_same_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>return if two lists of EntityMentions have the same ‘whole range’
+(The whole range here is from the position of the first token to the position of the last token of the list.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.has_same_type">
+<em class="property">static </em><code class="sig-name descname">has_same_type</code><span class="sig-paren">(</span><em class="sig-param">ems1: nlu.data.EntityMentions</em>, <em class="sig-param">ems2: nlu.data.EntityMentions</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#nlu.error.NERErrorExtractor.has_same_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.is_concatenated">
+<em class="property">static </em><code class="sig-name descname">is_concatenated</code><span class="sig-paren">(</span><em class="sig-param">mentions: nlu.data.EntityMentions</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error.NERErrorExtractor.is_concatenated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.is_mention_correct">
+<em class="property">static </em><code class="sig-name descname">is_mention_correct</code><span class="sig-paren">(</span><em class="sig-param">gold_em: nlu.data.EntityMention</em>, <em class="sig-param">predict_em: nlu.data.EntityMention</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#nlu.error.NERErrorExtractor.is_mention_correct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error.NERErrorExtractor.is_mentions_correct">
+<em class="property">static </em><code class="sig-name descname">is_mentions_correct</code><span class="sig-paren">(</span><em class="sig-param">gems: nlu.data.EntityMentions</em>, <em class="sig-param">pems: nlu.data.EntityMentions</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#nlu.error.NERErrorExtractor.is_mentions_correct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-nlu.error_analysis">
+<span id="nlu-error-analysis-module"></span><h2>nlu.error_analysis module<a class="headerlink" href="#module-nlu.error_analysis" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nlu.error_analysis.NERErrorAnalyzer">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">NERErrorAnalyzer</code><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>input: DocumentsWithErrorAnn</p>
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.get_confusion_matrix">
+<em class="property">static </em><code class="sig-name descname">get_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">parser: nlu.parser.ConllParser</em>, <em class="sig-param">tag_policy='conll'</em><span class="sig-paren">)</span> &#x2192; List[List[int]]<a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.get_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.get_confusion_matrix_df">
+<em class="property">classmethod </em><code class="sig-name descname">get_confusion_matrix_df</code><span class="sig-paren">(</span><em class="sig-param">parser: nlu.parser.ConllParser</em>, <em class="sig-param">tag_policy='conll'</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.get_confusion_matrix_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.get_false_error_category_df">
+<em class="property">static </em><code class="sig-name descname">get_false_error_category_df</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">transpose=True</em>, <em class="sig-param">tag_policy='conll'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.get_false_error_category_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.get_span_error_category_df">
+<em class="property">static </em><code class="sig-name descname">get_span_error_category_df</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">transpose=True</em>, <em class="sig-param">tag_policy='conll'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.get_span_error_category_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.pprint_confusion_matrix">
+<em class="property">static </em><code class="sig-name descname">pprint_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">cm: List[List[int]], tag_policy='conll', **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.pprint_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.pprint_ner_confusion_matrix">
+<em class="property">classmethod </em><code class="sig-name descname">pprint_ner_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">tag_policy='conll'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.pprint_ner_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_composite_errors">
+<em class="property">static </em><code class="sig-name descname">print_composite_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_composite_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_confusion_matrix">
+<em class="property">static </em><code class="sig-name descname">print_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">cm: List[List[int]], tag_policy='conll'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_error_pie">
+<em class="property">static </em><code class="sig-name descname">print_error_pie</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">save_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_error_pie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_false_error_heatmap">
+<em class="property">static </em><code class="sig-name descname">print_false_error_heatmap</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">save_file=None</em>, <em class="sig-param">tag_policy='conll'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_false_error_heatmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_false_errors">
+<em class="property">static </em><code class="sig-name descname">print_false_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">tag_policy='conll'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_false_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_ner_confusion_matrix">
+<em class="property">classmethod </em><code class="sig-name descname">print_ner_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">tag_policy='conll'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_ner_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_report">
+<em class="property">classmethod </em><code class="sig-name descname">print_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_span_error_heatmap">
+<em class="property">static </em><code class="sig-name descname">print_span_error_heatmap</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">tag_policy='conll'</em>, <em class="sig-param">save_file=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_span_error_heatmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.print_span_error_pie">
+<em class="property">static </em><code class="sig-name descname">print_span_error_pie</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.print_span_error_pie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_analysis.NERErrorAnalyzer.save_report">
+<em class="property">classmethod </em><code class="sig-name descname">save_report</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">tag_policy='conll'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.NERErrorAnalyzer.save_report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.filtered_results">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">filtered_results</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">is_funcs</em>, <em class="sig-param">boolean=&lt;built-in function all&gt;</em><span class="sig-paren">)</span> &#x2192; List[nlu.error_structure.NERErrorComposite]<a class="headerlink" href="#nlu.error_analysis.filtered_results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parser</strong> – <cite>ConllParser</cite> class</p></li>
+<li><p><strong>is_funcs</strong> – filter functions that return boolean value</p></li>
+<li><p><strong>boolean</strong> – <cite>any</cite> or <cite>all</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of <cite>NERErrorComposite</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_all_false_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_all_false_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_all_false_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_all_span_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_all_span_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_all_span_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_all_type_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_all_type_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_all_type_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_complicate_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_complicate_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_complicate_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_false_errors_category">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_false_errors_category</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_false_errors_category" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_false_negatives">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_false_negatives</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_false_negatives" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_false_positives">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_false_positives</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_false_positives" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_only_span_and_type_composite_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_only_span_and_type_composite_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_only_span_and_type_composite_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_only_span_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_only_span_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_only_span_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_only_type_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_only_type_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_only_type_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_span_and_type_composite_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_span_and_type_composite_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_span_and_type_composite_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.get_span_errors_category">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">get_span_errors_category</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.get_span_errors_category" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_complicate_error">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_complicate_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_complicate_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_correct">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_correct</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_correct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_cross">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_cross</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_cross" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_dim">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_dim</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_error">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_ex">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_ex</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_ex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_false_error">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_false_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_false_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_fn">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_fn</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_fn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_fp">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_fp</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_fp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_lc">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_lc</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_lc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_ld">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_ld</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_ld" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_le">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_le</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_le" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_merge">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_merge</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_merge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_merge_split">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_merge_split</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_merge_split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_only_span_error">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_only_span_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_only_span_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_only_type_error">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_only_type_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_only_type_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_rc">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_rc</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_rc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_rd">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_rd</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_rd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_re">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_re</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_re" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_rld">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_rld</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_rld" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_rle">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_rle</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_rle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_span_error">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_span_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_span_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_split">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_split</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.is_type_error">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">is_type_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.is_type_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.print_list_len_in_dict">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">print_list_len_in_dict</code><span class="sig-paren">(</span><em class="sig-param">dict_: Dict</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.print_list_len_in_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_analysis.print_type_errors">
+<code class="sig-prename descclassname">nlu.error_analysis.</code><code class="sig-name descname">print_type_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_analysis.print_type_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-nlu.error_structure">
+<span id="nlu-error-structure-module"></span><h2>nlu.error_structure module<a class="headerlink" href="#module-nlu.error_structure" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nlu.error_structure.ComplicatedError">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">ComplicatedError</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.ComplicatedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.SpanError" title="nlu.error_structure.SpanError"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.SpanError</span></code></a></p>
+<p>Complicated Case:
+- [O][OO] &lt;-&gt; [OO][O] both pems and gems have the same range +
+but none of them have only one entity mention
+- [OO]O[O] &lt;-&gt; [OOOO] not concat
+- [OO][O] &lt;-&gt; [O][OOO] not same range</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.EntityMentionsPair">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">EntityMentionsPair</code><span class="sig-paren">(</span><em class="sig-param">id_, gems: nlu.data.EntityMentions, pems: nlu.data.EntityMentions, id_incs: Tuple[nlu.utils.id_incrementer, nlu.utils.id_incrementer]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.EntityMentionsPair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.TextList" title="nlu.data.TextList"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextList</span></code></a></p>
+<p>An EntityMentionsPair has a gold EntityMentions and a predicted EntityMentions</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">nlu.data</span> <span class="k">import</span> <span class="n">Sentence</span><span class="p">,</span> <span class="n">EntityMentions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pems</span> <span class="o">=</span> <span class="n">EntityMentions</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">get_entity_mentions</span><span class="p">(</span><span class="s1">&#39;predict&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gems</span> <span class="o">=</span> <span class="n">EntityMentions</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">get_entity_mentions</span><span class="p">(</span><span class="s1">&#39;gold&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error_id_inc</span> <span class="o">=</span> <span class="n">id_incrementer</span><span class="p">(),</span> <span class="n">id_incrementer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pair</span> <span class="o">=</span> <span class="n">EntityMentionsPair</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">gems</span><span class="p">,</span> <span class="n">pems</span><span class="p">,</span> <span class="n">error_id_inc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pair</span>  
+<span class="go">EntityMentionsPair(...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">gems</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">pems</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">ems</span><span class="p">)</span>
+<span class="go">(1, 2, 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+<span class="go">D99-S999-PAIR0: (G) NLU Lab is in [33m[Taipei Taiwan]LOC[0m directed by Keh Yih Su . (P) NLU Lab is in [34m[Taipei]LOC[0m [34m[Taiwan]LOC[0m directed by Keh Yih Su .</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">any</span><span class="p">(</span><span class="n">em</span><span class="o">.</span><span class="n">entity_mentions_pair</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">pair</span> <span class="k">for</span> <span class="n">em</span> <span class="ow">in</span> <span class="n">pair</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">mentions</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pair</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+<span class="go">--- error id D99-S999-PAIR0 ---</span>
+<span class="go">(G) NLU Lab is in [33m[Taipei Taiwan]LOC[0m directed by Keh Yih Su .</span>
+<span class="go">(P) NLU Lab is in [34m[Taipei]LOC[0m [34m[Taiwan]LOC[0m directed by Keh Yih Su .</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="nlu.error_structure.EntityMentionsPair.iscorrect">
+<code class="sig-name descname">iscorrect</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#nlu.error_structure.EntityMentionsPair.iscorrect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_structure.EntityMentionsPair.pprint">
+<code class="sig-name descname">pprint</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.error_structure.EntityMentionsPair.pprint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_structure.EntityMentionsPair.set_correct">
+<code class="sig-name descname">set_correct</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.error_structure.EntityMentionsPair.set_correct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_structure.EntityMentionsPair.set_error">
+<code class="sig-name descname">set_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.error_structure.EntityMentionsPair.set_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_structure.EntityMentionsPair.set_result">
+<code class="sig-name descname">set_result</code><span class="sig-paren">(</span><em class="sig-param">result</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.error_structure.EntityMentionsPair.set_result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.EntityMentionsPairs">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">EntityMentionsPairs</code><span class="sig-paren">(</span><em class="sig-param">pairs: List[nlu.error_structure.EntityMentionsPair]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.EntityMentionsPairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.TextList" title="nlu.data.TextList"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.TextList</span></code></a></p>
+<p>One sentence will have one EntityMentionsPairs</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.FalseError">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">FalseError</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em>, <em class="sig-param">false_type</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.FalseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.NERErrorBase" title="nlu.error_structure.NERErrorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.NERErrorBase</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.MentionTypeError">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">MentionTypeError</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.MentionTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.NERErrorBase" title="nlu.error_structure.NERErrorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.NERErrorBase</span></code></a></p>
+<dl class="method">
+<dt id="nlu.error_structure.MentionTypeError.type_str">
+<code class="sig-name descname">type_str</code><span class="sig-paren">(</span><em class="sig-param">sep=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.MentionTypeError.type_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.MergeSplitError">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">MergeSplitError</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em>, <em class="sig-param">type_</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.MergeSplitError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.SpanError" title="nlu.error_structure.SpanError"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.SpanError</span></code></a></p>
+<dl class="attribute">
+<dt id="nlu.error_structure.MergeSplitError.main_type">
+<code class="sig-name descname">main_type</code><em class="property"> = 'Span Error'</em><a class="headerlink" href="#nlu.error_structure.MergeSplitError.main_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_structure.MergeSplitError.name_str">
+<code class="sig-name descname">name_str</code><span class="sig-paren">(</span><em class="sig-param">sep=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.MergeSplitError.name_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.MergeSplitError.sub_type">
+<code class="sig-name descname">sub_type</code><em class="property"> = ''</em><a class="headerlink" href="#nlu.error_structure.MergeSplitError.sub_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.NERComparison">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">NERComparison</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.NERComparison" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Base" title="nlu.data.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Base</span></code></a></p>
+<dl class="attribute">
+<dt id="nlu.error_structure.NERComparison.entity_types">
+<code class="sig-name descname">entity_types</code><em class="property"> = ('PER', 'LOC', 'ORG', 'MISC')</em><a class="headerlink" href="#nlu.error_structure.NERComparison.entity_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.NERComparisonWithID">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">NERComparisonWithID</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em>, <em class="sig-param">ids</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.NERComparisonWithID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.NERComparison" title="nlu.error_structure.NERComparison"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.NERComparison</span></code></a>, <a class="reference internal" href="#nlu.data.MD_IDs" title="nlu.data.MD_IDs"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.MD_IDs</span></code></a></p>
+<dl class="method">
+<dt id="nlu.error_structure.NERComparisonWithID.sep_str">
+<code class="sig-name descname">sep_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.NERComparisonWithID.sep_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.NERCorrect">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">NERCorrect</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em>, <em class="sig-param">type: str</em>, <em class="sig-param">correct_id</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.NERCorrect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.NERComparisonWithID" title="nlu.error_structure.NERComparisonWithID"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.NERComparisonWithID</span></code></a></p>
+<p>Only includes True Positives but no True Negatives</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.NERErrorBase">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">NERErrorBase</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.NERErrorBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.NERComparison" title="nlu.error_structure.NERComparison"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.NERComparison</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.NERErrorComposite">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">NERErrorComposite</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em>, <em class="sig-param">type: nlu.error_structure._ErrorTypeDict</em>, <em class="sig-param">error_id</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.NERErrorComposite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.NERComparisonWithID" title="nlu.error_structure.NERComparisonWithID"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.NERComparisonWithID</span></code></a></p>
+<p>all_errors: list</p>
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.all_span_error_types">
+<code class="sig-name descname">all_span_error_types</code><em class="property"> = ['R Expansion', 'L Expansion', 'RL Expansion', 'R Diminished', 'L Diminished', 'RL Diminished', 'R Crossed', 'L Crossed', 'Spans Merged', 'Span Split', 'Complicated']</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.all_span_error_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.all_types">
+<code class="sig-name descname">all_types</code><em class="property"> = ['PER-&gt;LOC', 'PER-&gt;ORG', 'PER-&gt;MISC', 'LOC-&gt;PER', 'LOC-&gt;ORG', 'LOC-&gt;MISC', 'ORG-&gt;PER', 'ORG-&gt;LOC', 'ORG-&gt;MISC', 'MISC-&gt;PER', 'MISC-&gt;LOC', 'MISC-&gt;ORG', 'R Expansion', 'L Expansion', 'RL Expansion', 'R Diminished', 'L Diminished', 'RL Diminished', 'R Crossed', 'L Crossed', 'Spans Merged', 'Span Split', 'Complicated']</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.all_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.error_structure.NERErrorComposite.ann_str">
+<code class="sig-name descname">ann_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.error_structure.NERErrorComposite.ann_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.f">
+<code class="sig-name descname">f</code><em class="property"> = 'False Negative'</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.false_error_types">
+<code class="sig-name descname">false_error_types</code><em class="property"> = ['False Positive - PER', 'False Negative - PER', 'False Positive - LOC', 'False Negative - LOC', 'False Positive - ORG', 'False Negative - ORG', 'False Positive - MISC', 'False Negative - MISC']</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.false_error_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.span_errors1">
+<code class="sig-name descname">span_errors1</code><em class="property"> = ['R Expansion', 'L Expansion', 'RL Expansion', 'R Diminished', 'L Diminished', 'RL Diminished', 'R Crossed', 'L Crossed']</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.span_errors1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.span_errors2">
+<code class="sig-name descname">span_errors2</code><em class="property"> = ['Spans Merged', 'Span Split', 'Complicated']</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.span_errors2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.t1">
+<code class="sig-name descname">t1</code><em class="property"> = 'MISC'</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.t1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.t2">
+<code class="sig-name descname">t2</code><em class="property"> = 'MISC'</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.t2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nlu.error_structure.NERErrorComposite.type_error_types">
+<code class="sig-name descname">type_error_types</code><em class="property"> = ['PER-&gt;LOC', 'PER-&gt;ORG', 'PER-&gt;MISC', 'LOC-&gt;PER', 'LOC-&gt;ORG', 'LOC-&gt;MISC', 'ORG-&gt;PER', 'ORG-&gt;LOC', 'ORG-&gt;MISC', 'MISC-&gt;PER', 'MISC-&gt;LOC', 'MISC-&gt;ORG']</em><a class="headerlink" href="#nlu.error_structure.NERErrorComposite.type_error_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.SimpleSpanError">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">SimpleSpanError</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em>, <em class="sig-param">direction</em>, <em class="sig-param">span_type</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.SimpleSpanError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.SpanError" title="nlu.error_structure.SpanError"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.SpanError</span></code></a></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">nlu.data</span> <span class="k">import</span> <span class="n">ConllToken</span><span class="p">,</span> <span class="n">ConllNERTag</span><span class="p">,</span> <span class="n">Sentence</span><span class="p">,</span> <span class="n">EntityMention</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">nlu.error</span> <span class="k">import</span> <span class="n">NERErrorAnnotator</span><span class="p">,</span> <span class="n">NERErrorExtractor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">nlu.data</span> <span class="k">import</span> <span class="n">Sentence</span><span class="p">,</span> <span class="n">EntityMentions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span> <span class="o">=</span> <span class="n">Sentence</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;NLU Lab is in Taipei Taiwan directed by Keh Yih Su .&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O&#39;</span><span class="p">,</span> <span class="s1">&#39;I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sen</span><span class="o">.</span><span class="n">set_entity_mentions</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">gems</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">pems</span><span class="p">)</span>
+<span class="go">(3, 4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pair</span> <span class="o">=</span> <span class="n">EntityMentionsPair</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">EntityMentions</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="n">EntityMentions</span><span class="p">(</span><span class="n">sen</span><span class="o">.</span><span class="n">pems</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">4</span><span class="p">]),</span> <span class="n">id_incrementer</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">SimpleSpanError</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;Diminished&#39;</span><span class="p">)))</span>
+<span class="go">R Diminished</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.error_structure.SpanError">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">SpanError</code><span class="sig-paren">(</span><em class="sig-param">ems_pair: nlu.error_structure.EntityMentionsPair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.SpanError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.error_structure.NERErrorBase" title="nlu.error_structure.NERErrorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.error_structure.NERErrorBase</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_complicate_error">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_complicate_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_complicate_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_correct">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_correct</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_correct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_cross">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_cross</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_cross" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_dim">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_dim</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_error">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_ex">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_ex</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_ex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_false_error">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_false_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_false_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_fn">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_fn</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_fn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_fp">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_fp</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_fp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_lc">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_lc</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_lc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_ld">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_ld</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_ld" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_le">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_le</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_le" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_merge">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_merge</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_merge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_merge_split">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_merge_split</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_merge_split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_only_span_error">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_only_span_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_only_span_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_only_type_error">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_only_type_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_only_type_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_rc">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_rc</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_rc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_rd">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_rd</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_rd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_re">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_re</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_re" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_rld">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_rld</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_rld" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_rle">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_rle</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_rle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_span_error">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_span_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_span_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_split">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_split</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.error_structure.is_type_error">
+<code class="sig-prename descclassname">nlu.error_structure.</code><code class="sig-name descname">is_type_error</code><span class="sig-paren">(</span><em class="sig-param">ems_pair</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.error_structure.is_type_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-nlu.parser">
+<span id="nlu-parser-module"></span><h2>nlu.parser module<a class="headerlink" href="#module-nlu.parser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nlu.parser.ConllParser">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.parser.</code><code class="sig-name descname">ConllParser</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">cols_format: List[Dict[str</em>, <em class="sig-param">Union[str</em>, <em class="sig-param">int]]] = None</em>, <em class="sig-param">tag_scheme='iob1'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nlu.data.Base" title="nlu.data.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">nlu.data.Base</span></code></a></p>
+<p>Column Parser for CoNLL03 formatted text file</p>
+<dl class="attribute">
+<dt id="nlu.parser.ConllParser.TAGGERSOURCE">
+<code class="sig-name descname">TAGGERSOURCE</code><em class="property"> = 'gold'</em><a class="headerlink" href="#nlu.parser.ConllParser.TAGGERSOURCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.add_back_refs_for_md_docs">
+<em class="property">static </em><code class="sig-name descname">add_back_refs_for_md_docs</code><span class="sig-paren">(</span><em class="sig-param">docs: List[nlu.data.Document]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.parser.ConllParser.add_back_refs_for_md_docs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.build_conll_token_from_tok_dicts">
+<em class="property">static </em><code class="sig-name descname">build_conll_token_from_tok_dicts</code><span class="sig-paren">(</span><em class="sig-param">tok</em>, <em class="sig-param">tid</em>, <em class="sig-param">sid</em>, <em class="sig-param">did</em><span class="sig-paren">)</span> &#x2192; nlu.data.ConllToken<a class="headerlink" href="#nlu.parser.ConllParser.build_conll_token_from_tok_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>build a ConllToken from token dictionarys, which are like
+tok_dict = {
+‘text’: ‘Obama’,
+‘poss’: {‘predict’: ‘NN’, ‘gold’: ‘NN’},
+‘chunks’: {‘predict’: ‘I-NNP’, ‘gold’: ‘I-NNP’},
+‘ners’: {‘predict’: ‘I-PER’, ‘gold’: ‘I-PER’},
+‘ner_conf’: 0.99983
+}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.build_md_docs_from_tok_dicts">
+<em class="property">static </em><code class="sig-name descname">build_md_docs_from_tok_dicts</code><span class="sig-paren">(</span><em class="sig-param">docs: List[List[List[dict]]]</em><span class="sig-paren">)</span> &#x2192; List[nlu.data.Document]<a class="headerlink" href="#nlu.parser.ConllParser.build_md_docs_from_tok_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>build the multi-document class from token dictionarys, which are like
+input:
+docs -  [</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="simple">
+<dt>[  # first doc</dt><dd><p>[ tok_dict1, tok_dict2, …], # first sent
+[…],
+…</p>
+</dd>
+</dl>
+<p>], 
+[…],
+…</p>
+</div></blockquote>
+<p>]
+where
+tok_dict = {</p>
+<blockquote>
+<div><p>‘text’: ‘Obama’,
+‘poss’: {‘predict’: ‘NN’, ‘gold’: ‘NN’},
+‘chunks’: {‘predict’: ‘I-NNP’, ‘gold’: ‘I-NNP’},
+‘ners’: {‘predict’: ‘I-PER’, ‘gold’: ‘I-PER’},
+‘ner_conf’: 0.99983
+}</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.error_overall_stats">
+<code class="sig-name descname">error_overall_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.parser.ConllParser.error_overall_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.get_from_fullid">
+<code class="sig-name descname">get_from_fullid</code><span class="sig-paren">(</span><em class="sig-param">fullid</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser.get_from_fullid" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fullid</strong> – ex - ‘D0-S3-T2’</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>object, ex - Token</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">get_from_fullid</span><span class="p">(</span><span class="s1">&#39;D0-S3-T2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fullid</span>
+<span class="go">&#39;D0-S3-T2&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.obtain_statistics">
+<code class="sig-name descname">obtain_statistics</code><span class="sig-paren">(</span><em class="sig-param">entity_stat=False</em>, <em class="sig-param">source=None</em>, <em class="sig-param">debug=False</em>, <em class="sig-param">tag_policy='conll'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser.obtain_statistics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.parse_conll_to_tok_dicts">
+<em class="property">static </em><code class="sig-name descname">parse_conll_to_tok_dicts</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">cols_format</em><span class="sig-paren">)</span> &#x2192; List[List[List[dict]]]<a class="headerlink" href="#nlu.parser.ConllParser.parse_conll_to_tok_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>read a conll-formatted text file to a hierarchical collection of token dictionaries (tok_dict is like below)</p>
+<p>input:
+filepath - the file path of the conll-formatted file
+cols_format - [{‘type’: ‘predict’, ‘col_num’: 1, ‘tagger’: ‘ner’},</p>
+<blockquote>
+<div><p>{‘type’: ‘gold’, ‘col_num’: 2, ‘tagger’: ‘ner’},
+{‘type’: ‘predict’, ‘col_num’: 3, ‘tagger’: ‘pos’},
+…
+{‘type’: ‘predict’, col_num’: 7, ‘tagger’: ‘ner_conf’}
+…]</p>
+</div></blockquote>
+<p>output: 
+same as the input of function build_md_docs_from_tok_dicts() where
+tok_dict = {</p>
+<blockquote>
+<div><p>‘text’: ‘Obama’,
+‘poss’: {‘predict’: ‘NN’, ‘gold’: ‘NN’},
+‘chunks’: {‘predict’: ‘I-NNP’, ‘gold’: ‘I-NNP’},
+‘ners’: {‘predict’: ‘I-PER’, ‘gold’: ‘I-PER’},
+‘ner_conf’: {‘predict’: 0.9993}
+}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.print_all_errors">
+<code class="sig-name descname">print_all_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.parser.ConllParser.print_all_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.print_corrects">
+<code class="sig-name descname">print_corrects</code><span class="sig-paren">(</span><em class="sig-param">num=10</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser.print_corrects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.print_n_corrects">
+<code class="sig-name descname">print_n_corrects</code><span class="sig-paren">(</span><em class="sig-param">n=50</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser.print_n_corrects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.print_n_errors">
+<code class="sig-name descname">print_n_errors</code><span class="sig-paren">(</span><em class="sig-param">n=50</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.parser.ConllParser.print_n_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.save_result">
+<code class="sig-name descname">save_result</code><span class="sig-paren">(</span><em class="sig-param">fname='result.tsv'</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser.save_result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.set_entity_mentions">
+<code class="sig-name descname">set_entity_mentions</code><span class="sig-paren">(</span><em class="sig-param">tag_policy=None</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.parser.ConllParser.set_entity_mentions" title="Permalink to this definition">¶</a></dt>
+<dd><p>chunk entity mentions for all sources (i.e. predict, gold)
+effect: call sentence.set_entity_mentions function for all sentences in the parser.docs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.set_errors">
+<em class="property">static </em><code class="sig-name descname">set_errors</code><span class="sig-paren">(</span><em class="sig-param">parser</em>, <em class="sig-param">gold_src</em>, <em class="sig-param">predict_src</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser.set_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.set_errors_in_document">
+<em class="property">static </em><code class="sig-name descname">set_errors_in_document</code><span class="sig-paren">(</span><em class="sig-param">doc</em>, <em class="sig-param">gold_src</em>, <em class="sig-param">predict_src</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser.ConllParser.set_errors_in_document" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nlu.parser.ConllParser.set_errors_in_sentence">
+<em class="property">static </em><code class="sig-name descname">set_errors_in_sentence</code><span class="sig-paren">(</span><em class="sig-param">sentence: nlu.data.Sentence</em>, <em class="sig-param">gold_src</em>, <em class="sig-param">predict_src</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#nlu.parser.ConllParser.set_errors_in_sentence" title="Permalink to this definition">¶</a></dt>
+<dd><p>effect: set sentence.ems_pairs, sentence.ner_results, sentence.corrects, sentence.errors</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nlu.parser.EntityMentionAnnotator">
+<em class="property">class </em><code class="sig-prename descclassname">nlu.parser.</code><code class="sig-name descname">EntityMentionAnnotator</code><a class="headerlink" href="#nlu.parser.EntityMentionAnnotator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nlu.parser_utils">
+<span id="nlu-parser-utils-module"></span><h2>nlu.parser_utils module<a class="headerlink" href="#module-nlu.parser_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="nlu.parser_utils.bioes2iob1">
+<code class="sig-prename descclassname">nlu.parser_utils.</code><code class="sig-name descname">bioes2iob1</code><span class="sig-paren">(</span><em class="sig-param">ner</em>, <em class="sig-param">last</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser_utils.bioes2iob1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.parser_utils.bioes2iob1_file">
+<code class="sig-prename descclassname">nlu.parser_utils.</code><code class="sig-name descname">bioes2iob1_file</code><span class="sig-paren">(</span><em class="sig-param">infile, outfile, bieos_cols=[1, 2]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.parser_utils.bioes2iob1_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Washington I-PER I-NNP
+…</p>
+<p>bieos_cols: ex- [1,2]</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bioes2iob1_file</span><span class="p">(</span><span class="s1">&#39;test/wnut.test.gold.pred&#39;</span><span class="p">,</span> <span class="s1">&#39;test/wnut.test.gold.pred.iob1test&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="nlu-setup-module">
+<h2>nlu.setup module<a class="headerlink" href="#nlu-setup-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nlu.utils">
+<span id="nlu-utils-module"></span><h2>nlu.utils module<a class="headerlink" href="#module-nlu.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="nlu.utils.add_total_column_row">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">add_total_column_row</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.add_total_column_row" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.bracket">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">bracket</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.bracket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.calc_f1">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">calc_f1</code><span class="sig-paren">(</span><em class="sig-param">corrects</em>, <em class="sig-param">pred_total</em>, <em class="sig-param">true_total</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.calc_f1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.camel_to_snake">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">camel_to_snake</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.camel_to_snake" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.colorize_list">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">colorize_list</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">begin=None</em>, <em class="sig-param">end=None</em>, <em class="sig-param">color: Callable = &lt;ansi.colour.base.Graphic object&gt;</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#nlu.utils.colorize_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.fprint">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">fprint</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.fprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>print framed text
+:param text:
+:param args:
+:param kwargs:
+:return: None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.frame_text">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">frame_text</code><span class="sig-paren">(</span><em class="sig-param">text, markers=None, style='=', spaces=[0, 1, 0, 1]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.frame_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.groupby">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">groupby</code><span class="sig-paren">(</span><em class="sig-param">list_</em>, <em class="sig-param">key</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.groupby" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.id_incrementer">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">id_incrementer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.id_incrementer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.list_to_str">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">list_to_str</code><span class="sig-paren">(</span><em class="sig-param">strlist</em>, <em class="sig-param">sep=' '</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.list_to_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.logtime">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">logtime</code><span class="sig-paren">(</span><em class="sig-param">logger_name</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.logtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.lprint">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">lprint</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.lprint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.ls_to_ls_str">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">ls_to_ls_str</code><span class="sig-paren">(</span><em class="sig-param">list1: Iterable</em>, <em class="sig-param">list2: Iterable</em>, <em class="sig-param">sep=None</em>, <em class="sig-param">to=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.ls_to_ls_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.make_autopct">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">make_autopct</code><span class="sig-paren">(</span><em class="sig-param">values</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.make_autopct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.overrides">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">overrides</code><span class="sig-paren">(</span><em class="sig-param">overridden</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.overrides" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.sep_str">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">sep_str</code><span class="sig-paren">(</span><em class="sig-param">list_: Iterable</em>, <em class="sig-param">sep=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.sep_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.setup_logger">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">setup_logger</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">log_file</em>, <em class="sig-param">level=20</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.setup_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function setup as many loggers as you want</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.sort_two_level_group">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">sort_two_level_group</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame</em>, <em class="sig-param">indexorder</em>, <em class="sig-param">columnorder</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.sort_two_level_group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nlu.utils.two_level_groupby">
+<code class="sig-prename descclassname">nlu.utils.</code><code class="sig-name descname">two_level_groupby</code><span class="sig-paren">(</span><em class="sig-param">list_</em>, <em class="sig-param">key1</em>, <em class="sig-param">key2</em>, <em class="sig-param">count=False</em>, <em class="sig-param">apply_func=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.utils.two_level_groupby" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-nlu">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nlu" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Chiao-Wei Hsu
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

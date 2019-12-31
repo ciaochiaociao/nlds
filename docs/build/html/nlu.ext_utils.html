@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>nlu.ext_utils package &mdash; ner_error_analysis 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ner_error_analysis
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">nlu.ext_utils package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-nlu.ext_utils.confusion_matrix_pretty_print">nlu.ext_utils.confusion_matrix_pretty_print module</a></li>
+<li><a class="reference internal" href="#module-nlu.ext_utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ner_error_analysis</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>nlu.ext_utils package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/nlu.ext_utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="nlu-ext-utils-package">
+<h1>nlu.ext_utils package<a class="headerlink" href="#nlu-ext-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nlu.ext_utils.confusion_matrix_pretty_print">
+<span id="nlu-ext-utils-confusion-matrix-pretty-print-module"></span><h2>nlu.ext_utils.confusion_matrix_pretty_print module<a class="headerlink" href="#module-nlu.ext_utils.confusion_matrix_pretty_print" title="Permalink to this headline">¶</a></h2>
+<p>plot a pretty confusion matrix with seaborn
+Created on Mon Jun 25 14:17:37 2018
+&#64;author: Wagner Cipriano - wagnerbhbr - gmail - CEFETMG / MMC
+REFerences:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://www.mathworks.com/help/nnet/ref/plotconfusion.html">https://www.mathworks.com/help/nnet/ref/plotconfusion.html</a>
+<a class="reference external" href="https://stackoverflow.com/questions/28200786/how-to-plot-scikit-learn-classification-report">https://stackoverflow.com/questions/28200786/how-to-plot-scikit-learn-classification-report</a>
+<a class="reference external" href="https://stackoverflow.com/questions/5821125/how-to-plot-confusion-matrix-with-string-axis-rather-than-integer-in-python">https://stackoverflow.com/questions/5821125/how-to-plot-confusion-matrix-with-string-axis-rather-than-integer-in-python</a>
+<a class="reference external" href="https://www.programcreek.com/python/example/96197/seaborn.heatmap">https://www.programcreek.com/python/example/96197/seaborn.heatmap</a>
+<a class="reference external" href="https://stackoverflow.com/questions/19233771/sklearn-plot-confusion-matrix-with-labels/31720054">https://stackoverflow.com/questions/19233771/sklearn-plot-confusion-matrix-with-labels/31720054</a>
+<a class="reference external" href="http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py">http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py</a></p>
+</div></blockquote>
+<dl class="function">
+<dt id="nlu.ext_utils.confusion_matrix_pretty_print.configcell_text_and_colors">
+<code class="sig-prename descclassname">nlu.ext_utils.confusion_matrix_pretty_print.</code><code class="sig-name descname">configcell_text_and_colors</code><span class="sig-paren">(</span><em class="sig-param">array_df</em>, <em class="sig-param">lin</em>, <em class="sig-param">col</em>, <em class="sig-param">oText</em>, <em class="sig-param">facecolors</em>, <em class="sig-param">posi</em>, <em class="sig-param">fz</em>, <em class="sig-param">fmt</em>, <em class="sig-param">show_null_values=0</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.ext_utils.confusion_matrix_pretty_print.configcell_text_and_colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>config cell text and colors
+and return text elements to add and to dell
+&#64;TODO: use fmt</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.ext_utils.confusion_matrix_pretty_print.get_new_fig">
+<code class="sig-prename descclassname">nlu.ext_utils.confusion_matrix_pretty_print.</code><code class="sig-name descname">get_new_fig</code><span class="sig-paren">(</span><em class="sig-param">fn, figsize=[9, 9]</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.ext_utils.confusion_matrix_pretty_print.get_new_fig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init graphics</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.ext_utils.confusion_matrix_pretty_print.insert_totals">
+<code class="sig-prename descclassname">nlu.ext_utils.confusion_matrix_pretty_print.</code><code class="sig-name descname">insert_totals</code><span class="sig-paren">(</span><em class="sig-param">df_cm</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.ext_utils.confusion_matrix_pretty_print.insert_totals" title="Permalink to this definition">¶</a></dt>
+<dd><p>insert total column and line (the last ones)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.ext_utils.confusion_matrix_pretty_print.plot_confusion_matrix_from_data">
+<code class="sig-prename descclassname">nlu.ext_utils.confusion_matrix_pretty_print.</code><code class="sig-name descname">plot_confusion_matrix_from_data</code><span class="sig-paren">(</span><em class="sig-param">y_test, predictions, columns=None, annot=True, cmap='Oranges', fmt='.2f', fz=11, lw=0.5, cbar=False, figsize=[8, 8], show_null_values=0, pred_val_axis='lin', **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.ext_utils.confusion_matrix_pretty_print.plot_confusion_matrix_from_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot confusion matrix function with y_test (actual values) and predictions (predic),
+whitout a confusion matrix yet</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nlu.ext_utils.confusion_matrix_pretty_print.pretty_plot_confusion_matrix">
+<code class="sig-prename descclassname">nlu.ext_utils.confusion_matrix_pretty_print.</code><code class="sig-name descname">pretty_plot_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">df_cm, annot=True, cmap='Oranges', fmt='.2f', fz=11, lw=0.5, cbar=False, figsize=[8, 8], show_null_values=0, pred_val_axis='y', save_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nlu.ext_utils.confusion_matrix_pretty_print.pretty_plot_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>print conf matrix with default layout (like matlab)
+params:</p>
+<blockquote>
+<div><p>df_cm          dataframe (pandas) without totals
+annot          print text in each cell
+cmap           Oranges,Oranges_r,YlGnBu,Blues,RdBu, … see:
+fz             fontsize
+lw             linewidth
+pred_val_axis  where to show the prediction values (x or y axis)</p>
+<blockquote>
+<div><p>‘col’ or ‘x’: show predicted values in columns (x axis) instead lines
+‘lin’ or ‘y’: show predicted values in lines   (y axis)</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nlu.ext_utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nlu.ext_utils" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Chiao-Wei Hsu
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
