@@ -381,6 +381,14 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         for correct_sent in randomized:
             correct_sent.print_corrects()
 
+    def save_result(self, fname='result.tsv'):
+        with open(fname, 'w', encoding='utf-8') as f:
+            f.write('id\tresult_type\tpem_word\tpem_type\tgem_word\tgem_type\tsentence\n')
+            for doc in self.docs:
+                for sent in doc:
+                    for ner_result in sent.ner_results:
+                        f.write(ner_result.sep_str() + '\n')
+                        
     def get_from_fullid(self, fullid):
         """
         :param fullid: ex - 'D0-S3-T2'

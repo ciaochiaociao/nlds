@@ -179,6 +179,11 @@ class NERComparison(MD_IDs):
                '\n[ID] {}'.format(self.fullid) + \
                '\n'
         # self.type - use type of NERErrorComposite and NERCorrect
+        
+    def sep_str(self):
+
+        strs = [str(self.fullid), str(self.filtered_type), self.pems.sep_str(sep='|'), str('|'.join(self.ptypes)), self.gems.sep_str(sep='|'), str('|'.join(self.gtypes)),  str(self.sentence)]
+        return '\t'.join(strs)
 
 
 class NERCorrect(NERComparison):
