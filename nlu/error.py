@@ -2,7 +2,7 @@ from typing import Tuple
 
 from nlu.data import *
 from nlu.error_structure import EntityMentionsPair, EntityMentionsPairs, NERCorrect, NERErrorComposite, SpanError, \
-    MergeSplitError, MentionTypeError, ComplicateError, FalseError
+    MergeSplitError, MentionTypeError, ComplicatedError, FalseError
 from nlu.parser import ConllParser
 from nlu.utils import id_incrementer
 
@@ -97,7 +97,7 @@ class NERErrorExtractor:
     @staticmethod
     def get_span_error_from_ge_three(ems_pair: EntityMentionsPair) -> str:
         pems, gems = ems_pair.pems, ems_pair.gems
-        span_error = ComplicateError(ems_pair)
+        span_error = ComplicatedError(ems_pair)
         return span_error
 
     @staticmethod

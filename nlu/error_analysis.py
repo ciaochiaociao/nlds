@@ -8,7 +8,7 @@ from sklearn.metrics import confusion_matrix
 import numpy as np
 
 from nlu.error_structure import MentionTypeError, MergeSplitError, FalseError, SpanError, NERCorrect, NERErrorComposite, \
-    ComplicateError
+    ComplicatedError
 from nlu.ext_utils.confusion_matrix_pretty_print import pretty_plot_confusion_matrix
 from nlu.parser import ConllParser
 from nlu.utils import groupby, two_level_groupby, sort_two_level_group, add_total_column_row, fprint, make_autopct
@@ -86,7 +86,7 @@ def is_type_error(ems_pair):
     return is_error(ems_pair) and isinstance(ems_pair.result.type_error, MentionTypeError)
 
 def is_complicate_error(ems_pair):
-    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, ComplicateError)
+    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, ComplicatedError)
 
 
 def filtered_results(parser, is_funcs, boolean=all) -> List[NERErrorComposite]:

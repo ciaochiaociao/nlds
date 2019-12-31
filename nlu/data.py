@@ -492,7 +492,7 @@ class Sentence(TextList, InDocument):
         self.ems_pairs: Optional['EntityMentionsPairs'] = None
             
             
-        self.ner_results: Optional[List['NERComparison']] = None
+        self.ner_results: Optional[List['NERComparisonWithID']] = None
         self.ner_corrects: Optional[List['NERCorrect']] = None
         self.ner_errors: Optional[List['NERErrorComposite']] = None
         ids = self.tokens[0].parent_ids
@@ -849,7 +849,7 @@ class EntityMentions(TextList):
             # (this occurs because there is no its id for EntityMentions for now) (Add id 'PEMS0' and 'GEMS0')
             self.sid, self.did = ids['S'], ids['D']
             self.source = mentions[0].source
-            self.type = mentions[0].type  # todo: sanity check
+            self.type = mentions[0].type
             self.token_b = mentions[0].token_b
             self.token_e = mentions[-1].token_e
             self.token_bs = [mention.token_b for mention in mentions]
