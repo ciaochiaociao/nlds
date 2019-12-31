@@ -1,4 +1,4 @@
 # Default ignored files
 /workspace.xml
-# Editor-based HTTP Client requests
-/httpRequests/
+# Project exclude paths
+/.

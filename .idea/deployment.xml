@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData">
+  <component name="PublishConfigData" uploadOnCheckin="f7d2b655-bb37-44c2-94bd-a25d68c2790c" exclude=".svn;.cvs;.idea;.DS_Store;.hg;*.hprof;*.pyc;.ipynb_checkpoints;">
     <serverData>
-      <paths name="cwhsu@140.109.19.191:22">
+      <paths name="cwhsu@140.109.19.51">
+        <serverdata>
+          <mappings>
+            <mapping deploy="ner_error_analysis" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="jjfan@140.109.19.66:9999">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
@@ -10,5 +17,6 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myUploadOnCheckinName" value="cwhsu@140.109.19.51" />
   </component>
 </project>

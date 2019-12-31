@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ner_error_analysis.iml" filepath="$PROJECT_DIR$/.idea/ner_error_analysis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/..//ner_error_analysis/../../NER/.idea/ner_error_analysis.iml" filepath="$PROJECT_DIR$/..//ner_error_analysis/../../NER/.idea/ner_error_analysis.iml" />
     </modules>
   </component>
 </project>
