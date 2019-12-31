@@ -228,7 +228,13 @@ class MentionTypeError(NERErrorBase):
         return ls_to_ls_str(self.gems.types, self.pems.types, sep=sep)
 
 
-class SpanError(NERErrorBase):  # MergeSplitError/ComplicateError
+class SpanError(NERErrorBase):  # SimpleSpanError/MergeSplitError/ComplicateError
+
+    def __init__(self, ems_pair: EntityMentionsPair):
+        super().__init__(ems_pair)
+
+
+class SimpleSpanError(SpanError):
     """
     >>> from nlu.data import ConllToken, ConllNERTag, Sentence, EntityMention
     >>> from nlu.error import NERErrorAnnotator, NERErrorExtractor
@@ -238,10 +244,9 @@ class SpanError(NERErrorBase):  # MergeSplitError/ComplicateError
     >>> len(sen.gems), len(sen.pems)
     (3, 4)
     >>> pair = EntityMentionsPair(0, EntityMentions(sen.gems[2:3]), EntityMentions(sen.pems[3:4]), id_incrementer())
-    >>> print(str(SpanError(pair, 'R', 'Diminished')))
+    >>> print(str(SimpleSpanError(pair, 'R', 'Diminished')))
     R Diminished
     """
-    main_type = 'Span Error'
 
     def __init__(self, ems_pair: EntityMentionsPair, direction, span_type):
         super().__init__(ems_pair)
@@ -253,7 +258,7 @@ class SpanError(NERErrorBase):  # MergeSplitError/ComplicateError
         return self.direction + ' ' + self.span_type
 
 
-class MergeSplitError(SpanError):  # MergeSplitError is one of the SpanError
+class MergeSplitError(SpanError):  # MergeSplitError is one of the SimpleSpanError
     main_type = 'Span Error'
     sub_type = ''
 
@@ -287,7 +292,7 @@ class ComplicatedError(SpanError):
 
 class _ErrorTypeDict(TypedDict):
     false_error: FalseError
-    span_error: SpanError
+    span_error: SimpleSpanError
     type_error: MentionTypeError
 
 
@@ -328,7 +333,7 @@ class NERErrorComposite(NERComparisonWithID):
         self.error_id = error_id
         self.all_errors: list = self._filtered_to_array(type)
         self.false_error: FalseError = self.type['false_error']
-        self.span_error: SpanError = self.type['span_error']
+        self.span_error: SimpleSpanError = self.type['span_error']
         self.type_error: MentionTypeError = self.type['type_error']
 
     def __str__(self):
@@ -387,7 +392,7 @@ def is_correct(ems_pair):
 
 
 def is_span_error(ems_pair):
-    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, SpanError)
+    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, SimpleSpanError)
 
 
 def is_only_span_error(ems_pair):

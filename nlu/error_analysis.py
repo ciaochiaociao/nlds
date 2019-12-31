@@ -7,7 +7,7 @@ from pandas import DataFrame
 from sklearn.metrics import confusion_matrix
 import numpy as np
 
-from nlu.error_structure import MentionTypeError, MergeSplitError, FalseError, SpanError, NERCorrect, NERErrorComposite, \
+from nlu.error_structure import MentionTypeError, MergeSplitError, FalseError, SimpleSpanError, NERCorrect, NERErrorComposite, \
     ComplicatedError
 from nlu.ext_utils.confusion_matrix_pretty_print import pretty_plot_confusion_matrix
 from nlu.parser import ConllParser
@@ -23,7 +23,7 @@ def is_correct(ems_pair):
     return isinstance(ems_pair.result, NERCorrect)
 
 def is_span_error(ems_pair):
-    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, SpanError)
+    return is_error(ems_pair) and isinstance(ems_pair.result.span_error, SimpleSpanError)
 
 def is_only_span_error(ems_pair):
     return is_span_error(ems_pair) and not is_type_error(ems_pair) and not is_complicate_error(ems_pair)

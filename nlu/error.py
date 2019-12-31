@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from nlu.data import *
-from nlu.error_structure import EntityMentionsPair, EntityMentionsPairs, NERCorrect, NERErrorComposite, SpanError, \
+from nlu.error_structure import EntityMentionsPair, EntityMentionsPairs, NERCorrect, NERErrorComposite, SimpleSpanError, \
     MergeSplitError, MentionTypeError, ComplicatedError, FalseError
 from nlu.parser import ConllParser
 from nlu.utils import id_incrementer
@@ -110,7 +110,7 @@ class NERErrorExtractor:
         return span_error
 
     @staticmethod
-    def get_span_error_from_eq_two(ems_pair: EntityMentionsPair) -> Optional[SpanError]:
+    def get_span_error_from_eq_two(ems_pair: EntityMentionsPair) -> Optional[SimpleSpanError]:
 
         pb, pe = ems_pair.pems[0].token_b, ems_pair.pems[0].token_e
         gb, ge = ems_pair.gems[0].token_b, ems_pair.gems[0].token_e
@@ -127,7 +127,7 @@ class NERErrorExtractor:
         else:  # pb == gb and pe == ge
             direction, type_ = None, None
 
-        span_error = SpanError(ems_pair, direction, type_) if (direction, type_) != (None, None) else None
+        span_error = SimpleSpanError(ems_pair, direction, type_) if (direction, type_) != (None, None) else None
         return span_error
 
     @staticmethod
