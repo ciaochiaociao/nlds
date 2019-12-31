@@ -215,6 +215,7 @@ class MD_IDs(Base):
 
 class TextWithIDs(MD_IDs):
     """abstract class: directly inherited by TextList, Token
+
     >>> class SomeText(TextWithIDs):
     ...     def __init__(self, text, ids):
     ...         self.text = text
@@ -249,6 +250,7 @@ class TextWithIDs(MD_IDs):
 
 class TextList(ObjectList, TextWithIDs):
     """Directly inherited by Sentence, Document, EntityMention, ...
+
     >>> sid, did = 3, 6
     >>> taiwan = ConllToken('Taiwan', 0, sid, 111, ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
     >>> semi = ConllToken('Semiconductor', 1, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
@@ -549,7 +551,9 @@ class Sentence(TextList, InDocument):
     
     def set_entity_mentions(self, sources: List=['predict', 'gold']) -> None:
         """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
+
         effect: set sentence.entity_mentions_dict ({'predict': `EntityMention`s})
+
         >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', pner_str='I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', gner_str='I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
         >>> sen.set_entity_mentions()
         >>> len(sen.gems), len(sen.pems), len(sen.ems)
@@ -578,6 +582,7 @@ class Sentence(TextList, InDocument):
     
     def get_entity_mentions(self, source: str) -> List['EntityMention']:
         """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
+
         >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', pner_str='I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', gner_str='I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
         >>> gems = sen.get_entity_mentions('gold')
         >>> pems = sen.get_entity_mentions('predict')
@@ -814,7 +819,9 @@ class EntityMention(TextList, InSentence):
 
 class EntityMentions(TextList):
     """A user-defined list of 'EntityMention's.
-    - ids: its ids is the same as the ids of the sentence it resides in
+
+    its ids is the same as the ids of the sentence it resides in
+
     >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
     >>> sen.set_entity_mentions()
     >>> pems = EntityMentions(sen.pems)
@@ -885,8 +892,10 @@ class EntityMentions(TextList):
     
     def __getitem__(self, item) -> 'EntityMentions':
         """
+
         extend TextList.__getitem__()
         return EntityMentions
+
         """
         if isinstance(item, slice):
             return EntityMentions(TextList.__getitem__(self, item))

@@ -13,6 +13,7 @@ NOTE = ' {} '.format(NOTE_SEP)
 
 class EntityMentionsPair(TextList):
     """An EntityMentionsPair has a gold EntityMentions and a predicted EntityMentions
+
     >>> from nlu.data import Sentence, EntityMentions
     >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
     >>> pems = EntityMentions(sen.get_entity_mentions('predict')[1:3])

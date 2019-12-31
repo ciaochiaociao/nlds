@@ -34,8 +34,9 @@ def bioes2iob1_file(infile, outfile, bieos_cols=[1,2]):
     """
     Washington I-PER I-NNP
     ...
-    
+
     bieos_cols: ex- [1,2]
+
     >>> bioes2iob1_file('test/wnut.test.gold.pred', 'test/wnut.test.gold.pred.iob1test')
     """
     with open(infile, encoding='utf-8') as f, open(outfile, 'w', encoding='utf-8') as fo:

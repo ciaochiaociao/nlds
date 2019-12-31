@@ -62,6 +62,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     @staticmethod
     def parse_conll_to_tok_dicts(filepath: str, cols_format) -> List[List[List[dict]]]:
         """read a conll-formatted text file to a hierarchical collection of token dictionaries (tok_dict is like below)
+
         input:
         filepath - the file path of the conll-formatted file
         cols_format - [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
