@@ -1,6 +1,7 @@
 from nlu.data import *
 from nlu.parser_utils import *
 
+
 class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     """Column Parser for CoNLL03 formatted text file"""
     TAGGERSOURCE = 'gold'
@@ -94,10 +95,10 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         
         
         docs, sentences, tokens = [], [], []
-        with open(filepath) as f:
+        with open(filepath, encoding='utf-8') as f:
 
             # parse conll formatted txt file to ConllParser class
-            for line in f:
+            for ix, line in enumerate(f):
                 if line == doc_separator:  # -DOCSTART-|: end of a document
                     if sentences:  # if not empty document
                         docs.append(sentences)
@@ -430,6 +431,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 class EntityMentionAnnotator:
     # put set_entity_mentions() here
     pass
+
 
 if __name__ == '__main__':
 

@@ -38,8 +38,8 @@ def bioes2iob1_file(infile, outfile, bieos_cols=[1,2]):
     bieos_cols: ex- [1,2]
     >>> bioes2iob1_file('test/wnut.test.gold.pred', 'test/wnut.test.gold.pred.iob1test')
     """
-    with open(infile) as f, open(outfile, 'w') as fo:
-
+    with open(infile, encoding='utf-8') as f, open(outfile, 'w', encoding='utf-8') as fo:
+    # add encoding='utf-8' to support windows OS
         lastcols = ['O'] * (max(bieos_cols) + 1)
         for line in f:
             if line.strip():
