@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="f7d2b655-bb37-44c2-94bd-a25d68c2790c" name="cwhsu@140.109.19.51" url="http://140.109.19.51:7877">
+        <fileTransfer host="140.109.19.51" port="22" rootFolder="/home/cwhsu/workspace" accessType="SFTP" authAgent="true">
+          <advancedOptions>
+            <advancedOptions controlEncoding="utf-8" dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
