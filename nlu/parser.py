@@ -34,7 +34,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         newfilepath = filepath + '.iob1'
         
         if tag_scheme in ['iob1', 'bio1']:
-            pass  #TODO
+            newfilepath = filepath
         elif tag_scheme in ['iob2', 'bio2']:
             bioes2iob1_file(filepath, newfilepath, bieos_cols=[1, 2])  #TODO
         elif tag_scheme in ['ioblu', 'iobes']:
@@ -62,7 +62,6 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     @staticmethod
     def parse_conll_to_tok_dicts(filepath: str, cols_format) -> List[List[List[dict]]]:
         """read a conll-formatted text file to a hierarchical collection of token dictionaries (tok_dict is like below)
-
         input:
         filepath - the file path of the conll-formatted file
         cols_format - [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
@@ -92,8 +91,9 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             col_conf = None
         
         # set doc_separator
-        doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner) + '\n'  # TODO: consider the order given by cols_format
-        
+        doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner + \
+                        ['O'] * (1 if col_conf else 0)) + '\n'  # TODO: consider the order given by cols_format
+        print('doc_separator:', doc_separator)
         
         docs, sentences, tokens = [], [], []
         with open(filepath, encoding='utf-8') as f:

@@ -180,7 +180,6 @@ class NERErrorExtractor:
 
 class MentionsPairsExtractor:
     """Extract EntityMentionsPairs from a Sentence object
-
     >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
     >>> sen.set_entity_mentions()
     >>> pairs = MentionsPairsExtractor.get_pairs(sen)
