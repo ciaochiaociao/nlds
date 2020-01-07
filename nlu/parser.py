@@ -32,7 +32,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         >>> train_parser.set_entity_mentions()
         """
         newfilepath = filepath + '.iob1'
-        
+        self.tag_scheme = tag_scheme
         if tag_scheme in ['iob1', 'bio1']:
             newfilepath = filepath
         elif tag_scheme in ['iob2', 'bio2']:
