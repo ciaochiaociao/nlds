@@ -91,8 +91,9 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             col_conf = None
         
         # set doc_separator
-        doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner + \
-                        ['O'] * (1 if col_conf else 0)) + '\n'  # TODO: consider the order given by cols_format
+        # doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner + \
+        #                 ['O'] * (1 if col_conf else 0)) + '\n'  # TODO: consider the order given by cols_format
+        doc_separator = '-DOCSTART-'
         print('doc_separator:', doc_separator)
         
         docs, sentences, tokens = [], [], []
@@ -100,7 +101,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 
             # parse conll formatted txt file to ConllParser class
             for ix, line in enumerate(f):
-                if line == doc_separator:  # -DOCSTART-|: end of a document
+                if line.startswith(doc_separator):  # -DOCSTART-|: end of a document
                     if sentences:  # if not empty document
                         docs.append(sentences)
                         sentences = []
@@ -318,6 +319,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                     for corr in sentence.ner_corrects:
                         if corr:
                             correct_total += 1
+
                     for error in sentence.ner_errors:
                         if error:
                             error_total += 1
