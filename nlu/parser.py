@@ -118,7 +118,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                     ners = {col['type']: ConllNERTag(a[col['col_num']])
                             for col in cols_format if col['tagger'] == 'ner'} if len_ner else None
                     ner_conf = a[col_conf] if col_conf is not None else None
-                    tokens.append({'text': a[0], 'poss': poss, 'chunks': chunks, 'ners': ners, 'ner_conf': ner_conf})
+                    tokens.append({'text': a[0], 'poss': poss, 'chunks': chunks, 'ners': ners, 'ner_conf': ner_conf,
+                                   'line': line, 'line_no': ix})
             if sentences:  # for the last document (without -DOCSTART- at the end)
                 docs.append(sentences)
         if len(docs) > 0:
@@ -200,8 +201,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         'ner_conf': 0.99983
         }
         """
-        return ConllToken(tok['text'], poss=tok['poss'], chunks=tok['chunks'], ners=tok['ners'], conf=tok['ner_conf'],
-                          id_=tid, sid=sid, did=did)
+        return ConllToken(tok['text'], id_=tid, sid=sid, did=did, poss=tok['poss'], chunks=tok['chunks'],
+                          ners=tok['ners'], conf=tok['ner_conf'], line=tok['line'], line_no=tok['line_no'])
             
     def set_entity_mentions(self, tag_policy=None) -> None:
         """chunk entity mentions for all sources (i.e. predict, gold)

@@ -387,9 +387,9 @@ class ConllToken(Token):
     
     auto_id = -1
     
-    def __init__(self, text, id_, sid, did, poss=None, chunks=None, ners=None, conf=None):
+    def __init__(self, text, id_, sid, did, poss=None, chunks=None, ners=None, conf=None, line=None, line_no=None):
         """
-        >>> ct = ConllToken(text='TSMC', id_=1, sid=2, did=3, ners={'predict': ConllNERTag('I-MISC')})
+        >>> ct = ConllToken(text='TSMC',id_=1,sid=2,did=3,ners={'predict': ConllNERTag('I-MISC')})
         >>> repr(ct)
         "ConllToken(text='TSMC', id_=1, sid=2, did=3, ners={'predict': 'I-MISC'})"
         >>> ct.fullid
@@ -399,6 +399,8 @@ class ConllToken(Token):
         self.chunks: Dict[str, str] = chunks
         self.ners: Dict[str, Tag] = ners
         self.conf = conf
+        self.line = line
+        self.line_no = line_no
         super().__init__(text, id_, sid, did)
         
     @classmethod
