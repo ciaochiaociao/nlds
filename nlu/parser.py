@@ -89,6 +89,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             col_conf = [col['col_num'] for col in cols_format if col['tagger'] == 'ner_conf'][0]
         except IndexError:
             col_conf = None
+        total_cols = len(cols_format) + 1  # text with annotations
         
         # set doc_separator
         # doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner + \
@@ -110,7 +111,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                         sentences.append(tokens)
                         tokens = []
                 else:  # inside a sentence: every token
-                    a = line.split()
+                    a = line.rsplit(' ', maxsplit=total_cols-1)
                     poss = {col['type']: ConllPosTag(a[col['col_num']])
                             for col in cols_format if col['tagger'] == 'pos'} if len_pos else None
                     chunks = {col['type']: ConllChunkTag(a[col['col_num']])
