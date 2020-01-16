@@ -339,7 +339,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
     @staticmethod
     def annotate(parser, gold_src: str = None, predict_src: str = None):
         """
-        >>> parser = ConllParser('../test/testa.pred.gold')
+        >>> parser = ConllParser('../scripts/conll/testa.pred.gold')
         >>> parser.set_entity_mentions()
         >>> NERErrorAnnotator.annotate(parser)
         >>> parser.error_overall_stats()

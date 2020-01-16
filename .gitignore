@@ -3,7 +3,7 @@ __pycache__
 *.log
 *.tsv
 docs/build/
-/winer_workspace/
 build/
 dist/
 *.egg-info/
+*.png

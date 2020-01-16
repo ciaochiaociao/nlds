@@ -13,7 +13,7 @@ cols_format = [{'type': 'gold', 'col_num': 1, 'tagger': 'ner'},
                 {'type': 'predict', 'col_num': 3, 'tagger': 'ner_conf'}
                ]
 
-fpath = 'test/wnut.test.gold.pred'
+fpath = 'wnut.test.gold.pred'
 parser = ConllParser(fpath, cols_format, tag_scheme='iob2')
 
 parser.set_entity_mentions(tag_policy='wnut')
