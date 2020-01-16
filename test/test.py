@@ -45,16 +45,18 @@ class TestData(BaseTestCase):
     
     def setUp(self):
         sid, did = 3, 6
-        self.tok_tsmc_org = ConllToken('TSMC', 1, sid, did, ners={'gold':ConllNERTag('I-ORG'), 'predict':ConllNERTag('I-ORG')})
-        self.tok_tsmc_org_o = ConllToken('TSMC', 1, sid, did, ners={'gold':ConllNERTag('O'), 'predict':ConllNERTag('I-ORG')})
-        taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-        'predict':ConllNERTag('I-ORG')})
-        semi = ConllToken('Semiconductor', 1, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-        'predict':ConllNERTag('I-ORG')})
-        manu = ConllToken('Manufacturer', 2, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-        'predict':ConllNERTag('B-ORG')})
-        co = ConllToken('Cooperation', 3, sid, did, ners={'gold':ConllNERTag('I-ORG'), \
-        'predict':ConllNERTag('I-ORG')})
+        self.tok_tsmc_org = ConllToken('TSMC', 1, sid, did,
+                                       ners={'gold': ConllNERTag('I-ORG'), 'predict': ConllNERTag('I-ORG')})
+        self.tok_tsmc_org_o = ConllToken('TSMC', 1, sid, did,
+                                         ners={'gold': ConllNERTag('O'), 'predict': ConllNERTag('I-ORG')})
+        taiwan = ConllToken('Taiwan', 0, sid, did, ners={'gold': ConllNERTag('I-ORG'), \
+                                                         'predict': ConllNERTag('I-ORG')})
+        semi = ConllToken('Semiconductor', 1, sid, did, ners={'gold': ConllNERTag('I-ORG'), \
+                                                              'predict': ConllNERTag('I-ORG')})
+        manu = ConllToken('Manufacturer', 2, sid, did, ners={'gold': ConllNERTag('I-ORG'), \
+                                                             'predict': ConllNERTag('B-ORG')})
+        co = ConllToken('Cooperation', 3, sid, did, ners={'gold': ConllNERTag('I-ORG'), \
+                                                          'predict': ConllNERTag('I-ORG')})
         
         tsmc_split = [taiwan, semi, manu, co]
         
