@@ -357,7 +357,7 @@ class NERErrorAnalyzer:
         for doc in parser.docs:
             for sentence in doc:
                 if sentence.ems_pairs:
-                    for ems_pair in sentence.ems_pairs.pairs:
+                    for ems_pair in sentence.ems_pairs:
                         if len(ems_pair.result.gtypes) == 1 and len(ems_pair.result.ptypes) == 1:
                             y_true.append(ems_pair.result.gtypes[0])
                             y_pred.append(ems_pair.result.ptypes[0])

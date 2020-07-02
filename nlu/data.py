@@ -1,11 +1,12 @@
-from collections import OrderedDict, Hashable
+from collections import OrderedDict, Hashable, defaultdict
 from copy import copy
-from functools import reduce
+from functools import reduce, partial
 from typing import List, Dict, Union, Optional
 
 from ansi.color import fg
 
-from nlu.utils import list_to_str, overrides, sep_str, camel_to_snake, setup_logger
+from nlu.utils import overrides, sep_str, camel_to_snake, setup_logger
+from nlu.utils import list_to_str_by_text as list_to_str
 
 import inspect
 import re
@@ -15,8 +16,8 @@ import re
 # todo: get_document|sentence|token_from_fullid|id()
 # todo: change all to id_incrementer if possible
 
-dataLogger = setup_logger('data_logger', '../data.log')
-
+dataLogger = setup_logger('data_logger', 'data.log')
+SRC_COLOR_TABLE = {'predict': fg.blue, 'gold': fg.yellow, 'recovered': fg.magenta}
 
 def get_func_keys(func):
     
@@ -27,24 +28,60 @@ def prepr(obj):
     return obj.prepr()
 
 
-def default_repr_format(obj, pretty=False):
+def vrepr(obj):
+    return obj.vrepr()
+
+
+def default_repr_format(obj, pretty=False, text_key='text'):
     kwargs = {k: obj.__getattribute__(k) for k in get_func_keys(obj.__init__)}
     
     if not pretty:
         kwargs_str = ', '.join(['%s=%r' % (k, v) for k, v in kwargs.items() if v is not None])
         return '{self.__class__.__name__}({})'.format(kwargs_str, self=obj)
-    else:  # TODO
-        kwargs_str = ', '.join(['{}={}'.format(k, prepr(v) if prepr in dir(v) else repr(v)) for k, v in kwargs.items() if v is not None])
-        return '{self.__class__.__name__}(\n\t{})'.format(kwargs_str, self=obj)
+#         kwargs_str = ', '.join(['{}={}'.format(k, prepr(v) if 'prepr' in dir(v) else repr(v)) for k, v in kwargs.items() if v is not None])
+#         return '{self.__class__.__name__}(\n\t{})'.format(kwargs_str, self=obj)
+    else:
+        _str = ''
+
+        try:
+            _str += '(' + str(obj.fullid) + ') '
+        except AttributeError:
+            pass
+        if isinstance(obj, TextList):
+            _str += '(' + str(len(obj)) + ' items) '
+        try:
+            _str += '(' + str(obj.source) + ') '
+        except AttributeError:
+            pass
+
+        # use __str__ if text_key is not found in the attribute list
+#         try:
+        __str_value = getattr(obj, text_key)
+#         except AttributeError:
+#             __str_value = str(obj)
+        try:
+            _str += __str_value()
+        except TypeError:
+            _str += __str_value
+
+        return _str
 
 
 class Base(object):
 
-    def __repr__(self):
-        return default_repr_format(self)
+    pass
+#     def __repr__(self):
+#         """can be overriden.
+#         In Python 3, the str of a list defaults to the repr of the elements. The str of an object defaults to the repr.
+#         Because we have most objects a container, the repr is based on str. Hence, the default_repr_format with pretty=True is used."""
+#         return self.prepr()
+
+#     def prepr(self, *args, **kwargs):
+#         return default_repr_format(self, True, *args, **kwargs)
     
-    def prepr(self):
-        return default_repr_format(self, True)
+#     def vrepr(self, *args, **kwargs):
+#         return default_repr_format(self, False, *args, **kwargs)
+
 
 class ObjectList(Base):
     """
@@ -88,10 +125,14 @@ class ObjectList(Base):
     def __len__(self):
         return len(self.members)
 
-    def sep_str(self, sep=None):
-        return sep_str(self.members, sep=sep)
+#     def sep_str(self, sep=None):  # TODO: move to TextList
+#         return sep_str(self.members, sep=sep)
 
     def __hash__(self):
+        """
+        Note:
+            - Normally, list is not hashable because it is mutable. But in our case, we do not mutate the list of objects (add/delete) once created.
+        """
         return hash(repr(self))
 
     def __getitem__(self, item):
@@ -136,6 +177,7 @@ class MD_IDs(Base):
         self.id_ = self.id
         self.fullid: str = MD_IDs.concat_ids(self.ids)
         self.parent_ids = MD_IDs.get_parent_ids(self.ids)
+        self.self_ids = OrderedDict(list(self.ids.items())[-1:])
         self.parent_fullid = MD_IDs.concat_ids(self.parent_ids)
 
     @property
@@ -177,7 +219,8 @@ class MD_IDs(Base):
         return self.ids == other.ids
 
     def __hash__(self):
-        # make children class hashable. This trick is especially needed when __eq__ is overridden
+        # make children class hashable. This trick is especially needed when __eq__ is overridden, making unhashable  ref: https://help.semmle.com/wiki/display/PYTHON/Inconsistent+equality+and+hashing
+        # TODO: change it to base on ids
         return hash(repr(self))
     
 #     def __repr__(self):
@@ -213,6 +256,7 @@ class MD_IDs(Base):
         """
         return cls(OrderedDict(list_))
 
+
 class TextWithIDs(MD_IDs):
     """abstract class: directly inherited by TextList, Token
     >>> class SomeText(TextWithIDs):
@@ -229,23 +273,44 @@ class TextWithIDs(MD_IDs):
     """
 
     def __init__(self, ids):
-        try:
-            self.text: str = str(self)
-        except AttributeError:  # for those who implement their __str__ with the use of other attribute
-            pass
+        self._text = None
+#         try:
+#             self.text: str = str(self)
+#         except AttributeError:  # for those who implement their __str__ with the use of other attribute
+#             pass
             
         MD_IDs.__init__(self, ids)
 
-    def print(self, detail=False):
-        if detail:
-            print('%s(%s)' % (self.text, self.fullid))
-        else:
-            print('%s' % self.text)
+#     def print(self, detail=False):
+#         if detail:
+#             print('%s(%s)' % (self.text, self.fullid))
+#         else:
+#             print('%s' % self.text)
 
     # abstract method
-    def __str__(self):
-        raise NotImplementedError
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, text):
+        self._text = text
     
+    @overrides(Base)
+    def __repr__(self):
+        """can be overriden."""
+        return self.prepr()
+
+    def prepr(self, *args, **kwargs):
+        return default_repr_format(self, True, *args, **kwargs)
+
+    def vrepr(self, *args, **kwargs):
+        return default_repr_format(self, False, *args, **kwargs)
+
+# #     abstract method
+#     def __str__(self):
+#         raise self.text
+
 
 class TextList(ObjectList, TextWithIDs):
     """Directly inherited by Sentence, Document, EntityMention, ...
@@ -301,9 +366,17 @@ class TextList(ObjectList, TextWithIDs):
 
         TextWithIDs.__init__(self, ids)
 
-    @overrides(TextWithIDs)
+        self.text = self.sep_texts()
+
     def __str__(self):
-        return self.sep_str()
+        return self.text
+
+    def sep_texts(self, sep=' '):
+        return sep.join([member.text for member in self.members if member.text]) if self.members else ''
+
+#     @overrides(TextWithIDs)
+#     def __str__(self):
+#         return self.sep_str()
 
     @overrides(ObjectList)
     def __add__(self, other):
@@ -370,15 +443,15 @@ class Token(TextWithIDs, InSentence):
         self.sentence = None
         
         ids = OrderedDict({'D': self.did, 'S': self.sid, 'T': id_})
-        self.text = text
         TextWithIDs.__init__(self, ids)  # self.id is set here
+        self.text = text
 
 #     def set_sentence(self, sentence: 'Sentence'):
 #         self.sentence = sentence
 
-    @overrides(TextWithIDs)
-    def __str__(self):
-        return self.text
+#     @overrides(TextWithIDs)
+#     def __str__(self):
+#         return self.text
 
 #     # TODO: reference to document
 
@@ -401,6 +474,8 @@ class ConllToken(Token):
         self.conf = conf
         self.line = line
         self.line_no = line_no
+        self.pem = None
+        self.gem = None
         super().__init__(text, id_, sid, did)
         
     @classmethod
@@ -493,13 +568,16 @@ class Sentence(TextList, InDocument):
         self.document = None
         self.ems_pairs: Optional['EntityMentionsPairs'] = None
             
-            
+        self.sources = []
         self.ner_results: Optional[List['NERComparisonWithID']] = None
         self.ner_corrects: Optional[List['NERCorrect']] = None
         self.ner_errors: Optional[List['NERErrorComposite']] = None
         ids = self.tokens[0].parent_ids
         TextList.__init__(self, ids, tokens)
 
+    @property
+    def lines(self):
+        return [str(tok.line_no) + ' ' + tok.line for tok in self.tokens]
 #     def set_document(self, document: 'Document') -> None:
 #         self.document = document
 
@@ -507,13 +585,21 @@ class Sentence(TextList, InDocument):
         if pairs is None:
             self.ner_errors = []
         else:
-            self.ner_errors = pairs.errors
+#             self.ner_errors = pairs.errors
+            self.ner_errors = []
+            for pair in pairs:
+                if pair.error:
+                    self.ner_errors.append(pair.error)
 
     def set_corrects_from_pairs(self, pairs) -> None:  # FIXME: No longer used?
         if pairs is None:
             self.ner_corrects = []
         else:
-            self.ner_corrects = pairs.corrects
+#             self.ner_corrects = pairs.corrects
+            self.ner_corrects = []
+            for pair in pairs:
+                if pair.correct:
+                    self.ner_corrects.append(pair.correct)
 
     def print_corrects(self) -> None:
         if self.ner_corrects:
@@ -542,6 +628,10 @@ class Sentence(TextList, InDocument):
         return cls(ConllToken.bulk_easy_build(*args, **kwargs))
     
     @classmethod
+    def from_list(cls, *args, **kwargs):
+        return cls.easy_build(*args, **kwargs)
+
+    @classmethod
     def from_str(cls, *args, **kwargs):
         """
         >>> Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')  # doctest: +ELLIPSIS
@@ -561,19 +651,22 @@ class Sentence(TextList, InDocument):
         >>> len(sen.pems[0]), sen.pems[0].type
         (2, 'ORG')
         """
+        self.sources = sources
         for source in sources:
 
             entity_mentions = self.get_entity_mentions(source)
             
-            if entity_mentions:
-                self.entity_mentions_dict[source] = entity_mentions
+#             if entity_mentions:
+            self.entity_mentions_dict[source] = entity_mentions
                 
-                if source == 'predict':
-                    self.pems = entity_mentions
-                elif source == 'gold':
-                    self.gems = entity_mentions
-                else:
-                    raise ValueError('source should be either "predict" or "gold": {}'.format(source))
+            if source == 'predict':
+                self.pems = entity_mentions
+            elif source == 'gold':
+                self.gems = entity_mentions
+            elif source == 'recovered':
+                self.rems = entity_mentions
+            else:
+                raise ValueError('source should be either "predict" or "gold": {}'.format(source))
         
         self.ems = []
         self.ems += [ em for ems in self.entity_mentions_dict.values() for em in ems]
@@ -627,11 +720,96 @@ class Sentence(TextList, InDocument):
     
         return entity_mentions
     
-    def get_ann_sent(self, ems: 'EntityMentions', color=fg.blue, color_em=True) -> str:
+    def __repr__(self):
+        if 'predict' in self.sources and 'gold' in self.sources:
+            return '({id_}) ({num} toks) {text}'.format(id_=self.fullid, num=len(self), text=self.get_ann_sent_2in1())
+        elif 'predict' in self.sources:
+            return '({id_}) ({num} toks) ({source}) {text}'.format(id_=self.fullid, num=len(self), source=self.sources[0][0].upper(), text=self.get_ann_sent_multi([self.pems], colors=[fg.blue]))
+        elif 'gold' in self.sources:
+            return '({id_}) ({num} toks) ({source}) {text}'.format(id_=self.fullid, num=len(self), source=self.sources[0].upper(), text=self.get_ann_sent_multi([self.gems], colors=[fg.yellow]))
+        else:
+            return TextList.__repr__(self)
+
+    def print_all_ann_sent(self, **kwargs):
+        print('(' + self.fullid + ')')
+        try:
+            print('(P) ' + ' ' + self.get_ann_sent(self.pems, **kwargs))
+        except AttributeError:
+            print('(P) ' + str(sent))  # no pems
+        try:
+            print('(G) ' + ' ' + self.get_ann_sent(self.gems, color=fg.yellow, **kwargs))
+        except AttributeError:
+            print('(G) ' + str(sent))  # no gems
+
+    def print_all_ann_sent_flair(self, **kwargs):
+        print('(' + self.fullid + ')')
+        print('(P)', self.get_sent_flair('predict'))
+        print('(G)', self.get_sent_flair('gold'))
+
+    def get_sent_flair(self, source='predict'):
+        _strs = []
+        for tok in self.tokens:
+            _strs.append(tok.text)
+            tag = tok.ners[source].type
+            if tag != 'O':
+                _strs.append('<' + tag + '>')
+        return ' '.join(_strs)
+
+    def get_ann_sent(self, ems: 'EntityMentions', color=fg.blue, color_em='all') -> str:  # TODO: to be deprecated
         """highlight all entity mentions with one color in the sentence"""
         return self.get_diff_ann_sent([ems], [color], color_em)
     
-    def get_diff_ann_sent(self, all_ems: List['EntityMentions'], colors=None, color_em=True) -> str:
+    def get_ann_sent_multi(self, all_ems: List['EntityMentions'] = None, colors=None):
+        if all_ems is None:
+            all_ems = [self.pems, self.gems]
+        if colors is None:
+            colors = [fg.blue, fg.yellow, fg.magenta, ...]
+
+        table = defaultdict(str)
+
+        for ems, color in zip(all_ems, colors):
+            for em in ems:
+                table[em.token_b] += color('[')
+
+        for tok in self.tokens:
+            table[tok.id] += tok.text
+
+        for ems, color in zip(all_ems, colors):
+            for em in ems:
+                table[em.token_e] += color(']' + em.type)
+
+        assert len(table) == len(self)
+        ann_tokens = dict(sorted(table.items())).values()
+        return ' '.join(ann_tokens)
+
+    def get_ann_sent_2in1(self, verbose=False):
+        def pem_color(em):
+            return fg.green if em.ems_pair.iscorrect() else fg.red
+
+        table = defaultdict(str)
+
+        for pem in self.pems:
+            table[pem.token_b] += pem_color(pem)('[')
+
+        for gem in self.gems:
+            if verbose or not gem.ems_pair.iscorrect():
+                table[gem.token_b] += fg.yellow('[')
+
+        for tok in self.tokens:
+            table[tok.id] += tok.text
+
+        for pem in self.pems:
+            table[pem.token_e] += pem_color(pem)(']' + pem.type)
+
+        for gem in self.gems:
+            if verbose or not gem.ems_pair.iscorrect():
+                table[gem.token_e] += fg.yellow(']' + gem.type)
+
+        assert len(table) == len(self)
+        ann_tokens = dict(sorted(table.items())).values()
+        return ' '.join(ann_tokens)
+
+    def get_diff_ann_sent(self, all_ems: List['EntityMentions'], colors=None, color_em='all') -> str:  # TODO: to refactor as above
         """highlight different entity mentions with different color in the sentence"""
         def _split(split: list, a: list):
 
@@ -654,11 +832,13 @@ class Sentence(TextList, InDocument):
             fa = sorted({j for i in splits for j in i})
             return sorted(set(_split(fa, a)) - set(splits))
 
-        def get_str(sentence: 'Sentence', range_: tuple, color=fg.blue, color_em=True):
-            if color_em:
+        def get_str(sentence: 'Sentence', range_: tuple, color=fg.blue, color_em='all'):
+            if color_em == 'all':
                 return color('[' + list_to_str(sentence[slice(*range_[0])]) + ']' + range_[1].type)
-            else:
+            elif color_em == 'bracket':
                 return color('[') + list_to_str(sentence[slice(*range_[0])]) + color(']' + range_[1].type)
+            elif color_em == 'none':
+                return '[' + list_to_str(sentence[slice(*range_[0])]) + ']' + range_[1].type
 
         def _get_ems_dict_with_range(ems: 'EntityMentions', *args, **kwargs) -> list:
             ems_range = [((em.token_b, em.token_e+1), em) for em in ems]
@@ -676,7 +856,7 @@ class Sentence(TextList, InDocument):
         all_ems_range = set()
         all_ems_dict = []
         for ems, color in zip(all_ems, colors):
-            ems_dict, ems_range = _get_ems_dict_with_range(ems, color)
+            ems_dict, ems_range = _get_ems_dict_with_range(ems, color, color_em=color_em)
             all_ems_range |= set(ems_range)
             all_ems_dict.extend(ems_dict)
                         
@@ -689,8 +869,8 @@ class Sentence(TextList, InDocument):
         
         sentence = list_to_str(dict(sorted(all_dict)).values())
         return sentence
-    
-    
+
+
 class Document(TextList):
     """
     >>> sen1 = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
@@ -719,6 +899,17 @@ class Document(TextList):
     @overrides(TextList)
     def __add__(self, other):
         return Document(self.members + other.members)
+
+    @overrides(TextList)
+    def __repr__(self):
+        from io import StringIO
+        s = StringIO()
+        print(f'({self.fullid}) ({len(self)} sents) ({len([tok for s in self for tok in s])} toks)', file=s)
+        for sent in self:
+            print(repr(sent), file=s)
+        str_ = s.getvalue()
+        s.close()
+        return str_
 
 
 class EntityMention(TextList, InSentence):
@@ -776,43 +967,54 @@ class EntityMention(TextList, InSentence):
         self.ems_pair = None
 
         ids = copy(self.tokens[0].parent_ids)
+
         if source == 'predict':
             prefix = 'PEM'
         elif source == 'gold':
             prefix = 'GEM'
+        elif source == 'recovered':
+            prefix = 'REM'
         else:
-            raise ValueError('source nees to be either "predict" or "gold"')
+            raise ValueError('source nees to be either "predict" / "gold" / "recovered"')
         ids.update({prefix: id_})
 
         TextList.__init__(self, ids, tokens)
 
-    @overrides(TextList)
-    def print(self, detail=False):
-        if detail:
-            print('(%s-%s)%s - %s' % (self.source, self.fullid, self.type, self.text))
-        else:
-            print('(%s)%s - %s' % (self.source, self.type, self.text))
+        # set backreference to tokens
+        self.set_em_to_tokens()
+
+#     @overrides(TextList)
+#     def print(self, detail=False):
+#         if detail:
+#             print('(%s-%s)%s - %s' % (self.source, self.fullid, self.type, self.text))
+#         else:
+#             print('(%s)%s - %s' % (self.source, self.type, self.text))
+
+    def __repr__(self):
+        return TextList.__repr__(self) + f' ({self.type})'
 
     def ann_in_sentence(self) -> str:
         return list_to_str(self.sentence[:self.token_b]) + self.ann_str() + list_to_str(self.sentence[self.token_e+1:])
+
+    def ann_in_sent(self):
+        return self.sentence.get_ann_sent([self])
 
     @overrides(TextList)
     def __add__(self, other):
         return EntityMention(self.members + other.members, self.id, self.source)
 
     def ann_str(self) -> str:
-        if self.source == 'predict':
-            color = fg.blue
-        elif self.source == 'gold':
-            color = fg.yellow
-        else:
-            raise ValueError('souce is neither "predict" nor "gold"')
+        color = SRC_COLOR_TABLE[self.source]
         return color('[') + str(self) + color(']') + color(self.type)
 
 #     @overrides(MD_IDs)  # this will make unhashable
 #     def __eq__(self):  # TODO
 #         MD_IDs.__eq__(self)
-        
+
+    def set_em_to_tokens(self) -> None:
+        for token in self.tokens:
+            setattr(token, self.source[0] + 'em', self)
+
 
 class EntityMentions(TextList):
     """A user-defined list of 'EntityMention's.

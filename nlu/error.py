@@ -212,7 +212,8 @@ class MentionsPairsExtractor:
 
         ems_pairs = MentionsPairsExtractor.to_ems_pairs(debug, gold_src, pairs, predict_src, sentence)
 
-        return EntityMentionsPairs(pairs=ems_pairs)
+#         return EntityMentionsPairs(pairs=ems_pairs)
+        return ems_pairs
 
     @staticmethod
     def to_ems_pairs(debug, gold_src, pairs, predict_src, sentence):
@@ -387,25 +388,29 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         else:
             for ems_pair in sentence.ems_pairs:
                 NERErrorAnnotator.set_result_in_ems_pair(ems_pair)
-            NERErrorAnnotator.set_results_in_ems_pairs(sentence.ems_pairs)
-            sentence.ner_results = sentence.ems_pairs.results
+#             NERErrorAnnotator.set_results_in_ems_pairs(sentence.ems_pairs)
+#             sentence.ner_results = sentence.ems_pairs.results
+            sentence.ner_results = []
+            for ems_pair in sentence.ems_pairs:
+                sentence.ner_results.append(ems_pair.result)
 
         sentence.set_corrects_from_pairs(sentence.ems_pairs)
         sentence.set_errors_from_pairs(sentence.ems_pairs)
 
     @staticmethod
-    def set_ems_pairs_in_sentence(sentence: Sentence, gold_src,predict_src):
+    def set_ems_pairs_in_sentence(sentence: Sentence, gold_src, predict_src):  # TODO: duplicate in parser.set_errors_in_sentence
         sentence.ems_pairs: Union[EntityMentionsPairs, None] = MentionsPairsExtractor.get_pairs(sentence, gold_src,
                                                                                                 predict_src)
     @staticmethod
     def set_result_in_ems_pair(ems_pair: EntityMentionsPair):
         ems_pair.set_result(NERErrorExtractor.extract(ems_pair, NERErrorAnnotator.id_incs))  # FIXME: ID
 
-    @staticmethod
-    def set_results_in_ems_pairs(ems_pairs: EntityMentionsPairs):
-        ems_pairs.results = [pair.result for pair in ems_pairs]
-        ems_pairs.corrects = [pair.correct for pair in ems_pairs if pair.correct is not None]
-        ems_pairs.errors = [pair.error for pair in ems_pairs if pair.error is not None]
+#     @staticmethod
+#     def set_results_in_ems_pairs(ems_pairs: EntityMentionsPairs):
+#         ems_pairs.results = [pair.result for pair in ems_pairs]
+#         ems_pairs.corrects = [pair.correct for pair in ems_pairs if pair.correct is not None]
+#         ems_pairs.errors = [pair.error for pair in ems_pairs if pair.error is not None]
+
 
 
 if __name__ == '__main__':

@@ -36,9 +36,9 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         if tag_scheme in ['iob1', 'bio1']:
             newfilepath = filepath
         elif tag_scheme in ['iob2', 'bio2']:
-            bioes2iob1_file(filepath, newfilepath, bieos_cols=[1, 2])  #TODO
+            bioes2iob1_file(filepath, newfilepath, bieos_cols=[col['col_num'] for col in cols_format if col['tagger'] == 'ner'])
         elif tag_scheme in ['ioblu', 'iobes']:
-            bioes2iob1_file(filepath, newfilepath, bieos_cols=[1, 2])  #TODO
+            bioes2iob1_file(filepath, newfilepath, bieos_cols=[col['col_num'] for col in cols_format if col['tagger'] == 'ner'])
         else:
             raise ValueError('Invalid tagging scheme')
         
@@ -111,7 +111,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                         sentences.append(tokens)
                         tokens = []
                 else:  # inside a sentence: every token
-                    a = line.rsplit(' ', maxsplit=total_cols-1)
+                    a = line.strip().rsplit(' ', maxsplit=total_cols-1)
                     poss = {col['type']: ConllPosTag(a[col['col_num']])
                             for col in cols_format if col['tagger'] == 'pos'} if len_pos else None
                     chunks = {col['type']: ConllChunkTag(a[col['col_num']])
@@ -243,17 +243,17 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                 self.__setattr__(ems_attr_name, self.__getattribute__(ems_attr_name) + self.__getattribute__(attr_name))  # set self.gems/self.pems
 
     @staticmethod
-    def set_errors(parser, gold_src, predict_src):  # FIXME: set_errors_xx() duplicated method with methods in NERErrorAnnotator
+    def set_errors(parser, gold_src, predict_src):  # FIXME: deprecated. set_errors_xx() duplicated method with methods in NERErrorAnnotator
         for doc in parser.docs:
             ConllParser.set_errors_in_document(doc, gold_src, predict_src)
 
     @staticmethod
-    def set_errors_in_document(doc, gold_src, predict_src):
+    def set_errors_in_document(doc, gold_src, predict_src):  # FIXME: deprecated
         for sentence in doc.sentences:
             ConllParser.set_errors_in_sentence(sentence, gold_src, predict_src)
 
     @staticmethod
-    def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:
+    def set_errors_in_sentence(sentence: Sentence, gold_src, predict_src) -> None:  # FIXME: deprecated
         """
         effect: set sentence.ems_pairs, sentence.ner_results, sentence.corrects, sentence.errors
         """
@@ -263,6 +263,21 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 
         sentence.set_corrects_from_pairs(sentence.ems_pairs)
         sentence.set_errors_from_pairs(sentence.ems_pairs)
+
+        for ems_pair in setence.ems_pairs:
+            try:
+                for pem in ems_pair.pems:
+                    for tok in pem.tokens:
+                        tok.ems_pair = ems_pair
+            except TypeError:
+                pass
+            try:
+                for gem in ems_pair.gems:
+                    for tok in gem.tokens:
+                        tok.ems_pair = ems_pair
+            except TypeError:
+                pass
+
         # TODO: unify the setter or property usage
 
     def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy='conll'):
@@ -436,12 +451,32 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 
             if attr_name is not None:
                 obj = obj.__getattribute__(attr_name)[idx]
-            else:
+            else:  # use  __getitem__
                 obj = obj[idx]
 
         return obj
 
+    def next(self, obj, step=1):
+        return self.move_to(obj, step)
+
+    def prev(self, obj, step=1):
+        return self.move_to(obj, -step)
     
+    def move_to(self, obj, step=1):
+        self_pre, self_id = list(obj.self_ids.items())[-1]
+        new_ids = OrderedDict()
+        new_ids.update(obj.parent_ids)
+        new_ids.update({self_pre: self_id + step})
+        new_ids = MD_IDs(new_ids)
+
+        try:
+            return self.get_from_fullid(new_ids.fullid)
+        except ValueError:  # id turns to '-N' which resembles another prefix w/o id
+            raise IndexError('Reach the beginning of a collection')
+        except IndexError:
+            raise IndexError('Reach the end of a collection')
+
+
 class EntityMentionAnnotator:
     # put set_entity_mentions() here
     pass

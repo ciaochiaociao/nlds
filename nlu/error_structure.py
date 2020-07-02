@@ -4,14 +4,15 @@ from typing_extensions import TypedDict
 
 from ansi.color import fg
 
-from nlu.data import TextList, EntityMentions, MD_IDs, Base
-from nlu.utils import id_incrementer, overrides, colorize_list, ls_to_ls_str, TO_SEP
+from nlu.data import ObjectList, TextList, EntityMentions, TextWithIDs, MD_IDs, Base
+from nlu.utils import id_incrementer, overrides, ls_to_ls_str, TO_SEP
+from nlu.utils import colorize_list_by_text as colorize_list
 
 NOTE_SEP = '-'
 NOTE = ' {} '.format(NOTE_SEP)
 
 
-class EntityMentionsPair(TextList):
+class EntityMentionsPair(TextWithIDs):
     """An EntityMentionsPair has a gold EntityMentions and a predicted EntityMentions
     >>> from nlu.data import Sentence, EntityMentions
     >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', 'I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', 'I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
@@ -45,15 +46,12 @@ class EntityMentionsPair(TextList):
         self.result: Optional[NERComparisonWithID] = None
         self.correct: Optional[NERCorrect] = None
         self.error: Optional[NERErrorComposite] = None
-
         # ids
         try:
             self.sid, self.did = self.mentions[0].sid, self.mentions[0].did
         except IndexError:
             raise IndexError("Can't access the index of gold mentions and predicted mentions! Probably there is no any "
                              "mentions in the ems_pair group")
-
-        self.source = self.mentions[0].source
 
         ids = copy(self.mentions.ids)
         ids.update({'PAIR': id_})
@@ -72,7 +70,7 @@ class EntityMentionsPair(TextList):
         self.predict_text_sep = '|'.join([str(pem) for pem in pems])
         self.gold_text_sep = '|'.join([str(gem) for gem in gems])
 
-        TextList.__init__(self, ids, self.mentions.mentions)
+        TextWithIDs.__init__(self, ids)
 
         # navigation
         self.sentence = self.mentions[0].sentence
@@ -81,33 +79,33 @@ class EntityMentionsPair(TextList):
         self.did = self.ids['D']
 
         # set backreference to entity mentions
+        self.set_ems_pair_to_ems()
 
-    #         self.set_ems_pair_to_ems()
+    def __repr__(self):
 
-    def __str__(self):
-
-        em = self.pems[0] if len(self.pems.members) > 0 else self.gems[0]
-        ids = MD_IDs.from_list([('D', em.did), ('S', em.sid), ('PAIR', self.ids['PAIR'])])
-
+#         em = self.pems[0] if len(self.pems.members) > 0 else self.gems[0]
+#         ids = MD_IDs.from_list([('D', em.did), ('S', em.sid), ('PAIR', self.ids['PAIR'])])
+#         print('--- error id %s ---' % self.fullid)
         gem_sent = self.sentence.get_ann_sent(self.gems, fg.yellow) if len(self.gems) > 0 else str(self.sentence)
         pem_sent = self.sentence.get_ann_sent(self.pems) if len(self.pems) > 0 else str(self.sentence)
 
-        return ids.fullid + ': (G) ' + gem_sent + ' (P) ' + pem_sent
+        return self.fullid + '\n(G) ' + gem_sent + '\n(P) ' + pem_sent + '\n=> ' + self.type
 
-    def pprint(self) -> None:
-
-        print('--- error id %s ---' % self.fullid)
-        print('(G)', self.sentence.get_ann_sent(self.gems, fg.yellow))
-        print('(P)', self.sentence.get_ann_sent(self.pems))
-
-    @overrides(TextList)
-    def __add__(self, other):
-        return EntityMentionsPair(self.id, self.gems + other.gems, self.pems + other.pems, self.id_incs)
+#     @overrides(TextWithIDs)
+#     def __add__(self, other):
+#         return EntityMentionsPair(self.id, self.gems + other.gems, self.pems + other.pems, self.id_incs)
 
     def set_result(self, result) -> None:
         self.result: Union[NERErrorComposite, NERCorrect] = result
         self.set_error()
         self.set_correct()
+        self.all_errors = self.result.all_errors
+        if isinstance(self.result, NERCorrect):
+            self.type = 'correct'
+        elif isinstance(self.result, NERErrorComposite):
+            self.type = ' & '.join([str(e) for e in self.result.all_errors])
+        else:
+            raise ValueError('Result is neither NERCorrect nor NERErrorComposite\n' + str(self.result))
 
     def set_error(self) -> None:
         try:
@@ -132,32 +130,35 @@ class EntityMentionsPair(TextList):
             raise TypeError('The returned result is neither {} nor {}, but {} is obtained'
                             .format(NERCorrect.__name__, NERErrorComposite.__name__, type(self.result)))
 
-
-#     def set_ems_pair_to_ems(self) -> None:
-#         for em in self.mentions:
-#             em.ems_pair = self
+    def set_ems_pair_to_ems(self) -> None:
+        for em in self.mentions:
+            em.ems_pair = self
 
 
 class EntityMentionsPairs(TextList):
-    """One sentence will have one EntityMentionsPairs"""
+    ...
+# # class EntityMentionsPairs(ObjectList, MD_IDs):
+#     """One sentence will have one EntityMentionsPairs"""
 
-    def __init__(self, pairs: List[EntityMentionsPair]):
-        self.pairs = pairs
-        self.results: Optional[List[NERComparisonWithID]] = None
-        self.corrects: Optional[List[NERCorrect]] = None
-        self.errors: Optional[List[NERErrorComposite]] = None
+#     def __init__(self, pairs: List[EntityMentionsPair]):
+#         self.pairs = pairs
+#         self.results: Optional[List[NERComparisonWithID]] = None
+#         self.corrects: Optional[List[NERCorrect]] = None
+#         self.errors: Optional[List[NERErrorComposite]] = None
 
-        try:
-            ids = self.pairs[0].ids
-        except IndexError:
-            raise IndexError("""Can't access the first element of the pairs. Overlaps should be empty.
-            repr(pairs): {}
-            """.format(repr(self.pairs)))
+#         try:
+#             ids = self.pairs[0].ids
+#         except IndexError:
+#             raise IndexError("""Can't access the first element of the pairs. Overlaps should be empty.
+#             repr(pairs): {}
+#             """.format(repr(self.pairs)))
 
-        TextList.__init__(self, ids, self.pairs)
+# #         MD_IDs.__init__(self, ids)
+# #         ObjectList.__init__(self, pairs)
+#         TextList.__init__(self, ids, self.pairs)
 
 
-class NERComparison(Base):
+class NERComparison(Base):  # TODO: to be deprecated
     entity_types = ('PER', 'LOC', 'ORG', 'MISC')
 
     def __init__(self, ems_pair: EntityMentionsPair):
@@ -178,15 +179,15 @@ class NERComparison(Base):
     # def all_errors(self):
     #     raise NotImplementedError
 
-class NERComparisonWithID(NERComparison, MD_IDs):
+class NERComparisonWithID(NERComparison, MD_IDs):  # TODO: to be deprecated
 
     def __init__(self, ems_pair, ids):
         NERComparison.__init__(self, ems_pair)
         MD_IDs.__init__(self, ids)
 
     def __str__(self):
-        return '\n[predict] {} ({})'.format(self.pems.sep_str(sep='|'), self.ptypes) + \
-               '\n[gold] {} ({})'.format(self.gems.sep_str(sep='|'), self.gtypes) + \
+        return '\n[predict] {} ({})'.format(self.pems.sep_texts(sep='|'), self.ptypes) + \
+               '\n[gold] {} ({})'.format(self.gems.sep_texts(sep='|'), self.gtypes) + \
                '\n[type] {}'.format(str(self.all_errors)) + \
                '\n[sentence] {}'.format(colorize_list(
                    self.sentence.tokens, self.ems_pair.token_b, self.ems_pair.token_e)) + \
@@ -194,10 +195,10 @@ class NERComparisonWithID(NERComparison, MD_IDs):
                '\n'
         # self.type - use type of NERErrorComposite and NERCorrect
 
-    def sep_str(self):
-        strs = [str(self.fullid), str(self.all_errors), self.pems.sep_str(sep='|'), str('|'.join(self.ptypes)),
-                self.gems.sep_str(sep='|'), str('|'.join(self.gtypes)), str(self.sentence)]
-        return '\t'.join(strs)
+#     def sep_str(self):
+#         strs = [str(self.fullid), str(self.all_errors), self.pems.sep_str(sep='|'), str('|'.join(self.ptypes)),
+#                 self.gems.sep_str(sep='|'), str('|'.join(self.gtypes)), str(self.sentence)]
+#         return '\t'.join(strs)
 
 
 class NERErrorBase(NERComparison):

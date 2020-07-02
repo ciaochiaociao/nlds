@@ -6,6 +6,7 @@ from ansi.color import fg
 import logging
 import time
 import re
+from functools import partial
 
 from pandas import DataFrame
 
@@ -19,17 +20,31 @@ def bracket(text):
     return '[' + text + ']'
 
 
-def list_to_str(strlist, sep=' '):
-    return sep.join([str(s) for s in strlist])
+def list_to_str(strlist, sep=' ', str_func=str):
+    return sep.join([str_func(s) for s in strlist])
 
 
-def colorize_list(arr, begin=None, end=None, color: Callable=fg.blue) -> str:
+def list_to_str_by_text(strlist, *args, **kwargs):
+    try:
+        return list_to_str(strlist, str_func=lambda x: x.text, *args, **kwargs)
+    except AttributeError:
+        return list_to_str(strlist, str_func=str, *args, **kwargs)
+
+
+def colorize_list(arr, begin=None, end=None, color: Callable=fg.blue, str_func=str) -> str:
     if begin is None:
         begin = arr[0]
     if end is None:
         end = arr[-1]
-    return list_to_str(arr[:begin]) + ' ' + color(list_to_str(arr[begin:end + 1])) \
-           + ' ' + list_to_str(arr[end + 1:])
+    return list_to_str(arr[:begin], str_func=str_func) + ' ' + color(list_to_str(arr[begin:end + 1], str_func=str_func)) \
+           + ' ' + list_to_str(arr[end + 1:], str_func=str_func)
+
+
+def colorize_list_by_text(arr, *args, **kwargs):
+    try:
+        return colorize_list(arr, str_func=lambda x: x.text, *args, **kwargs)
+    except AttributeError:
+        return colorize_list(arr, str_func=str, *args, **kwargs)
 
 
 def id_incrementer():
