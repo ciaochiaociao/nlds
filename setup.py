@@ -8,7 +8,7 @@ setup(
     name='ner_error_analysis',
     version='0.2',
     # packages=['ext_utils'],
-    packages=find_packages(),
+    packages=find_packages('nlu'),
     package_dir={'': 'nlu'},
     url='https://github.com/ciaochiaociao/ner_error_analysis',
     license='',
