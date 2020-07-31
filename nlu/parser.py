@@ -53,14 +53,32 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         else:
             self.cols_format = cols_format
 
-        tok_dicts = ConllParser.parse_conll_to_tok_dicts(self.filepath, self.cols_format)
+        self.doc_sep_tok = doc_sep_tok
+
+        tok_dicts = ConllParser.parse_conll_to_tok_dicts(self.filepath, self.cols_format, self.doc_sep_tok)
         self.docs = ConllParser.build_md_docs_from_tok_dicts(tok_dicts)
-        
+
+        self.tag_policy = tag_policy
+        self.ann_states = set()
+
         # optional back reference functionality: token1.sentence, sentence5.document
         ConllParser.add_back_refs_for_md_docs(self.docs)
 
+    @property
+    def doc_sep_line(self):
+        _num_o = len(self.docs[0][0][0].line.split()) - 1
+        return ' '.join(['-DOCSTART-'] + ['O'] * _num_o) + '\n'
+
+    def __repr__(self):
+        entity_stat = True if 'entity_ann' in self.ann_states else False
+        print('(Parser Annotations)', *self.ann_states)
+        self.obtain_statistics(entity_stat=entity_stat, debug=True, tag_policy=self.tag_policy)
+        if 'error_ann' in self.ann_states:
+            self.error_overall_stats()
+        return ''
+
     @staticmethod
-    def parse_conll_to_tok_dicts(filepath: str, cols_format) -> List[List[List[dict]]]:
+    def parse_conll_to_tok_dicts(filepath: str, cols_format, doc_sep_tok='-DOCSTART-') -> List[List[List[dict]]]:
         """read a conll-formatted text file to a hierarchical collection of token dictionaries (tok_dict is like below)
         input:
         filepath - the file path of the conll-formatted file
@@ -91,18 +109,17 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             col_conf = None
         total_cols = len(cols_format) + 1  # text with annotations
         
-        # set doc_separator
-        # doc_separator = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner + \
+        # set doc_sep_tok
+        # doc_sep_tok = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner + \
         #                 ['O'] * (1 if col_conf else 0)) + '\n'  # TODO: consider the order given by cols_format
-        doc_separator = '-DOCSTART-'
-        print('doc_separator:', doc_separator)
+        print('doc_sep_tok:', doc_sep_tok)
         
         docs, sentences, tokens = [], [], []
         with open(filepath, encoding='utf-8') as f:
 
             # parse conll formatted txt file to ConllParser class
-            for ix, line in enumerate(f):
-                if line.startswith(doc_separator):  # -DOCSTART-|: end of a document
+            for ix, line in tqdm(enumerate(f), desc='LINE'):
+                if line.startswith(doc_sep_tok):  # -DOCSTART-|: end of a document
                     if sentences:  # if not empty document
                         docs.append(sentences)
                         sentences = []
@@ -143,8 +160,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                         em.set_sentence(sent)
                 except AttributeError:
                     pass  # to remove
-                        
-    
+
     @staticmethod
     def build_md_docs_from_tok_dicts(docs: List[List[List[dict]]]) -> List[Document]:  
         # TODO: Maybe it can further be abstracted such that it can be put in other classes than ConllParser?
@@ -173,7 +189,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 
         docs_classes = []
 
-        for doc in docs:
+        for doc in tqdm(docs, desc='DOC'):
             did += 1
             sid = -1
             sents_classes = []
@@ -214,8 +230,10 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             for sentence in doc.sentences:
                 sentence.set_entity_mentions([src['type'] for src in self.cols_format])
 
+        if tag_policy is None:
+            tag_policy = self.tag_policy
         # set different types of entity mentions from different sources
-        if tag_policy in [None, 'conll']:
+        if tag_policy == 'conll':
             _types = ['PER', 'LOC', 'ORG', 'MISC']
         elif tag_policy == 'wnut':
             _types = ['person', 'location', 'corporation', 'creative-work', 'group', 'product']
@@ -241,6 +259,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             self.__setattr__(ems_attr_name, [])
             for attr_name in attr_names:
                 self.__setattr__(ems_attr_name, self.__getattribute__(ems_attr_name) + self.__getattribute__(attr_name))  # set self.gems/self.pems
+        self.tag_policy = tag_policy
+        self.ann_states.add('entity_ann')
 
     @staticmethod
     def set_errors(parser, gold_src, predict_src):  # FIXME: deprecated. set_errors_xx() duplicated method with methods in NERErrorAnnotator
@@ -264,7 +284,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         sentence.set_corrects_from_pairs(sentence.ems_pairs)
         sentence.set_errors_from_pairs(sentence.ems_pairs)
 
-        for ems_pair in setence.ems_pairs:
+        for ems_pair in sentence.ems_pairs:
             try:
                 for pem in ems_pair.pems:
                     for tok in pem.tokens:
@@ -280,13 +300,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 
         # TODO: unify the setter or property usage
 
-    def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy='conll'):
-        if tag_policy == 'conll':
-            _types = ['PER', 'LOC', 'ORG', 'MISC']
-        elif tag_policy == 'wnut':
-            _types = ['person', 'location', 'corporation', 'creative-work', 'group', 'product']
-        else:
-            raise ValueError('illegal tag_policy {} (should be conll, wnut or ...)'.format(tag_policy))
+    def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy='conll') -> None:
 
         print(f'---{self.filepath} ({source})---')
         print('Document number: ', len([doc for doc in self.docs]))
@@ -297,6 +311,12 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             source = self.TAGGERSOURCE
 
         if entity_stat:
+            if tag_policy == 'conll':
+                _types = ['PER', 'LOC', 'ORG', 'MISC']
+            elif tag_policy == 'wnut':
+                _types = ['person', 'location', 'corporation', 'creative-work', 'group', 'product']
+            else:
+                raise ValueError('illegal tag_policy {} (should be conll, wnut or ...)'.format(tag_policy))
             ent_tot = len(self.__getattribute__(source[0] + 'ems'))
             for type_ in _types:
                 ems = self.__getattribute__(source[:4] + '_' + type_.lower() + 's')
