@@ -304,23 +304,26 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             print('TOTAL: {}'.format(ent_tot))
 
         if debug:
-            print('Empty document number: ', len([doc for doc in self.docs if not doc]))
-            print('Empty sentence number: ', len([sen for doc in self.docs for sen in doc.sentences if not sen]))
-            print('Empty token number: ', len([token for doc in self.docs
+            print('--- debugging info ---')
+            _d = {
+                'Empty document number': len([doc for doc in self.docs if not doc]),
+                'Empty sentence number': len([sen for doc in self.docs for sen in doc.sentences if not sen]),
+                'Empty token number': len([token for doc in self.docs
                                                for sen in doc.sentences
-                                               for token in sen.tokens if not token]))
-            print('Empty-content token number: ', len([token for doc in self.docs for sen in doc.sentences
-                                                       for token in sen.tokens if not len(token.text)]))
-            print('Empty-id token number: ', len([token for doc in self.docs for sen in doc.sentences
-                                                  for token in sen.tokens if token.id is None]))
-            print('Token id error number: ',  [(sen.tokens[-1].id, len(sen.tokens)-1) for doc in self.docs
-                                               for sen in doc.sentences if sen.tokens[-1].id != len(sen.tokens)-1])
-            print('Fullid of empty sentences: ', [sen.fullid for doc in self.docs
-                                                  for sen in doc.sentences if not sen])
+                                               for token in sen.tokens if not token]),
+                'Empty-content token number': len([token for doc in self.docs for sen in doc.sentences
+                                                       for token in sen.tokens if not len(token.text)]),
+                'Empty-id token number': len([token for doc in self.docs for sen in doc.sentences
+                                                  for token in sen.tokens if token.id is None]),
+                'Token id error number': [(sen.tokens[-1].id, len(sen.tokens)-1) for doc in self.docs
+                                               for sen in doc.sentences if sen.tokens[-1].id != len(sen.tokens)-1],
+                'Fullid of empty sentences':[sen.fullid for doc in self.docs
+                                                  for sen in doc.sentences if not sen]
+            }
 
-#             print('Fullid of tokens: ', [token.fullid for doc in self.docs
-#             for sen in doc.sentences
-#             for token in sen.tokens])
+            for _s, _v in _d.items():
+                if _v:
+                    print(f'{_s}: {_v}')
 
     def error_overall_stats(self) -> None:  # TODO: move to NERErrorAnalyzer
 
