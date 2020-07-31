@@ -338,7 +338,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
     id_incs = id_incrementer(), id_incrementer()
 
     @staticmethod
-    def annotate(parser, gold_src: str = None, predict_src: str = None):
+    def annotate(parser: ConllParser, gold_src: str = None, predict_src: str = None):
         """
         >>> parser = ConllParser('../scripts/conll/testa.pred.gold')
         >>> parser.set_entity_mentions()
@@ -366,6 +366,8 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         parser.ner_errors = [error for doc in parser.docs for error in doc.ner_errors]
         parser.ner_corrects = [correct for doc in parser.docs for correct in doc.ner_corrects]
         parser.ner_results = [result for doc in parser.docs for result in doc.ner_results]
+
+        parser.ann_states.add('error_ann')
 
     @staticmethod
     def set_results_in_document(doc, gold_src, predict_src):
