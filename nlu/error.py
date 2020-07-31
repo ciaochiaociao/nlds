@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from tqdm import tqdm
+
 from nlu.data import *
 from nlu.error_structure import EntityMentionsPair, EntityMentionsPairs, NERCorrect, NERErrorComposite, SimpleSpanError, \
     MergeSplitError, MentionTypeError, ComplicatedError, FalseError
@@ -359,7 +361,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         gold_src = NERErrorAnnotator.GOLD_SOURCE_ALIAS if gold_src is None else gold_src
         predict_src = NERErrorAnnotator.PREDICT_SOURCE_ALIAS if predict_src is None else predict_src
 
-        for doc in parser.docs:
+        for doc in tqdm(parser.docs, desc='DOC'):
             NERErrorAnnotator.set_results_in_document(doc, gold_src, predict_src)
 
         # set back references for parser

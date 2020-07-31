@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from nlu.data import *
 from nlu.parser_utils import *
 
@@ -6,7 +8,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     """Column Parser for CoNLL03 formatted text file"""
     TAGGERSOURCE = 'gold'
 
-    def __init__(self, filepath: str, cols_format: List[Dict[str, Union[str, int]]] = None, tag_scheme='iob1') -> None:
+    def __init__(self, filepath: str, cols_format: List[Dict[str, Union[str, int]]] = None, tag_scheme='iob1',
+                 tag_policy=None, doc_sep_tok='-DOCSTART-') -> None:
         """
             :param filepath: The filename. Note that the file loaded should end with two blank lines!!!
             :param cols_format:
@@ -147,7 +150,6 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         else:
             return [[tokens]]
 
-    
     @staticmethod
     def add_back_refs_for_md_docs(docs: List[Document]) -> None:  # TODO: Maybe it can be moved to sentence or other places?
         for doc in docs:
@@ -498,6 +500,19 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             raise IndexError('Reach the beginning of a collection')
         except IndexError:
             raise IndexError('Reach the end of a collection')
+
+    def search(self, text, return_item='doc'):
+        if return_item == 'doc':
+            items = self.docs
+        elif return_item == 'sent':
+            items = [sent for doc in self.docs for sent in doc]
+        elif return_item == 'token':
+            items = [tok for doc in self.docs for sent in doc for tok in sent]
+        else:
+            raise ValueError(return_item)
+        for item in items:
+            if text.lower() in item.text.lower():
+                yield item
 
 
 class EntityMentionAnnotator:

@@ -1,3 +1,4 @@
+from io import StringIO
 from collections import OrderedDict, Hashable, defaultdict
 from copy import copy
 from functools import reduce, partial
@@ -93,13 +94,7 @@ class ObjectList(Base):
     def __init__(self, members):
         
         self_name = camel_to_snake(self.__class__.__name__)
-        
-        # santiy check
-        if len(set([type(member) for member in members])) > 1:
-            dataLogger.warning('Not all members in ObjectList are the same: {}'.format(members))
-            dataLogger.warning('This first element is set with self.{}'.format(
-                mems_attr_name))
-        
+
         # set refs
         try:
             mems_attr_name = camel_to_snake(members[0].__class__.__name__) + 's'  #TODO: better plural 
@@ -110,7 +105,13 @@ class ObjectList(Base):
             dataLogger.warning('Not an object in building a ObjectList')
 
         self.members: List = members  #container.members  ex-entity_mention.members
-        
+
+        # santiy check
+        if len(set([type(member) for member in members])) > 1:
+            dataLogger.warning('Not all members in ObjectList are the same: {}'.format(members))
+            dataLogger.warning('This first element is set with self.{}'.format(
+                mems_attr_name))
+
         # set backrefs
         for member in members:
             if 'parents' not in dir(member):
@@ -639,7 +640,7 @@ class Sentence(TextList, InDocument):
         """
         return cls(ConllToken.bulk_from_str(*args, **kwargs))
     
-    def set_entity_mentions(self, sources: List=['predict', 'gold']) -> None:
+    def set_entity_mentions(self, sources: List = ['predict', 'gold']) -> None:
         """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
         effect: set sentence.entity_mentions_dict ({'predict': `EntityMention`s})
         >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', pner_str='I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', gner_str='I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
@@ -726,7 +727,7 @@ class Sentence(TextList, InDocument):
         elif 'predict' in self.sources:
             return '({id_}) ({num} toks) ({source}) {text}'.format(id_=self.fullid, num=len(self), source=self.sources[0][0].upper(), text=self.get_ann_sent_multi([self.pems], colors=[fg.blue]))
         elif 'gold' in self.sources:
-            return '({id_}) ({num} toks) ({source}) {text}'.format(id_=self.fullid, num=len(self), source=self.sources[0].upper(), text=self.get_ann_sent_multi([self.gems], colors=[fg.yellow]))
+            return '({id_}) ({num} toks) ({source}) {text}'.format(id_=self.fullid, num=len(self), source=self.sources[0][0].upper(), text=self.get_ann_sent_multi([self.gems], colors=[fg.yellow]))
         else:
             return TextList.__repr__(self)
 
@@ -735,11 +736,11 @@ class Sentence(TextList, InDocument):
         try:
             print('(P) ' + ' ' + self.get_ann_sent(self.pems, **kwargs))
         except AttributeError:
-            print('(P) ' + str(sent))  # no pems
+            print('(P) ' + str(self))  # no pems
         try:
             print('(G) ' + ' ' + self.get_ann_sent(self.gems, color=fg.yellow, **kwargs))
         except AttributeError:
-            print('(G) ' + str(sent))  # no gems
+            print('(G) ' + str(self))  # no gems
 
     def print_all_ann_sent_flair(self, **kwargs):
         print('(' + self.fullid + ')')
@@ -880,6 +881,12 @@ class Sentence(TextList, InDocument):
         sentence = list_to_str(dict(sorted(all_dict)).values())
         return sentence
 
+    def to_conll(self, file=None, end=''):
+        if file is None:
+            file = StringIO()
+        print(*[str(tok.line) for tok in self.tokens], sep='', end=end, file=file)
+        return file.getvalue()
+
 
 class Document(TextList):
     """
@@ -920,6 +927,16 @@ class Document(TextList):
         str_ = s.getvalue()
         s.close()
         return str_
+
+    def to_conll(self, doc_sep_line=None, file=None):
+        if doc_sep_line is None:
+            doc_sep_line = self.parser.doc_sep_line
+        if file is None:
+            file = StringIO()
+        print(doc_sep_line, file=file)
+        for sent in self:
+            sent.to_conll(file=file, end='\n')
+        return file.getvalue()
 
 
 class EntityMention(TextList, InSentence):
