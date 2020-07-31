@@ -447,6 +447,16 @@ class Token(TextWithIDs, InSentence):
         TextWithIDs.__init__(self, ids)  # self.id is set here
         self.text = text
 
+    def next(self):
+        return self.sentence[self.id + 1]
+
+    def prev(self):
+        ix = self.id - 1
+        if ix < 0:
+            raise IndexError('Reach the beginning of a sentence.')
+        else:
+            return self.sentence[ix]
+
 #     def set_sentence(self, sentence: 'Sentence'):
 #         self.sentence = sentence
 
