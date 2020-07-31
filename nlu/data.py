@@ -784,7 +784,19 @@ class Sentence(TextList, InDocument):
 
     def get_ann_sent_2in1(self, verbose=False):
         def pem_color(em):
-            return fg.green if em.ems_pair.iscorrect() else fg.red
+            try:
+                return fg.green if em.ems_pair.iscorrect() else fg.red
+            except AttributeError:  # no error annotation
+                return fg.blue
+
+        def gem_color(em):
+            try:
+                if verbose or not em.ems_pair.iscorrect():
+                    return fg.yellow
+                else:
+                    return lambda x: ''
+            except AttributeError:  # no error annotation
+                return fg.yellow
 
         table = defaultdict(str)
 
@@ -792,8 +804,7 @@ class Sentence(TextList, InDocument):
             table[pem.token_b] += pem_color(pem)('[')
 
         for gem in self.gems:
-            if verbose or not gem.ems_pair.iscorrect():
-                table[gem.token_b] += fg.yellow('[')
+            table[gem.token_b] += gem_color(gem)('[')
 
         for tok in self.tokens:
             table[tok.id] += tok.text
@@ -802,8 +813,7 @@ class Sentence(TextList, InDocument):
             table[pem.token_e] += pem_color(pem)(']' + pem.type)
 
         for gem in self.gems:
-            if verbose or not gem.ems_pair.iscorrect():
-                table[gem.token_e] += fg.yellow(']' + gem.type)
+            table[gem.token_e] += gem_color(gem)(']' + gem.type)
 
         assert len(table) == len(self)
         ann_tokens = dict(sorted(table.items())).values()
