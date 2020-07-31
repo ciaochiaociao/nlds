@@ -7,9 +7,7 @@ with open("README.md", "r") as fh:
 setup(
     name='ner_error_analysis',
     version='0.2',
-    # packages=['ext_utils'],
-    packages=find_packages('nlu'),
-    package_dir={'': 'nlu'},
+    packages=find_packages(),
     url='https://github.com/ciaochiaociao/ner_error_analysis',
     license='',
     author='Chiao-Wei Hsu',
