@@ -36,14 +36,14 @@ class NERErrorExtractor:
         gems: EntityMentions = ems_pair.gems
         ems_total = len(gems) + len(pems)
 
-        error_id, correct_id = id_incs
+        error_id_inc, correct_id_inc = id_incs
 
         if NERErrorExtractor.is_mentions_correct(pems, gems):
-            return NERCorrect(ems_pair, ems_pair.gems.type, correct_id)
+            return NERCorrect(ems_pair, ems_pair.gems.type, next(correct_id_inc))
         else:
             false_error, span_error, type_error = NERErrorExtractor.get_error(ems_pair)
             return NERErrorComposite(ems_pair, {'false_error': false_error, 'type_error': type_error,
-                                  'span_error': span_error}, error_id)
+                                  'span_error': span_error}, next(error_id_inc))
 
     @staticmethod
     def get_error(ems_pair: EntityMentionsPair):
@@ -198,7 +198,7 @@ class MentionsPairsExtractor:
 
     @staticmethod
     def get_pairs(sentence: Sentence, gold_src: str='gold', predict_src: str='predict', debug=False) \
-            -> Union[None, EntityMentionsPairs]:
+            -> Union[None, List[EntityMentionsPair]]:
 
         if not sentence.entity_mentions_dict[gold_src] and not sentence.entity_mentions_dict[predict_src]:
             return None
@@ -214,14 +214,12 @@ class MentionsPairsExtractor:
 
         ems_pairs = MentionsPairsExtractor.to_ems_pairs(debug, gold_src, pairs, predict_src, sentence)
 
-#         return EntityMentionsPairs(pairs=ems_pairs)
         return ems_pairs
 
     @staticmethod
-    def to_ems_pairs(debug, gold_src, pairs, predict_src, sentence):
+    def to_ems_pairs(debug, gold_src, pairs, predict_src, sentence) -> List[EntityMentionsPair]:
         # split to gold and predict entity mentions and create a list of EntityMentionsPair
         ems_pairs: List[EntityMentionsPair] = []
-        id_incs = id_incrementer(), id_incrementer()
         for i, pair in enumerate(pairs):  # create a EntityMentionsPair
             pair_p, pair_g = [], []
             for em in pair:  # split to gold mentions and predict mentions (ems_pair is a set, the element is a tuple)
@@ -244,7 +242,7 @@ class MentionsPairsExtractor:
                 raise ValueError('No any mentions in the pair!!!!')
 
             ems_pairs.append(EntityMentionsPair(i, EntityMentions(pair_g, source_g, type_g, ids_g)
-                                                , EntityMentions(pair_p, source_p, type_p, ids_p), id_incs))
+                                                , EntityMentions(pair_p, source_p, type_p, ids_p)))
         if debug: print("---------ems_pairs: ", ems_pairs)
         return ems_pairs
 
@@ -402,7 +400,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         sentence.set_errors_from_pairs(sentence.ems_pairs)
 
     @staticmethod
-    def set_ems_pairs_in_sentence(sentence: Sentence, gold_src, predict_src):  # TODO: duplicate in parser.set_errors_in_sentence
+    def set_ems_pairs_in_sentence(sentence: Sentence, gold_src, predict_src):  # TODO: duplicate in parser.set_errors_in_sentence, this is used
         sentence.ems_pairs: Union[EntityMentionsPairs, None] = MentionsPairsExtractor.get_pairs(sentence, gold_src,
                                                                                                 predict_src)
     @staticmethod

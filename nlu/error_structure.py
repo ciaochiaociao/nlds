@@ -34,15 +34,13 @@ class EntityMentionsPair(TextWithIDs):
     (P) NLU Lab is in \x1b[34m[Taipei]LOC\x1b[0m \x1b[34m[Taiwan]LOC\x1b[0m directed by Keh Yih Su .
     """
 
-    def __init__(self, id_, gems: EntityMentions, pems: EntityMentions, id_incs: Tuple[id_incrementer, id_incrementer]):
+    def __init__(self, id_, gems: EntityMentions, pems: EntityMentions):
         # TODO: idea - Set A Proxy Class for List[EntityMention] like EntityMentions (like `view`)
-        # TODO: fix id_incs generator
         # TODO: Use List[EntityMention] instead of EntityMentions to be input into TextList constructor
         self.gems = gems
         self.pems = pems
         self.mentions: EntityMentions = self.pems + self.gems
         self.ems: EntityMentions = self.mentions
-        self.id_incs = id_incs
         self.result: Optional[NERComparisonWithID] = None
         self.correct: Optional[NERCorrect] = None
         self.error: Optional[NERErrorComposite] = None
@@ -326,12 +324,12 @@ class NERErrorComposite(NERComparisonWithID):
 
     def __init__(self, ems_pair: EntityMentionsPair, 
                  type: _ErrorTypeDict,
-                 error_id):
+                 id):
         ids = copy(ems_pair.parent_ids)
-        ids.update({'NERErr': next(error_id)})
+        ids.update({'NERErr': id})
         super().__init__(ems_pair, ids)
         self.type = type
-        self.error_id = error_id
+        self.id = id
         self.all_errors: list = self._filtered_to_array(type)
         self.false_error: FalseError = self.type['false_error']
         self.span_error: SimpleSpanError = self.type['span_error']
@@ -371,13 +369,12 @@ class NERErrorComposite(NERComparisonWithID):
 class NERCorrect(NERComparisonWithID):
     """Only includes True Positives but no True Negatives"""
 
-    def __init__(self, ems_pair: EntityMentionsPair, type: str, correct_id):
+    def __init__(self, ems_pair: EntityMentionsPair, type: str, id):
         ids = copy(ems_pair.parent_ids)
-        ids.update({'NERCorr': next(correct_id)})
+        ids.update({'NERCorr': id})
         super().__init__(ems_pair, ids)
         self.type = type
         self.filtered_type = type
-        self.correct_id = correct_id
         self.all_errors = None
 
     def __str__(self):
