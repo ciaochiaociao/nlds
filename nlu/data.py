@@ -699,36 +699,45 @@ class Sentence(TextList, InDocument):
         'ORG'
         """
 
-        tokens_tray: List[Token] = []
-        entity_mentions: List['EntityMention'] = []
-#         last_token = ConllToken(text='', ner='O')
-        last_token = None
-        eid = 0
+        entity_mentions: List[EntityMention] = []
 
-        for i, token in enumerate(self.tokens):
-            # A. Boundary Detected: create an EntityMention from the tokens_tray and append to entity_mentions and
-            # empty tokens_tray if the tokens_tray is not empty (the last token is of entity tag)
-            # (Boundary: 'O', "B-" prefix, "I-" with different suffix )
-            # B. Entity Tags Detected: add Token to tokens_tray
-            # (not 'O')
+        tags = [token.ners[source].type for token in self.tokens]
+        _entities: List[tuple] = get_entities(tags)  # (type, first token idx, last token idx)
 
-            if token.ners[source].type == 'O' or token.ners[source].prefix == 'B' or not last_token \
-                    or token.ners[source].suffix != last_token.ners[source].suffix:  # Boundary detected
-                if tokens_tray:
-                    entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
-                    eid += 1
-                    tokens_tray = []
+        for eid, ent in enumerate(_entities):
+            _, first_idx, last_idx = ent
+            entity_mentions.append(EntityMention(self.tokens[first_idx: last_idx + 1], id_=eid, source=source))
 
-            if token.ners[source].type != 'O':
-                tokens_tray.append(token)
+        # # original version (my method)
+        # # last_token = ConllToken(text='', ner='O')
+        # # last_token = None
+        # tokens_tray: List[Token] = []
+        # eid = 0
+        #
+        # for i, token in enumerate(self.tokens):
+        #     # A. Boundary Detected: create an EntityMention from the tokens_tray and append to entity_mentions and
+        #     # empty tokens_tray if the tokens_tray is not empty (the last token is of entity tag)
+        #     # (Boundary: 'O', "B-" prefix, "I-" with different suffix )
+        #     # B. Entity Tags Detected: add Token to tokens_tray
+        #     # (not 'O')
+        #
+        #     if token.ners[source].type == 'O' or token.ners[source].prefix == 'B' or not last_token \
+        #             or token.ners[source].suffix != last_token.ners[source].suffix:  # Boundary detected
+        #         if tokens_tray:
+        #             entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
+        #             eid += 1
+        #             tokens_tray = []
+        #
+        #     if token.ners[source].type != 'O':
+        #         tokens_tray.append(token)
+        #
+        #     last_token = token
+        #
+        # # at the end of a sentence:
+        # #  - add the last entity mention if it exists
+        # if tokens_tray:
+        #     entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
 
-            last_token = token
-
-        # at the end of a sentence: 
-        #  - add the last entity mention if it exists
-        if tokens_tray:
-            entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
-    
         return entity_mentions
     
     def __repr__(self):

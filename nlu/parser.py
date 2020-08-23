@@ -34,18 +34,19 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         TOTAL: 23492
         >>> train_parser.set_entity_mentions()
         """
-        newfilepath = filepath + '.iob1'
-        self.tag_scheme = tag_scheme
-        if tag_scheme in ['iob1', 'bio1']:
-            newfilepath = filepath
-        elif tag_scheme in ['iob2', 'bio2']:
-            bioes2iob1_file(filepath, newfilepath, bieos_cols=[col['col_num'] for col in cols_format if col['tagger'] == 'ner'])
-        elif tag_scheme in ['ioblu', 'iobes']:
-            bioes2iob1_file(filepath, newfilepath, bieos_cols=[col['col_num'] for col in cols_format if col['tagger'] == 'ner'])
-        else:
-            raise ValueError('Invalid tagging scheme')
+
+        # newfilepath = filepath + '.iob1'
+        # self.tag_scheme = tag_scheme
+        # if tag_scheme in ['iob1', 'bio1']:
+        #     newfilepath = filepath
+        # elif tag_scheme in ['iob2', 'bio2']:
+        #     bioes2iob1_file(filepath, newfilepath, bieos_cols=[col['col_num'] for col in cols_format if col['tagger'] == 'ner'])
+        # elif tag_scheme in ['ioblu', 'iobes']:
+        #     bioes2iob1_file(filepath, newfilepath, bieos_cols=[col['col_num'] for col in cols_format if col['tagger'] == 'ner'])
+        # else:
+        #     raise ValueError('Invalid tagging scheme')
         
-        filepath = newfilepath
+        # filepath = newfilepath
         
         # attributes
         self.docs = []
