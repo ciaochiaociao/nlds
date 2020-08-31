@@ -991,17 +991,18 @@ class EntityMention(TextList, InSentence):
     \x1b[33m[\x1b[0mNLU Lab\x1b[33m]\x1b[0m\x1b[33mORG\x1b[0mis in Taipei Taiwan directed by Keh Yih Su .
     """
 
-    def __init__(self, tokens, id_, source):
-        # sanity check
-        if len(set([token.ners[source].suffix for token in tokens])) != 1:
-            raise ValueError("""Not consistent ner types in tokens of the entity mention {} : {}
-            sentence: {}
-            """.format(id_
-                       , [(token.fullid, token.text, token.ners[source].type) for token in tokens]
-                       , tokens[0].sentence))
-        elif [token.id for token in tokens] != list(range(tokens[0].id, tokens[-1].id + 1)):
-            raise ValueError('Not consecutive ner positions (id) in tokens of the entity mention {}: id - {}'
-                             .format(id_, [token.id for token in tokens]))
+    def __init__(self, tokens, id_, source, check_w_toks=True):
+        # sanity check with tokens
+        if check_w_toks:
+            if len(set([token.ners[source].suffix for token in tokens])) != 1:
+                raise ValueError("""Not consistent ner types in tokens of the entity mention {} : {}
+                sentence: {}
+                """.format(id_
+                           , [(token.fullid, token.text, token.ners[source].type) for token in tokens]
+                           , tokens[0].sentence))
+            if [token.id for token in tokens] != list(range(tokens[0].id, tokens[-1].id + 1)):
+                raise ValueError('Not consecutive ner positions (id) in tokens of the entity mention {}: id - {}'
+                                 .format(id_, [token.id for token in tokens]))
 
         self.tokens: List[Token] = tokens
         self.source = source
