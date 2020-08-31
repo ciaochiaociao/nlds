@@ -691,6 +691,14 @@ class Sentence(TextList, InDocument):
         
         self.ems = []
         self.ems += [ em for ems in self.entity_mentions_dict.values() for em in ems]
+
+    def add_entity_mentions(self, source: str, attr_name: str = None):
+        entity_mentions = self.get_entity_mentions(source)
+        self.entity_mentions_dict[source] = entity_mentions
+        if attr_name is None:
+            attr_name = source[0] + 'ems'
+        setattr(self, attr_name, entity_mentions)
+        self.ems += entity_mentions
     
     def get_entity_mentions(self, source: str) -> List['EntityMention']:
         """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
