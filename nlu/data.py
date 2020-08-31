@@ -1019,7 +1019,11 @@ class EntityMention(TextList, InSentence):
         self.source = source
 
         self.sid, self.did = tokens[0].sid, tokens[0].did
-        self.type: str = tokens[0].ners[source].suffix
+        if source == 'candidate':
+            self.type = 'O'
+        else:
+            self.type: str = tokens[0].ners[source].suffix
+
         self.token_b = tokens[0].id
         self.token_e = tokens[-1].id
 
