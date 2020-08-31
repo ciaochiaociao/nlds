@@ -411,7 +411,10 @@ class Tag(Base):
 #         self.type_: str = type_
 
     def __repr__(self):
-        return repr(self.type)
+        if not hasattr(self, 'score') or self.score == 'gold':  # compatibility of previous versions
+            return str(self.type)
+        else:
+            return str(self.type) + f' ({str(self.score)})'
 
 
 class ConllNERTag(Tag):  # TODO: Create an EntityTag and an ConllEntityTag class
