@@ -486,6 +486,18 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             _str += doc.to_conll(sources=sources, doc_sep_line=doc_sep_line, original=original) + '\n'
         return _str
 
+    def get_tp_fp_fn(self, pred_attr_name):
+        tps, fps, fns = [], [], []
+        for doc in self.docs:
+            for sentence in doc:
+                sentence: Sentence
+                _tps, _fps, _fns = sentence.get_tp_fp_fn(pred_attr_name)
+                tps.extend(_tps)
+                fps.extend(_fps)
+                fns.extend(_fns)
+
+        return tps, fps, fns
+
 
 class EntityMentionAnnotator:
     # put set_entity_mentions() here

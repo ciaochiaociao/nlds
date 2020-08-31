@@ -765,7 +765,26 @@ class Sentence(TextList, InDocument):
         #     entity_mentions.append(EntityMention(tokens_tray, id_=eid, source=source))
 
         return entity_mentions
-    
+
+    def get_tp_fp_fn(self, pred_attr_name):
+        _tps, _fps, _fns = [], [], []
+        # make list of gold tags
+        gold_spans = self.gems
+        gold_tags = [(span.type, (span[0].id, span[-1].id)) for span in gold_spans]
+        # make list of predicted tags
+        predicted_spans = getattr(self, pred_attr_name)  # (cwhsu)
+        predicted_tags = [(span.type, (span[0].id, span[-1].id)) for span in predicted_spans]
+        # check for true positives, false positives and false negatives
+        for tag, prediction in predicted_tags:
+            if (tag, prediction) in gold_tags:
+                _tps.append(tag)
+            else:
+                _fps.append(tag)
+        for tag, gold in gold_tags:
+            if (tag, gold) not in predicted_tags:
+                _fns.append(tag)
+        return _tps, _fps, _fns
+
     def __repr__(self):
         if 'predict' in self.sources and 'gold' in self.sources:
             return '({id_}) ({num} toks) {text}'.format(id_=self.fullid, num=len(self), text=self.get_ann_sent_2in1())
