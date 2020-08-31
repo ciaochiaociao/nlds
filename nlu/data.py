@@ -136,8 +136,15 @@ class ObjectList(Base):
         """
         return hash(repr(self))
 
-    def __getitem__(self, item):
-        return self.members[item]
+    def __getitem__(self, indices):
+        def get_item(tensor, indices):
+            if isinstance(indices, int) or isinstance(indices, slice):
+                return tensor[indices]
+            elif len(indices) == 1:
+                return tensor[indices[0]]
+            return get_item(tensor[indices[0]], indices[1:])
+
+        return get_item(self.members, indices)
 
     def __iter__(self):
         return iter(self.members)
