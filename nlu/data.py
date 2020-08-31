@@ -4,10 +4,11 @@ from copy import copy
 from functools import reduce, partial
 from typing import List, Dict, Union, Optional
 
-from ansi.color import fg
+from ansi.colour import fg, bg
 
-from nlu.utils import overrides, sep_str, camel_to_snake, setup_logger
-from nlu.utils import list_to_str_by_text as list_to_str
+from nlu.parser_utils import get_entities
+from .utils import overrides, sep_str, camel_to_snake, setup_logger
+from .utils import list_to_str_by_text as list_to_str
 
 import inspect
 import re
@@ -34,9 +35,9 @@ def vrepr(obj):
 
 
 def default_repr_format(obj, pretty=False, text_key='text'):
-    kwargs = {k: obj.__getattribute__(k) for k in get_func_keys(obj.__init__)}
     
     if not pretty:
+        kwargs = {k: obj.__getattribute__(k) for k in get_func_keys(obj.__init__)}
         kwargs_str = ', '.join(['%s=%r' % (k, v) for k, v in kwargs.items() if v is not None])
         return '{self.__class__.__name__}({})'.format(kwargs_str, self=obj)
 #         kwargs_str = ', '.join(['{}={}'.format(k, prepr(v) if 'prepr' in dir(v) else repr(v)) for k, v in kwargs.items() if v is not None])
@@ -100,7 +101,7 @@ class ObjectList(Base):
             mems_attr_name = camel_to_snake(members[0].__class__.__name__) + 's'  #TODO: better plural 
             self.__setattr__(mems_attr_name, members)  # container.<member_name>  ex-entity_mention.tokens
         except IndexError:
-            dataLogger.warning('No members in building a ObjectList')
+            pass  # 'No members in building a ObjectList, e.g., empty pem or gem for FN or FP
         except AttributeError:
             dataLogger.warning('Not an object in building a ObjectList')
 
@@ -406,9 +407,10 @@ class InDocument:
 
 
 class Tag(Base):
-    def __init__(self, type_):
+    def __init__(self, type_, score='gold'):
         self.type: str = type_
 #         self.type_: str = type_
+        self.score = score
 
     def __repr__(self):
         if not hasattr(self, 'score') or self.score == 'gold':  # compatibility of previous versions
@@ -681,6 +683,7 @@ class Sentence(TextList, InDocument):
         (2, 'ORG')
         """
         self.sources = sources
+
         for source in sources:
 
             entity_mentions = self.get_entity_mentions(source)
@@ -692,8 +695,6 @@ class Sentence(TextList, InDocument):
                 self.pems = entity_mentions
             elif source == 'gold':
                 self.gems = entity_mentions
-            elif source == 'recovered':
-                self.rems = entity_mentions
             else:
                 raise ValueError('source should be either "predict" or "gold": {}'.format(source))
         
@@ -847,7 +848,8 @@ class Sentence(TextList, InDocument):
         ann_tokens = dict(sorted(table.items())).values()
         return ' '.join(ann_tokens)
 
-    def get_ann_sent_2in1(self, verbose=False):
+    def get_ann_sent_2in1(self, verbose=False, bg_range: List[Union[Token, List[Token]]] = None,
+                          bg_range_color: Union[bg.Graphic, List[bg.Graphic]] = None):
         def pem_color(em):
             try:
                 return fg.green if em.ems_pair.iscorrect() else fg.red
@@ -863,22 +865,51 @@ class Sentence(TextList, InDocument):
             except AttributeError:  # no error annotation
                 return fg.yellow
 
+        if bg_range is None:
+            bg_range = []
+        elif isinstance(bg_range[0], Token):  # range (token sequence)
+            bg_range = [bg_range]
+        else:  # list of ranges (token sequence)
+            assert isinstance(bg_range[0][0], Token)
+
+        if bg_range_color is None:
+            bg_range_color = [bg.brightgrey]
+        elif isinstance(bg_range_color, bg.Graphic):
+            bg_range_color = [bg_range_color]
+        else:  # list of colors
+            assert isinstance(bg_range_color[0], bg.Graphic)
+
+        bg_range: List[List[Token]]
+        bg_range_color: List[bg.Graphic]
+
+        def bg_color(token):
+            for _color, _range in zip(bg_range_color, bg_range):
+                if token in _range:
+                    return _color
+            return lambda x: x
+
         table = defaultdict(str)
 
         for pem in self.pems:
             table[pem.token_b] += pem_color(pem)('[')
 
-        for gem in self.gems:
-            table[gem.token_b] += gem_color(gem)('[')
+        try:
+            for gem in self.gems:
+                table[gem.token_b] += gem_color(gem)('[')
+        except AttributeError:  # no gold answer
+            pass
 
         for tok in self.tokens:
-            table[tok.id] += tok.text
+            table[tok.id] += bg_color(tok)(tok.text)
 
         for pem in self.pems:
             table[pem.token_e] += pem_color(pem)(']' + pem.type)
 
-        for gem in self.gems:
-            table[gem.token_e] += gem_color(gem)(']' + gem.type)
+        try:
+            for gem in self.gems:
+                table[gem.token_e] += gem_color(gem)(']' + gem.type)
+        except AttributeError:  # no gold answer
+            pass
 
         assert len(table) == len(self)
         ann_tokens = dict(sorted(table.items())).values()
@@ -1053,7 +1084,7 @@ class EntityMention(TextList, InSentence):
 
         # set refs automatically
         try:
-            self.sentence = tokens[0].sentence
+            self.sentence: Sentence = tokens[0].sentence
         except AttributeError:
             pass
 
@@ -1072,7 +1103,7 @@ class EntityMention(TextList, InSentence):
         elif source == 'candidate':
             prefix = 'CEM'
         else:
-            raise ValueError('source nees to be either "predict" / "gold" / "recovered"')
+            raise ValueError('source needs to be either "predict" / "gold" / "recovered" / "non" / "candidate"')
         ids.update({prefix: id_})
 
         TextList.__init__(self, ids, tokens)
@@ -1088,12 +1119,16 @@ class EntityMention(TextList, InSentence):
 #             print('(%s)%s - %s' % (self.source, self.type, self.text))
 
     def __repr__(self):
-        return TextList.__repr__(self) + f' ({self.type})'
+        if self.ems_pair is not None:
+            return TextList.__repr__(self) + f' ({self.type})' + ' => ' + \
+                   self.sentence.get_ann_sent_2in1(bg_range=self.tokens)
+        else:
+            return TextList.__repr__(self) + f' ({self.type})' + ' => ' + self.ann_in_sentence()
 
     def ann_in_sentence(self) -> str:
-        return list_to_str(self.sentence[:self.token_b]) + self.ann_str() + list_to_str(self.sentence[self.token_e+1:])
+        return list_to_str(self.sentence[:self.token_b]) + self.ann_str() + ' ' + list_to_str(self.sentence[self.token_e+1:])
 
-    def ann_in_sent(self):
+    def ann_in_sent(self) -> str:
         return self.sentence.get_ann_sent([self])
 
     @overrides(TextList)
@@ -1158,8 +1193,7 @@ class EntityMentions(TextList):
             self.sentence = mentions[0].sentence
             self.types: List[str] = [mention.type for mention in mentions]
             self.type_ = type_
-        except IndexError:  # no mention
-            dataLogger.error(mentions)
+        except IndexError:  # no mention, e.g., in FN or FP
             self.source = source
             self.type = type_
             self.type_ = type_

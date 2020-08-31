@@ -2,11 +2,11 @@ from copy import copy
 from typing import Tuple, Union, List, Dict, Optional
 from typing_extensions import TypedDict
 
-from ansi.color import fg
+from ansi.colour import fg
 
-from nlu.data import ObjectList, TextList, EntityMentions, TextWithIDs, MD_IDs, Base
+from nlu.data import ObjectList, TextList, EntityMentions, TextWithIDs, MD_IDs, Base, Sentence
 from nlu.utils import id_incrementer, overrides, ls_to_ls_str, TO_SEP
-from nlu.utils import colorize_list_by_text as colorize_list
+from .utils import colorize_list_by_text as colorize_list
 
 NOTE_SEP = '-'
 NOTE = ' {} '.format(NOTE_SEP)
@@ -61,6 +61,9 @@ class EntityMentionsPair(TextWithIDs):
 
         self.token_b = min([em.token_b for em in self.mentions])
         self.token_e = max([em.token_e for em in self.mentions])
+        self.ptokens = [token for pem in self.pems for token in pem.tokens]
+        self.gtokens = [token for gem in self.gems for token in gem.tokens]
+        self.tokens = list(sorted(set(self.ptokens) | set(self.gtokens), key=lambda x: x.id))
 
         # text
         self.predict_text = ' '.join([str(pem) for pem in pems])
@@ -71,7 +74,7 @@ class EntityMentionsPair(TextWithIDs):
         TextWithIDs.__init__(self, ids)
 
         # navigation
-        self.sentence = self.mentions[0].sentence
+        self.sentence: Sentence = self.mentions[0].sentence
 
         self.sid = self.ids['S']
         self.did = self.ids['D']
@@ -80,7 +83,9 @@ class EntityMentionsPair(TextWithIDs):
         self.set_ems_pair_to_ems()
 
     def __repr__(self):
+        return self.sentence.get_ann_sent_2in1(bg_range=self.tokens)
 
+    def old_repr(self):
 #         em = self.pems[0] if len(self.pems.members) > 0 else self.gems[0]
 #         ids = MD_IDs.from_list([('D', em.did), ('S', em.sid), ('PAIR', self.ids['PAIR'])])
 #         print('--- error id %s ---' % self.fullid)

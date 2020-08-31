@@ -12,7 +12,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     """Column Parser for CoNLL03 formatted text file"""
     TAGGERSOURCE = 'gold'
 
-    def __init__(self, filepath: str, cols_format: List[Dict[str, Union[str, int]]] = None, tag_scheme='iob1',
+    def __init__(self, filepath: str, cols_format: List[Dict[str, Union[str, int]]] = None,
                  tag_policy=None, doc_sep_tok='-DOCSTART-') -> None:
         """
             :param filepath: The filename. Note that the file loaded should end with two blank lines!!!
@@ -72,18 +72,40 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         # optional back reference functionality: token1.sentence, sentence5.document
         ConllParser.add_back_refs_for_md_docs(self.docs)
 
+        self.tag_types = [col['type'] for col in self.cols_format]
+        if 'predict' in self.tag_types or 'gold' in self.tag_types:
+            self.set_entity_mentions(tag_policy=tag_policy)
+        if 'predict' in self.tag_types and 'gold' in self.tag_types:
+            NERErrorAnnotator.annotate(self)
+
     @property
-    def doc_sep_line(self):
+    def doc_sep_line_original(self):
         _num_o = len(self.docs[0][0][0].line.split()) - 1
-        return ' '.join(['-DOCSTART-'] + ['O'] * _num_o) + '\n'
+        return ' '.join([self.doc_sep_tok] + ['O'] * _num_o) + '\n'
+
+    @property
+    def doc_sep_line_default(self):
+        _num_o = len(self.docs[0][0][0].ners)
+        return ' '.join([self.doc_sep_tok] + ['O'] * _num_o) + '\n'
 
     def __repr__(self):
+        _str = StringIO()
         entity_stat = True if 'entity_ann' in self.ann_states else False
-        print('(Parser Annotations)', *self.ann_states)
-        self.obtain_statistics(entity_stat=entity_stat, debug=True, tag_policy=self.tag_policy)
+        print('(Parser Annotations)', *self.ann_states, file=_str)
+        print(self.obtain_statistics(entity_stat=entity_stat, debug=True, tag_policy=self.tag_policy), file=_str)
         if 'error_ann' in self.ann_states:
             self.error_overall_stats()
-        return ''
+        return _str.getvalue()
+
+    def __getitem__(self, indices):
+        def get_item(tensor, indices):
+            if isinstance(indices, int) or isinstance(indices, slice):
+                return tensor[indices]
+            elif len(indices) == 1:
+                return tensor[indices[0]]
+            return get_item(tensor[indices[0]], indices[1:])
+
+        return get_item(self.docs, indices)
 
     @staticmethod
     def parse_conll_to_tok_dicts(*args, **kwargs):
@@ -178,8 +200,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         effect: call sentence.set_entity_mentions function for all sentences in the parser.docs
         """
         for doc in self.docs:
-            for sentence in doc.sentences:
-                sentence.set_entity_mentions([src['type'] for src in self.cols_format])
+            for sentence in doc:
+                sentence.set_entity_mentions(self.tag_types)
 
         if tag_policy is None:
             tag_policy = self.tag_policy
@@ -191,7 +213,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         else:
             raise ValueError('illegal tag_policy {} (should be conll, wnut or ...)'.format(tag_policy))
             
-        for source in [src['type'] for src in self.cols_format]:
+        for source in self.tag_types:
             preffix = 'pred' if source == 'predict' else 'gold'
             ems_attr_name = preffix[0] + 'ems'  # 'pems'/'gems'
             attr_names = [preffix + '_' + _type.lower() + 's' for _type in _types]  # self.pred_pers/self.gold_miscs/...
@@ -199,7 +221,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             for attr_name in attr_names:
                 self.__setattr__(attr_name, [])
             for doc in self.docs:
-                for sentence in doc.sentences:
+                for sentence in doc:
                     try:
                         for entity_mention in sentence.entity_mentions_dict[source]:
                             attr_name = preffix + '_' + entity_mention.type.lower() + 's'
@@ -212,6 +234,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                 self.__setattr__(ems_attr_name, self.__getattribute__(ems_attr_name) + self.__getattribute__(attr_name))  # set self.gems/self.pems
         self.tag_policy = tag_policy
         self.ann_states.add('entity_ann')
+        print('Mention Annotation Finished with sources:', *self.tag_types, file=sys.stderr)
 
     @staticmethod
     def set_errors(parser, gold_src, predict_src):  # FIXME: deprecated. set_errors_xx() duplicated method with methods in NERErrorAnnotator
@@ -251,12 +274,20 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 
         # TODO: unify the setter or property usage
 
-    def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy='conll') -> None:
-
-        print(f'---{self.filepath} ({source})---')
-        print('Document number: ', len([doc for doc in self.docs]))
-        print('Sentence number: ', len([sen for doc in self.docs for sen in doc.sentences]))
-        print('Token number: ', len([token for doc in self.docs for sen in doc.sentences for token in sen.tokens]))
+    def obtain_statistics(self, entity_stat=False, source=None, debug=False, tag_policy='conll') -> str:
+        file = StringIO()
+        print(f'---{self.filepath} ({source})---', file=file)
+        print('Document number: %i (avg. %.1f max. %i max_tok. %i)' % (len([doc for doc in self.docs]),
+                                                           mean([len(doc) for doc in self.docs]),
+                                                           max([len(doc) for doc in self.docs]),
+                                                           max([len([tok for sent in doc for tok in sent]) for doc in self.docs])), file=file)
+        print('Sentence number: %i (avg. %.1f max. %i)' % (len([sen for doc in self.docs for sen in doc]),
+                                                           mean([len(sen) for doc in self.docs for sen in doc]),
+                                                           max([len(sen) for doc in self.docs for sen in doc])), file=file)
+        print('Token number: %i (avg. %.1f max. %i)' %
+              (len([token for doc in self.docs for sen in doc for token in sen]),
+               mean([len(token.text) for doc in self.docs for sen in doc for token in sen]),
+               max([len(token.text) for doc in self.docs for sen in doc for token in sen])), file=file)
 
         if source is None:
             source = self.TAGGERSOURCE
@@ -271,11 +302,11 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             ent_tot = len(self.__getattribute__(source[0] + 'ems'))
             for type_ in _types:
                 ems = self.__getattribute__(source[:4] + '_' + type_.lower() + 's')
-                print(type_ + ': {} ({:.0%})'.format(len(ems), len(ems)/ent_tot))
-            print('TOTAL: {}'.format(ent_tot))
+                print(type_ + ': {} ({:.0%})'.format(len(ems), len(ems)/ent_tot), file=file)
+            print('TOTAL: {}'.format(ent_tot), file=file)
 
         if debug:
-            print('--- debugging info ---')
+            print('--- debugging info ---', file=file)
             _d = {
                 'Empty document number': len([doc for doc in self.docs if not doc]),
                 'Empty sentence number': len([sen for doc in self.docs for sen in doc if not sen]),
@@ -303,8 +334,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             # TODO: Add tag sequence validation test
         return file.getvalue()
 
-    def error_overall_stats(self) -> None:  # TODO: move to NERErrorAnalyzer
-
+    def error_overall_stats(self) -> str:  # TODO: move to NERErrorAnalyzer
+        _str = StringIO()
         # count all errors
         correct_total = 0
         error_total = 0
@@ -322,21 +353,22 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                     for error in sentence.ner_errors:
                         if error:
                             error_total += 1
-        print('---Overall Results---')
-        print('found entity mentions:', len(self.pems))
-        print('true entity mentions:', len(self.gems))
-        print('correct_total: ', correct_total)
-        print('error_total: ', error_total)
+        print('---Overall Results---', file=_str)
+        print('found entity mentions:', len(self.pems), file=_str)
+        print('true entity mentions:', len(self.gems), file=_str)
+        print('correct_total: ', correct_total, file=_str)
+        print('error_total: ', error_total, file=_str)
         self.precision = correct_total/len(self.pems)
         self.recall = correct_total/len(self.gems)
         self.microf1 = 2 * self.precision * self.recall / (self.recall + self.precision)
-        print('precision: {:.2%}'.format(self.precision))
-        print('recall: {:.2%}'.format(self.recall))
-        print('micro-f1: {:.2%}'.format(self.microf1))
-        print('corrects ratio: {:.2%}'.format(correct_total/(correct_total+error_total)))
-        print('all corrects and errors', correct_total + error_total)
+        print('precision: {:.2%}'.format(self.precision), file=_str)
+        print('recall: {:.2%}'.format(self.recall), file=_str)
+        print('micro-f1: {:.2%}'.format(self.microf1), file=_str)
+        print('corrects ratio: {:.2%}'.format(correct_total/(correct_total+error_total)), file=_str)
+        print('all corrects and errors', correct_total + error_total, file=_str)
         print('the number of sentences with/without entities (predict + gold): {} ({:.0%}), {} ({:.0%})'.format(
-            ol_total, ol_total/sen_total, sen_total - ol_total, (sen_total - ol_total)/sen_total))
+            ol_total, ol_total/sen_total, sen_total - ol_total, (sen_total - ol_total)/sen_total), file=_str)
+        return _str.getvalue()
 
     def print_all_errors(self) -> None:
         for doc in self.docs:

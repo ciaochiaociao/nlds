@@ -1,12 +1,11 @@
 from collections import defaultdict
 from typing import Callable, Iterable
 
-from ansi.color import fg
+from ansi.colour import fg
 
 import logging
 import time
 import re
-from functools import partial
 
 from pandas import DataFrame
 

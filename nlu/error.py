@@ -1,3 +1,4 @@
+import sys
 from typing import Tuple
 
 from tqdm import tqdm
@@ -5,7 +6,6 @@ from tqdm import tqdm
 from nlu.data import *
 from nlu.error_structure import EntityMentionsPair, EntityMentionsPairs, NERCorrect, NERErrorComposite, SimpleSpanError, \
     MergeSplitError, MentionTypeError, ComplicatedError, FalseError
-from nlu.parser import ConllParser
 from nlu.utils import id_incrementer
 
 
@@ -338,7 +338,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
     id_incs = id_incrementer(), id_incrementer()
 
     @staticmethod
-    def annotate(parser: ConllParser, gold_src: str = None, predict_src: str = None):
+    def annotate(parser: 'ConllParser', gold_src: str = None, predict_src: str = None):
         """
         >>> parser = ConllParser('../scripts/conll/testa.pred.gold')
         >>> parser.set_entity_mentions()
@@ -356,6 +356,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         all corrects and errors 5942
         the number of sentences with/without entities (predict + gold): 2605 (80%), 645 (20%)        
         """
+        assert 'entity_ann' in parser.ann_states
         gold_src = NERErrorAnnotator.GOLD_SOURCE_ALIAS if gold_src is None else gold_src
         predict_src = NERErrorAnnotator.PREDICT_SOURCE_ALIAS if predict_src is None else predict_src
 
@@ -368,6 +369,7 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
         parser.ner_results = [result for doc in parser.docs for result in doc.ner_results]
 
         parser.ann_states.add('error_ann')
+        print('Error Annotation Finished!', file=sys.stderr)
 
     @staticmethod
     def set_results_in_document(doc, gold_src, predict_src):
@@ -412,7 +414,6 @@ class NERErrorAnnotator:  # TODO: takes DocumentsWithEMAnn returns DocumentsWith
 #         ems_pairs.results = [pair.result for pair in ems_pairs]
 #         ems_pairs.corrects = [pair.correct for pair in ems_pairs if pair.correct is not None]
 #         ems_pairs.errors = [pair.error for pair in ems_pairs if pair.error is not None]
-
 
 
 if __name__ == '__main__':
