@@ -76,7 +76,7 @@ def bioes2iob2(tag):
     return tag.replace('S-', 'B-').replace('E-', 'I-')
 
 
-def bioes2iob2_file(infile, outfile, bieos_cols=[1,2]):
+def bioes2iob2_file(infile, outfile, bieos_cols=[1, 2]):  # deprecated: combined into convert_scheme
 
     if isinstance(infile, str):
         infile = open(infile, encoding='utf-8')
@@ -98,12 +98,61 @@ def bioes2iob2_file(infile, outfile, bieos_cols=[1,2]):
     outfile.close()
 
 
+def iob12bioes_file(*args, **kwargs):
+    return iob2bioes_file(*args, **kwargs, convert_fn='iob12bioes')
+
+
+def iob22bioes_file(*args, **kwargs):
+    return iob2bioes_file(*args, **kwargs, convert_fn='iob22bioes')
+
+
+def iob2bioes_file(infile, outfile, col_nums=[1,2], col_sep=' ', doc_sep_tok='-DOCSTART-', convert_fn=None):
+
+    if convert_fn is None or convert_fn == 'iob12bioes':
+        convert_fn = iob12bioes
+    elif convert_fn == 'iob22bioes':
+        convert_fn = iob22bioes
+    else:
+        raise ValueError
+
+    cols_format = [{'type': 'tmp'+str(col_num), 'col_num': col_num, 'tagger': 'ner'} for col_num in col_nums]
+    # e.g. [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
+    # {'type': 'gold', 'col_num': 2, 'tagger': 'ner'}]
+
+    docs = parse_conll_to_tok_dicts(infile, cols_format, doc_sep_tok=doc_sep_tok, col_sep=col_sep)
+
+    if isinstance(outfile, str):
+        outfile = open(outfile, 'w', encoding='utf-8')
+
+    for doc in docs:
+        outfile.write(doc_sep_tok + col_sep.join(['O'] * len(col_nums)) + '\n\n')
+        for sent in doc:
+            # convert tag schemes for each tag columns
+            new_tags_list = []
+            for col_num in col_nums:
+                tags = [token['ners']['tmp'+str(col_num)] for token in sent]
+                new_tags = convert_fn(tags)
+                new_tags_list.append(new_tags)
+            assert all([len(_l) == len(sent) for _l in new_tags_list])
+
+            # write out
+            for token, *token_new_tags in zip(sent, *new_tags_list):
+                outfile.write(col_sep.join([token['text']] + token_new_tags) + '\n')
+            outfile.write('\n')
+    outfile.close()
+
+
+def iob12bioes(tags):
+    return iob22bioes(iob12iob2(tags))
+
+
 def iob12iob2(tags):
     """
     Check that tags have a valid IOB format.
     Tags in IOB1 format are converted to IOB2.
     .. seealso:: `https://github.com/flairNLP/flair/blob/master/flair/data.py <https://github.com/flairNLP/flair/blob/master/flair/data.py>`_.
     """
+    new_tags = []
     for i, tag in enumerate(tags):
         if tag == "O":
             new_tags.append(tag)
@@ -114,7 +163,9 @@ def iob12iob2(tags):
         if len(split) != 2 or split[0] not in ["I", "B"]:
             # (cwhsu) check 'X-X' and 'B-, I-' # FIXME: len(split) == 3 when using wnut, e.g., I-creative-work
             return False
+
         if split[0] == "B":
+            new_tags.append(tag)
             continue
         elif i == 0 or tags[i - 1] == "O":  # conversion IOB1 to IOB2
             # (cwhsu) case: 'I-X'; when the left boundary is detected (BOE, beginning of an entity)
@@ -132,7 +183,7 @@ def iob12iob2(tags):
     return new_tags
 
 
-def iob22iobes(tags):
+def iob22bioes(tags):
     """
     IOB -> IOBES
     .. seealso:: modified from `https://github.com/flairNLP/flair/blob/master/flair/data.py <https://github.com/flairNLP/flair/blob/master/flair/data.py>`_.
@@ -173,9 +224,13 @@ if __name__ == '__main__':
     argparser.add_argument('--target-file', type=argparse.FileType('w'), default='-')
     argparser.add_argument('--cols', nargs='*', default=[1, 2], type=int)
     args = argparser.parse_args()
-    if args.source == 'bioes' and args.target == 'iob1':
+    if args.source in ['bioes', 'iobes'] and args.target == 'iob1':
         bioes2iob1_file(args.source_file, args.target_file, bieos_cols=args.cols)
-    elif args.source == 'bioes' and args.target == 'iob2':
+    elif args.source in ['bioes', 'iobes'] and args.target == 'iob2':
         bioes2iob2_file(args.source_file, args.target_file, args.cols)
+    elif args.source == 'iob1' and args.target in ['bioes', 'iobes']:
+        iob12bioes_file(args.source_file, args.target_file, col_nums=args.cols)
+    elif args.source == 'iob2' and args.target in ['bioes', 'iobes']:
+        iob22bioes_file(args.source_file, args.target_file, col_nums=args.cols)
     else:
-        raise argparse.ArgumentError
+        raise argparse.ArgumentTypeError('source/target invalid type: ' + args.source + '/' + args.target + ' must be bioes/iob1/iob2')
