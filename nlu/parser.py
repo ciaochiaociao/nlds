@@ -1,3 +1,7 @@
+import sys
+from statistics import mean
+
+from nlu.error import NERErrorAnnotator
 from tqdm import tqdm
 
 from nlu.data import *
@@ -274,23 +278,30 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             print('--- debugging info ---')
             _d = {
                 'Empty document number': len([doc for doc in self.docs if not doc]),
-                'Empty sentence number': len([sen for doc in self.docs for sen in doc.sentences if not sen]),
+                'Empty sentence number': len([sen for doc in self.docs for sen in doc if not sen]),
                 'Empty token number': len([token for doc in self.docs
-                                               for sen in doc.sentences
-                                               for token in sen.tokens if not token]),
-                'Empty-content token number': len([token for doc in self.docs for sen in doc.sentences
-                                                       for token in sen.tokens if not len(token.text)]),
-                'Empty-id token number': len([token for doc in self.docs for sen in doc.sentences
-                                                  for token in sen.tokens if token.id is None]),
-                'Token id error number': [(sen.tokens[-1].id, len(sen.tokens)-1) for doc in self.docs
-                                               for sen in doc.sentences if sen.tokens[-1].id != len(sen.tokens)-1],
-                'Fullid of empty sentences':[sen.fullid for doc in self.docs
-                                                  for sen in doc.sentences if not sen]
+                                               for sen in doc
+                                               for token in sen if not token]),
+                'Empty-content token number': len([token for doc in self.docs for sen in doc
+                                                       for token in sen if not len(token.text)]),
+                'Empty-id token number': len([token for doc in self.docs for sen in doc
+                                                  for token in sen if token.id is None]),
+                'Token id error number': [(sen[-1].id, len(sen)-1) for doc in self.docs
+                                               for sen in doc if sen[-1].id != len(sen)-1],
+                'Fullid of empty sentences': [sen.fullid for doc in self.docs
+                                                  for sen in doc if not sen]
             }
-
+            check_pass = True
             for _s, _v in _d.items():
                 if _v:
-                    print(f'{_s}: {_v}')
+                    check_pass = False
+                    print(f'{_s}: {_v}', file=file)
+
+            if check_pass:
+                print('No empty tokens/sentences/documents :)', file=file)
+
+            # TODO: Add tag sequence validation test
+        return file.getvalue()
 
     def error_overall_stats(self) -> None:  # TODO: move to NERErrorAnalyzer
 
