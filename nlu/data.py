@@ -1067,6 +1067,10 @@ class EntityMention(TextList, InSentence):
             prefix = 'GEM'
         elif source == 'recovered':
             prefix = 'REM'
+        elif source == 'non':
+            prefix = 'NEM'
+        elif source == 'candidate':
+            prefix = 'CEM'
         else:
             raise ValueError('source nees to be either "predict" / "gold" / "recovered"')
         ids.update({prefix: id_})
