@@ -82,74 +82,18 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
         return ''
 
     @staticmethod
-    def parse_conll_to_tok_dicts(filepath: str, cols_format, doc_sep_tok='-DOCSTART-') -> List[List[List[dict]]]:
-        """read a conll-formatted text file to a hierarchical collection of token dictionaries (tok_dict is like below)
-        input:
-        filepath - the file path of the conll-formatted file
-        cols_format - [{'type': 'predict', 'col_num': 1, 'tagger': 'ner'},
-                        {'type': 'gold', 'col_num': 2, 'tagger': 'ner'},
-                        {'type': 'predict', 'col_num': 3, 'tagger': 'pos'},
-                        ...
-                        {'type': 'predict', col_num': 7, 'tagger': 'ner_conf'}
-                        ...]
-        output: 
-        same as the input of function build_md_docs_from_tok_dicts() where
-        tok_dict = {
-            'text': 'Obama',
-            'poss': {'predict': 'NN', 'gold': 'NN'},
-            'chunks': {'predict': 'I-NNP', 'gold': 'I-NNP'},
-            'ners': {'predict': 'I-PER', 'gold': 'I-PER'},
-            'ner_conf': {'predict': 0.9993}
-            }
-        """
-        
-        # parse cols_format
-        len_pos = len([col for col in cols_format if col['tagger'] == 'pos'])
-        len_chunk = len([col for col in cols_format if col['tagger'] == 'chunk'])
-        len_ner = len([col for col in cols_format if col['tagger'] == 'ner'])
-        try:
-            col_conf = [col['col_num'] for col in cols_format if col['tagger'] == 'ner_conf'][0]
-        except IndexError:
-            col_conf = None
-        total_cols = len(cols_format) + 1  # text with annotations
-        
-        # set doc_sep_tok
-        # doc_sep_tok = ' '.join(['-DOCSTART-'] + ['-X-'] * len_pos + ['O'] * len_chunk + ['O'] * len_ner + \
-        #                 ['O'] * (1 if col_conf else 0)) + '\n'  # TODO: consider the order given by cols_format
-        print('doc_sep_tok:', doc_sep_tok)
-        
-        docs, sentences, tokens = [], [], []
-        with open(filepath, encoding='utf-8') as f:
-
-            # parse conll formatted txt file to ConllParser class
-            for ix, line in tqdm(enumerate(f), desc='LINE'):
-                if line.startswith(doc_sep_tok):  # -DOCSTART-|: end of a document
-                    if sentences:  # if not empty document
-                        docs.append(sentences)
-                        sentences = []
-                elif not line.strip():  # blank line: the end of a sentence
-                    if tokens:  # if not empty sentence (like after -DOCSTART-)
-                        sentences.append(tokens)
-                        tokens = []
-                else:  # inside a sentence: every token
-                    a = line.strip().rsplit(' ', maxsplit=total_cols-1)
-                    poss = {col['type']: ConllPosTag(a[col['col_num']])
-                            for col in cols_format if col['tagger'] == 'pos'} if len_pos else None
-                    chunks = {col['type']: ConllChunkTag(a[col['col_num']])
-                              for col in cols_format if col['tagger'] == 'chunk'} if len_chunk else None
-                    ners = {col['type']: ConllNERTag(a[col['col_num']])
-                            for col in cols_format if col['tagger'] == 'ner'} if len_ner else None
-                    ner_conf = a[col_conf] if col_conf is not None else None
-                    tokens.append({'text': a[0], 'poss': poss, 'chunks': chunks, 'ners': ners, 'ner_conf': ner_conf,
-                                   'line': line, 'line_no': ix})
-            if sentences:  # for the last document (without -DOCSTART- at the end)
-                docs.append(sentences)
-        if len(docs) > 0:
-            return docs
-        elif len(docs) == 0 and len(sentences) > 0:
-            return [sentences]
-        else:
-            return [[tokens]]
+    def parse_conll_to_tok_dicts(*args, **kwargs):
+        docs = parse_conll_to_tok_dicts(*args, **kwargs)
+        for doc in docs:
+            for sent in doc:
+                for token in sent:
+                    if token['poss'] is not None:
+                        token['poss'] = {source: ConllPosTag(value) for source, value in token['poss'].items()}
+                    if token['ners'] is not None:
+                        token['ners'] = {source: ConllNERTag(value) for source, value in token['ners'].items()}
+                    if token['chunks'] is not None:
+                        token['chunks'] = {source: ConllChunkTag(value) for source, value in token['chunks'].items()}
+        return docs
 
     @staticmethod
     def add_back_refs_for_md_docs(docs: List[Document]) -> None:  # TODO: Maybe it can be moved to sentence or other places?
