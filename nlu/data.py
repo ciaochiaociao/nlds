@@ -558,6 +558,14 @@ class ConllToken(Token):
         args = [arg.strip().split(sep) for arg in [text_str, pner_str, gner_str] if arg is not None]
         return cls.bulk_easy_build(*args, **kwargs)
 
+    def to_conll(self, sources=None, sep=' ', end='', original=False):
+        if original:
+            return self.line
+        if sources is None:
+            sources = [key for key in self.ners.keys()]
+        tags = [self.ners[source].type for source in sources]
+        return sep.join([self.text, *tags]) + end
+
     
 class Sentence(TextList, InDocument):
     def __init__(self, tokens: List[Token]):
@@ -918,11 +926,11 @@ class Sentence(TextList, InDocument):
         sentence = list_to_str(dict(sorted(all_dict)).values())
         return sentence
 
-    def to_conll(self, file=None, end=''):
-        if file is None:
-            file = StringIO()
-        print(*[str(tok.line) for tok in self.tokens], sep='', end=end, file=file)
-        return file.getvalue()
+    def to_conll(self, sources=None, end='', original=False):
+
+        def _line(tok: ConllToken):
+            return tok.to_conll(sources=sources, original=original, end='\n')
+        return ''.join([str(_line(tok)) for tok in self.tokens]) + end
 
 
 class Document(TextList):
@@ -965,15 +973,12 @@ class Document(TextList):
         s.close()
         return str_
 
-    def to_conll(self, doc_sep_line=None, file=None):
-        if doc_sep_line is None:
-            doc_sep_line = self.parser.doc_sep_line
-        if file is None:
-            file = StringIO()
-        print(doc_sep_line, file=file)
+    def to_conll(self, sources=None, doc_sep_line=None, original=False):
+        _str = ''
+        _str += doc_sep_line + '\n'
         for sent in self:
-            sent.to_conll(file=file, end='\n')
-        return file.getvalue()
+            _str += sent.to_conll(sources=sources, original=original, end='\n')
+        return _str
 
 
 class EntityMention(TextList, InSentence):

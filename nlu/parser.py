@@ -515,6 +515,22 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             if text.lower() in item.text.lower():
                 yield item
 
+    def to_conll(self, sources=None, doc_sep_line=None, original=False):
+        if doc_sep_line is None:
+            if original:
+                doc_sep_line = self.doc_sep_line_original
+            else:
+                if sources:
+                    _num_o = len(sources)
+                    doc_sep_line = ' '.join([self.doc_sep_tok] + ['O'] * _num_o) + '\n'
+                else:
+                    doc_sep_line = self.doc_sep_line_default
+
+        _str = ''
+        for doc in self.docs:
+            _str += doc.to_conll(sources=sources, doc_sep_line=doc_sep_line, original=original) + '\n'
+        return _str
+
 
 class EntityMentionAnnotator:
     # put set_entity_mentions() here
