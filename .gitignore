@@ -1,11 +1,6 @@
-.ipynb_checkpoints
-__pycache__
 *.log
-*.tsv
-docs/build/
 build/
 dist/
 *.egg-info/
 *.png
-.idea/
 scripts/winer/
