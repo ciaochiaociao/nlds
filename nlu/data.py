@@ -19,7 +19,7 @@ import re
 # todo: change all to id_incrementer if possible
 
 dataLogger = setup_logger('data_logger', 'data.log')
-SRC_COLOR_TABLE = {'predict': fg.blue, 'gold': fg.yellow, 'recovered': fg.magenta}
+SRC_COLOR_TABLE = {'predict': fg.blue, 'gold': fg.yellow, 'recovered': fg.magenta, 'candidate': fg.cyan}
 
 def get_func_keys(func):
     
@@ -869,8 +869,8 @@ class Sentence(TextList, InDocument):
             bg_range = []
         elif isinstance(bg_range[0], Token):  # range (token sequence)
             bg_range = [bg_range]
-        else:  # list of ranges (token sequence)
-            assert isinstance(bg_range[0][0], Token)
+        else:  # list of ranges (token sequence) or empty list (e.g. CR w/o pem)
+            assert isinstance(bg_range, list) and (isinstance(bg_range[0][0], Token) or len(bg_range[0]) == 0)
 
         if bg_range_color is None:
             bg_range_color = [bg.brightgrey]
