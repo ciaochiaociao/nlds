@@ -1074,7 +1074,7 @@ class EntityMention(TextList, InSentence):
         self.source = source
 
         self.sid, self.did = tokens[0].sid, tokens[0].did
-        if source == 'candidate':
+        if source in ['candidate', 'non']:
             self.type = 'O'
         else:
             self.type: str = tokens[0].ners[source].suffix
