@@ -870,7 +870,7 @@ class Sentence(TextList, InDocument):
         elif isinstance(bg_range[0], Token):  # range (token sequence)
             bg_range = [bg_range]
         else:  # list of ranges (token sequence) or empty list (e.g. CR w/o pem)
-            assert isinstance(bg_range, list) and (isinstance(bg_range[0][0], Token) or len(bg_range[0]) == 0)
+            assert isinstance(bg_range, list) and (len(bg_range[0]) == 0 or isinstance(bg_range[0][0], Token))
 
         if bg_range_color is None:
             bg_range_color = [bg.brightgrey]
@@ -1074,7 +1074,7 @@ class EntityMention(TextList, InSentence):
         self.source = source
 
         self.sid, self.did = tokens[0].sid, tokens[0].did
-        if source == 'candidate':
+        if source in ['candidate', 'non']:
             self.type = 'O'
         else:
             self.type: str = tokens[0].ners[source].suffix
