@@ -695,6 +695,8 @@ class Sentence(TextList, InDocument):
                 self.pems = entity_mentions
             elif source == 'gold':
                 self.gems = entity_mentions
+            elif source == 'recovered':
+                self.rems = entity_mentions
             else:
                 raise ValueError('source should be either "predict" or "gold": {}'.format(source))
         
