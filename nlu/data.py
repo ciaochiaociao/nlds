@@ -683,34 +683,76 @@ class Sentence(TextList, InDocument):
         (2, 'ORG')
         """
         self.sources = sources
+        for source in sources:
+            if self.entity_mention_annotated(source):
+                self.clear_entity_mentions(source)
 
         for source in sources:
-
             entity_mentions = self.get_entity_mentions(source)
-            
-#             if entity_mentions:
-            self.entity_mentions_dict[source] = entity_mentions
-                
-            if source == 'predict':
-                self.pems = entity_mentions
-            elif source == 'gold':
-                self.gems = entity_mentions
-            elif source == 'recovered':
-                self.rems = entity_mentions
-            else:
-                raise ValueError('source should be either "predict" or "gold": {}'.format(source))
-        
-        self.ems = []
-        self.ems += [ em for ems in self.entity_mentions_dict.values() for em in ems]
+            self.add_entity_mentions(entity_mentions, source)
 
-    def add_entity_mentions(self, source: str, attr_name: str = None):
-        entity_mentions = self.get_entity_mentions(source)
-        self.entity_mentions_dict[source] = entity_mentions
-        if attr_name is None:
-            attr_name = source[0] + 'ems'
-        setattr(self, attr_name, entity_mentions)
-        self.ems += entity_mentions
+    def entity_mention_annotated(self, source):
+        return source in self.entity_mentions_dict
+
+    def clear_entity_mentions(self, source):
+        del self.entity_mentions_dict[source]
+
+    def add_entity_mentions(self, entity_mentions: List['EntityMention'], source):
+        if source not in self.entity_mentions_dict.keys():
+            self.entity_mentions_dict[source] = []
+        
+        for entity_mention in entity_mentions:
+            self.add_entity_mention(entity_mention, source)
+
+    def add_entity_mention(self, entity_mention: 'EntityMention', source: str):
+        """add em to 'entity_mentions_dict[source]'
+        """
+        if source not in self.entity_mentions_dict.keys():
+            self.entity_mentions_dict[source] = []
+        
+        # 1. create/add to the container entity_mentions_dict[source] to save the added entity mentions for the first time
+        self.entity_mentions_dict[source].append(entity_mention)
+
+    @property
+    def pems(self):
+        return self.entity_mentions_dict['predict']
+
+    @pems.setter
+    def pems(self, ems):
+        self.entity_mentions_dict['predict'] = ems
+
+    @property
+    def gems(self):
+        return self.entity_mentions_dict['gold']
+
+    @gems.setter
+    def gems(self, ems):
+        self.entity_mentions_dict['gold'] = ems
+
+    @property
+    def cems(self):
+        return self.entity_mentions_dict['candidate']
     
+    @cems.setter
+    def cems(self, ems):
+        self.entity_mentions_dict['candidate'] = ems
+    
+    @property
+    def rems(self):
+        return self.entity_mentions_dict['recovered']
+    
+    @rems.setter
+    def rems(self, ems):
+        self.entity_mentions_dict['recovered'] = ems
+
+    @property
+    def nems(self):
+        return self.entity_mentions_dict['non']
+
+    @nems.setter
+    def nems(self, ems):
+        self.entity_mentions_dict['non'] = ems
+
     def get_entity_mentions(self, source: str) -> List['EntityMention']:
         """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
         >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', pner_str='I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', gner_str='I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')
