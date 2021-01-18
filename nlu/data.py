@@ -502,7 +502,7 @@ class ConllToken(Token):
         super().__init__(text, id_, sid, did)
         
     @classmethod
-    def easy_build(cls, text, ner=None, gner=None, restart=False, id_=None, sid=999, did=99, **kwargs):
+    def easy_build(cls, text, ner=None, gner=None, chunk=None, pos=None, restart=False, id_=None, sid=999, did=99, **kwargs):
         """
         >>> ConllToken.easy_build('TSMC', 'I-ORG', restart=True)
         ConllToken(text='TSMC', id_=0, sid=999, did=99, ners={'predict': 'I-ORG'})
@@ -528,11 +528,19 @@ class ConllToken(Token):
             ners_dict.update({'predict': ConllNERTag(ner)})
         if gner is not None:
             ners_dict.update({'gold': ConllNERTag(gner)})
-            
-        return cls(text, id_, sid, did, ners=ners_dict, **kwargs)
+
+        chunks_dict = {}
+        if chunk is not None:
+            chunks_dict.update({'predict': chunk})
+        
+        poss_dict = {}
+        if pos is not None:
+            poss_dict.update({'predict': pos})
+        
+        return cls(text, id_, sid, did, ners=ners_dict, chunks=chunks_dict, poss=poss_dict, **kwargs)
         
     @classmethod
-    def bulk_easy_build(cls, texts: List[str], pners: List[str]=None, gners=None, **kwargs):
+    def bulk_easy_build(cls, texts: List[str], pners: List[str]=None, gners=None, chunks=None, poss=None, **kwargs):
         """
         >>> tokens = ConllToken.bulk_easy_build(['TSMC', 'is', 'in', 'Hsinchu', 'Taiwan', '.'], ['I-ORG', 'O', 'O', 'I-LOC', 'B-LOC', 'O'])
         >>> len(tokens)
@@ -545,7 +553,7 @@ class ConllToken(Token):
             (pners is None or len(pners) == len(texts)), 'The number of tokens and ner tags do not match!'
             
         
-        argses = zip(*[arg for arg in [texts, pners, gners] if arg is not None])
+        argses = zip(*[arg for arg in [texts, pners, gners, chunks, poss] if arg is not None])
         return [cls.easy_build(*args, **kwargs) for args in argses]
         
        
