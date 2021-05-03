@@ -401,7 +401,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                     for ner_result in sent.ner_results:
                         f.write(ner_result.sep_str() + '\n')
                         
-    def get_from_fullid(self, fullid):
+    def get_from_fullid(self, fullid, update_attr_name_table):
         """
         :param fullid: ex - 'D0-S3-T2'
         :return: object, ex - Token
@@ -416,6 +416,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             'PEM': 'pems',
             'PAIR': 'ems_pairs'
         }
+
+        attr_name_table.update(update_attr_name_table)
 
         abs_id_table = {
             'NERErr': 'ner_errors',
