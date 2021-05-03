@@ -6,7 +6,7 @@ from typing import List, Dict, Union, Optional
 
 from ansi.colour import fg, bg
 
-from nlu.parser_utils import get_entities
+from .parser_utils import get_entities
 from .utils import overrides, sep_str, camel_to_snake, setup_logger
 from .utils import list_to_str_by_text as list_to_str
 
@@ -18,7 +18,9 @@ import re
 # todo: get_document|sentence|token_from_fullid|id()
 # todo: change all to id_incrementer if possible
 
-dataLogger = setup_logger('data_logger', 'data.log')
+import logging
+
+logger = logging.getLogger(__name__)
 SRC_COLOR_TABLE = {'predict': fg.blue, 'gold': fg.yellow, 'recovered': fg.magenta, 'candidate': fg.cyan}
 
 def get_func_keys(func):
@@ -712,7 +714,7 @@ class Sentence(TextList, InDocument):
         for entity_mention in entity_mentions:
             self.add_entity_mention(entity_mention, source)
 
-    def add_entity_mention(self, entity_mention: 'EntityMention', source: str):
+    def add_entity_mention(self, entity_mention: 'EntityMention', source: str):  # TODO: deprecated
         """add em to 'entity_mentions_dict[source]'
         """
         if source not in self.entity_mentions_dict.keys():
