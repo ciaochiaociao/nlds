@@ -502,7 +502,7 @@ class ConllToken(Token):
         super().__init__(text, id_, sid, did)
         
     @classmethod
-    def easy_build(cls, text, ner=None, gner=None, restart=False, id_=None, sid=999, did=99, **kwargs):
+    def easy_build(cls, text, ner=None, gner=None, chunk=None, pos=None, restart=False, id_=None, sid=999, did=99, **kwargs):
         """
         >>> ConllToken.easy_build('TSMC', 'I-ORG', restart=True)
         ConllToken(text='TSMC', id_=0, sid=999, did=99, ners={'predict': 'I-ORG'})
@@ -528,11 +528,19 @@ class ConllToken(Token):
             ners_dict.update({'predict': ConllNERTag(ner)})
         if gner is not None:
             ners_dict.update({'gold': ConllNERTag(gner)})
-            
-        return cls(text, id_, sid, did, ners=ners_dict, **kwargs)
+
+        chunks_dict = {}
+        if chunk is not None:
+            chunks_dict.update({'predict': chunk})
+        
+        poss_dict = {}
+        if pos is not None:
+            poss_dict.update({'predict': pos})
+        
+        return cls(text, id_, sid, did, ners=ners_dict, chunks=chunks_dict, poss=poss_dict, **kwargs)
         
     @classmethod
-    def bulk_easy_build(cls, texts: List[str], pners: List[str]=None, gners=None, **kwargs):
+    def bulk_easy_build(cls, texts: List[str], pners: List[str]=None, gners=None, chunks=None, poss=None, **kwargs):
         """
         >>> tokens = ConllToken.bulk_easy_build(['TSMC', 'is', 'in', 'Hsinchu', 'Taiwan', '.'], ['I-ORG', 'O', 'O', 'I-LOC', 'B-LOC', 'O'])
         >>> len(tokens)
@@ -545,7 +553,7 @@ class ConllToken(Token):
             (pners is None or len(pners) == len(texts)), 'The number of tokens and ner tags do not match!'
             
         
-        argses = zip(*[arg for arg in [texts, pners, gners] if arg is not None])
+        argses = zip(*[arg for arg in [texts, pners, gners, chunks, poss] if arg is not None])
         return [cls.easy_build(*args, **kwargs) for args in argses]
         
        
@@ -683,32 +691,76 @@ class Sentence(TextList, InDocument):
         (2, 'ORG')
         """
         self.sources = sources
+        for source in sources:
+            if self.entity_mention_annotated(source):
+                self.clear_entity_mentions(source)
 
         for source in sources:
-
             entity_mentions = self.get_entity_mentions(source)
-            
-#             if entity_mentions:
-            self.entity_mentions_dict[source] = entity_mentions
-                
-            if source == 'predict':
-                self.pems = entity_mentions
-            elif source == 'gold':
-                self.gems = entity_mentions
-            else:
-                raise ValueError('source should be either "predict" or "gold": {}'.format(source))
-        
-        self.ems = []
-        self.ems += [ em for ems in self.entity_mentions_dict.values() for em in ems]
+            self.add_entity_mentions(entity_mentions, source)
 
-    def add_entity_mentions(self, source: str, attr_name: str = None):
-        entity_mentions = self.get_entity_mentions(source)
-        self.entity_mentions_dict[source] = entity_mentions
-        if attr_name is None:
-            attr_name = source[0] + 'ems'
-        setattr(self, attr_name, entity_mentions)
-        self.ems += entity_mentions
+    def entity_mention_annotated(self, source):
+        return source in self.entity_mentions_dict
+
+    def clear_entity_mentions(self, source):
+        del self.entity_mentions_dict[source]
+
+    def add_entity_mentions(self, entity_mentions: List['EntityMention'], source):
+        if source not in self.entity_mentions_dict.keys():
+            self.entity_mentions_dict[source] = []
+        
+        for entity_mention in entity_mentions:
+            self.add_entity_mention(entity_mention, source)
+
+    def add_entity_mention(self, entity_mention: 'EntityMention', source: str):
+        """add em to 'entity_mentions_dict[source]'
+        """
+        if source not in self.entity_mentions_dict.keys():
+            self.entity_mentions_dict[source] = []
+        
+        # 1. create/add to the container entity_mentions_dict[source] to save the added entity mentions for the first time
+        self.entity_mentions_dict[source].append(entity_mention)
+
+    @property
+    def pems(self):
+        return self.entity_mentions_dict['predict']
+
+    @pems.setter
+    def pems(self, ems):
+        self.entity_mentions_dict['predict'] = ems
+
+    @property
+    def gems(self):
+        return self.entity_mentions_dict['gold']
+
+    @gems.setter
+    def gems(self, ems):
+        self.entity_mentions_dict['gold'] = ems
+
+    @property
+    def cems(self):
+        return self.entity_mentions_dict['candidate']
     
+    @cems.setter
+    def cems(self, ems):
+        self.entity_mentions_dict['candidate'] = ems
+    
+    @property
+    def rems(self):
+        return self.entity_mentions_dict['recovered']
+    
+    @rems.setter
+    def rems(self, ems):
+        self.entity_mentions_dict['recovered'] = ems
+
+    @property
+    def nems(self):
+        return self.entity_mentions_dict['non']
+
+    @nems.setter
+    def nems(self, ems):
+        self.entity_mentions_dict['non'] = ems
+
     def get_entity_mentions(self, source: str) -> List['EntityMention']:
         """chunk entity mentions for all sources (i.e. predict, gold) from `ConllToken`s in a sentence
         >>> sen = Sentence.from_str('NLU Lab is in Taipei Taiwan directed by Keh Yih Su .', pner_str='I-ORG I-ORG O O I-LOC B-LOC O O I-PER I-PER I-PER O', gner_str='I-ORG I-ORG O O I-LOC I-LOC O O O I-PER I-PER O')

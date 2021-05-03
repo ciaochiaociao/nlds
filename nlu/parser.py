@@ -74,7 +74,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
 
         self.tag_types = [col['type'] for col in self.cols_format]
         if 'predict' in self.tag_types or 'gold' in self.tag_types:
-            self.set_entity_mentions(tag_policy=tag_policy)
+            self.set_entity_mentions()
         if 'predict' in self.tag_types and 'gold' in self.tag_types:
             NERErrorAnnotator.annotate(self)
 
@@ -195,46 +195,24 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                           line=tok['line'], line_no=tok['line_no'],
                           id_=tid, sid=sid, did=did)
             
-    def set_entity_mentions(self, tag_policy=None) -> None:
+    def set_entity_mentions(self) -> None:
         """chunk entity mentions for all sources (i.e. predict, gold)
         effect: call sentence.set_entity_mentions function for all sentences in the parser.docs
         """
         for doc in self.docs:
             for sentence in doc:
                 sentence.set_entity_mentions(self.tag_types)
-
-        if tag_policy is None:
-            tag_policy = self.tag_policy
-        # set different types of entity mentions from different sources
-        if tag_policy == 'conll':
-            _types = ['PER', 'LOC', 'ORG', 'MISC']
-        elif tag_policy == 'wnut':
-            _types = ['person', 'location', 'corporation', 'creative-work', 'group', 'product']
-        else:
-            raise ValueError('illegal tag_policy {} (should be conll, wnut or ...)'.format(tag_policy))
-            
-        for source in self.tag_types:
-            preffix = 'pred' if source == 'predict' else 'gold'
-            ems_attr_name = preffix[0] + 'ems'  # 'pems'/'gems'
-            attr_names = [preffix + '_' + _type.lower() + 's' for _type in _types]  # self.pred_pers/self.gold_miscs/...
-            
-            for attr_name in attr_names:
-                self.__setattr__(attr_name, [])
-            for doc in self.docs:
-                for sentence in doc:
-                    try:
-                        for entity_mention in sentence.entity_mentions_dict[source]:
-                            attr_name = preffix + '_' + entity_mention.type.lower() + 's'
-                            self.__getattribute__(attr_name).append(entity_mention)  # set self.pred_pers/self.gold_miscs/...
-                    except KeyError:
-                        pass
-            
-            self.__setattr__(ems_attr_name, [])
-            for attr_name in attr_names:
-                self.__setattr__(ems_attr_name, self.__getattribute__(ems_attr_name) + self.__getattribute__(attr_name))  # set self.gems/self.pems
-        self.tag_policy = tag_policy
+        
         self.ann_states.add('entity_ann')
         print('Mention Annotation Finished with sources:', *self.tag_types, file=sys.stderr)
+
+    @property
+    def pems(self):
+        return [em for doc in self.docs for sentence in doc for em in sentence.pems]
+    
+    @property
+    def gems(self):
+        return [em for doc in self.docs for sentence in doc for em in sentence.gems]
 
     @staticmethod
     def set_errors(parser, gold_src, predict_src):  # FIXME: deprecated. set_errors_xx() duplicated method with methods in NERErrorAnnotator
@@ -301,8 +279,8 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
                 raise ValueError('illegal tag_policy {} (should be conll, wnut or ...)'.format(tag_policy))
             ent_tot = len(self.__getattribute__(source[0] + 'ems'))
             for type_ in _types:
-                ems = self.__getattribute__(source[:4] + '_' + type_.lower() + 's')
-                print(type_ + ': {} ({:.0%})'.format(len(ems), len(ems)/ent_tot), file=file)
+                len_ems = len([em for doc in self.docs for sent in doc for em in sent.entity_mentions_dict[source] if em.type == type_])
+                print(type_ + ': {} ({:.0%})'.format(len_ems, len_ems/ent_tot), file=file)
             print('TOTAL: {}'.format(ent_tot), file=file)
 
         if debug:
