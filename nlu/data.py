@@ -714,7 +714,7 @@ class Sentence(TextList, InDocument):
         for entity_mention in entity_mentions:
             self.add_entity_mention(entity_mention, source)
 
-    def add_entity_mention(self, entity_mention: 'EntityMention', source: str):
+    def add_entity_mention(self, entity_mention: 'EntityMention', source: str):  # TODO: deprecated
         """add em to 'entity_mentions_dict[source]'
         """
         if source not in self.entity_mentions_dict.keys():
