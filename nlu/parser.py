@@ -13,7 +13,7 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
     TAGGERSOURCE = 'gold'
 
     def __init__(self, filepath: str, cols_format: List[Dict[str, Union[str, int]]] = None,
-                 tag_policy=None, doc_sep_tok='-DOCSTART-') -> None:
+                 tag_policy=None, doc_sep_tok='-DOCSTART-', col_sep=' ') -> None:
         """
             :param filepath: The filename. Note that the file loaded should end with two blank lines!!!
             :param cols_format:
@@ -62,8 +62,9 @@ class ConllParser(Base):  #TODO: create methods that returns ConllDocuments
             self.cols_format = cols_format
 
         self.doc_sep_tok = doc_sep_tok
+        self.col_sep = col_sep
 
-        tok_dicts = ConllParser.parse_conll_to_tok_dicts(self.filepath, self.cols_format, self.doc_sep_tok)
+        tok_dicts = ConllParser.parse_conll_to_tok_dicts(self.filepath, self.cols_format, self.doc_sep_tok, self.col_sep)
         self.docs = ConllParser.build_md_docs_from_tok_dicts(tok_dicts)
 
         self.tag_policy = tag_policy
