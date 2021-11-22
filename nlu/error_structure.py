@@ -198,10 +198,10 @@ class NERComparisonWithID(NERComparison, MD_IDs):  # TODO: to be deprecated
                '\n'
         # self.type - use type of NERErrorComposite and NERCorrect
 
-#     def sep_str(self):
-#         strs = [str(self.fullid), str(self.all_errors), self.pems.sep_str(sep='|'), str('|'.join(self.ptypes)),
-#                 self.gems.sep_str(sep='|'), str('|'.join(self.gtypes)), str(self.sentence)]
-#         return '\t'.join(strs)
+    def sep_str(self):
+        strs = [str(self.fullid), str(self.all_errors), self.pems.sep_texts(sep='|'), str('|'.join(self.ptypes)),
+                self.gems.sep_texts(sep='|'), str('|'.join(self.gtypes)), str(self.sentence)]
+        return '\t'.join(strs)
 
 
 class NERErrorBase(NERComparison):
