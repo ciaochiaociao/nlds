@@ -129,9 +129,6 @@ class ObjectList(Base):
     def __len__(self):
         return len(self.members)
 
-#     def sep_str(self, sep=None):  # TODO: move to TextList
-#         return sep_str(self.members, sep=sep)
-
     def __hash__(self):
         """
         Note:
